@@ -1,0 +1,1191 @@
+# Development Standards - Consultor.AI
+## AI-Powered WhatsApp Sales Assistant Platform
+
+**Version:** 1.0
+**Last Updated:** 2025-12-12
+**Stack:** Next.js 14 + TypeScript + Supabase + PostgreSQL
+**Target:** Health Plan Consultants & Real Estate Agents
+
+---
+
+## 📑 Table of Contents
+
+- [1. Language and Documentation](#1-language-and-documentation)
+- [2. Code Organization](#2-code-organization)
+- [3. TypeScript Standards](#3-typescript-standards)
+- [4. React and Next.js Patterns](#4-react-and-nextjs-patterns)
+- [5. Supabase and Database](#5-supabase-and-database)
+- [6. API Development](#6-api-development)
+- [7. Error Handling](#7-error-handling)
+- [8. Testing](#8-testing)
+- [9. Performance](#9-performance)
+- [10. Security](#10-security)
+- [11. Git Workflow](#11-git-workflow)
+- [12. Code Review Checklist](#12-code-review-checklist)
+
+---
+
+## 1. Language and Documentation
+
+### Code Language
+**English mandatory** for:
+- File names, folders, variables, functions, classes
+- Comments, JSDoc, technical documentation
+- Git commits, branches, pull requests
+- API endpoints, database schema
+
+```typescript
+// ✅ CORRECT
+export async function analyzeConversation(
+  leadId: string,
+  flowId: string
+): Promise<AnalysisResult> {
+  // Process conversation flow
+  return result;
+}
+
+// ❌ WRONG
+export async function analisarConversa(
+  idLead: string,
+  idFluxo: string
+): Promise<ResultadoAnalise> {
+  // Processar fluxo de conversa
+  return resultado;
+}
+```
+
+### Documentation Language
+**Brazilian Portuguese** for:
+- README.md, CHANGELOG.md
+- Business documentation (PRD, requirements)
+- User-facing content and UI messages
+- Issue descriptions, project management
+
+```typescript
+/**
+ * Calcula a taxa de engajamento de um lead com base nas respostas fornecidas.
+ *
+ * @param responses - Respostas coletadas do lead durante o fluxo
+ * @param flowDefinition - Definição do fluxo de conversa
+ * @returns Taxa de engajamento entre 0.0 e 1.0
+ *
+ * @example
+ * const engagement = calculateEngagement(leadResponses, healthPlanFlow);
+ * // engagement = 0.85 (85% do fluxo completado)
+ */
+export function calculateEngagement(
+  responses: LeadResponses,
+  flowDefinition: FlowDefinition
+): number {
+  // Implementation
+}
+```
+
+### UI Messages
+**Brazilian Portuguese** for all user-facing text:
+- Button labels, form fields, error messages
+- Notifications, tooltips, help text
+- Dashboard headings, navigation labels
+
+```typescript
+// ✅ CORRECT
+const messages = {
+  buttonAnalyze: 'Analisar Lead',
+  errorLoadingData: 'Erro ao carregar dados. Tente novamente.',
+  successMessage: 'Lead qualificado com sucesso!',
+};
+
+// ❌ WRONG
+const messages = {
+  buttonAnalyze: 'Analyze Lead',
+  errorLoadingData: 'Error loading data. Try again.',
+  successMessage: 'Lead qualified successfully!',
+};
+```
+
+---
+
+## 2. Code Organization
+
+### Project Structure
+
+```
+Consultor.AI/
+├── src/
+│   ├── app/                          # Next.js 14 App Router
+│   │   ├── (auth)/                   # Auth route group
+│   │   │   ├── login/
+│   │   │   └── register/
+│   │   ├── (dashboard)/              # Dashboard route group
+│   │   │   ├── dashboard/
+│   │   │   ├── leads/
+│   │   │   ├── analytics/
+│   │   │   └── settings/
+│   │   ├── (public)/                 # Public route group
+│   │   │   └── [slug]/               # Consultant public page
+│   │   ├── api/                      # API routes
+│   │   │   ├── auth/
+│   │   │   ├── leads/
+│   │   │   ├── flows/
+│   │   │   ├── analytics/
+│   │   │   └── webhooks/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   │
+│   ├── components/                    # React components
+│   │   ├── ui/                        # shadcn/ui components
+│   │   │   ├── button.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── card.tsx
+│   │   │   └── ...
+│   │   ├── leads/
+│   │   │   ├── lead-list.tsx
+│   │   │   ├── lead-detail.tsx
+│   │   │   └── lead-status-badge.tsx
+│   │   ├── analytics/
+│   │   │   ├── metrics-card.tsx
+│   │   │   └── funnel-chart.tsx
+│   │   ├── conversation/
+│   │   │   └── message-thread.tsx
+│   │   └── layout/
+│   │       ├── header.tsx
+│   │       ├── sidebar.tsx
+│   │       └── footer.tsx
+│   │
+│   ├── lib/                           # Utility libraries
+│   │   ├── supabase/
+│   │   │   ├── client.ts              # Supabase client
+│   │   │   ├── server.ts              # Supabase server client
+│   │   │   └── middleware.ts          # Supabase middleware
+│   │   ├── api/
+│   │   │   ├── groq.ts                # Groq API client
+│   │   │   ├── whatsapp.ts            # WhatsApp API client
+│   │   │   └── canva.ts               # Canva API client
+│   │   ├── flow-engine/
+│   │   │   ├── parser.ts              # Flow JSON parser
+│   │   │   ├── executor.ts            # Flow executor
+│   │   │   └── state-manager.ts       # Conversation state
+│   │   ├── validators/
+│   │   │   └── schemas.ts             # Zod validation schemas
+│   │   └── utils.ts                   # Generic utilities
+│   │
+│   ├── types/                         # TypeScript type definitions
+│   │   ├── database.ts                # Generated from Supabase
+│   │   ├── api.ts                     # API types
+│   │   ├── flow.ts                    # Flow definition types
+│   │   └── index.ts                   # Barrel exports
+│   │
+│   ├── hooks/                         # Custom React hooks
+│   │   ├── use-leads.ts
+│   │   ├── use-auth.ts
+│   │   ├── use-analytics.ts
+│   │   └── use-toast.ts
+│   │
+│   ├── stores/                        # Zustand stores (if needed)
+│   │   └── auth-store.ts
+│   │
+│   └── styles/                        # Global styles
+│       └── globals.css
+│
+├── supabase/                          # Supabase configuration
+│   ├── functions/                     # Edge Functions
+│   │   ├── whatsapp-webhook/
+│   │   ├── process-message/
+│   │   ├── generate-ai-response/
+│   │   └── generate-image/
+│   └── migrations/                    # Database migrations
+│       ├── 20251201000000_initial_schema.sql
+│       └── 20251202000000_add_flows.sql
+│
+├── tests/                             # Test files
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+│
+├── docs/                              # Documentation
+├── .rules/                            # Development rules
+└── public/                            # Static assets
+```
+
+### File Naming Conventions
+
+| Type | Convention | Example |
+|------|------------|---------|
+| Components | kebab-case | `lead-list.tsx`, `metrics-card.tsx` |
+| Utilities | kebab-case | `date-utils.ts`, `format-number.ts` |
+| Types | kebab-case | `database.ts`, `api-types.ts` |
+| API Routes | kebab-case | `route.ts` in `api/leads/[id]/` |
+| Constants | UPPER_SNAKE_CASE | `MAX_LEADS_PER_PAGE` |
+| Environment Variables | UPPER_SNAKE_CASE | `NEXT_PUBLIC_SUPABASE_URL` |
+
+---
+
+## 3. TypeScript Standards
+
+### Strict Mode Configuration
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  }
+}
+```
+
+### Type Definitions
+
+**✅ DO:** Use explicit types for function parameters and return values
+```typescript
+function calculateConversionRate(
+  totalLeads: number,
+  convertedLeads: number
+): number {
+  return convertedLeads / totalLeads;
+}
+```
+
+**❌ DON'T:** Rely on type inference for public APIs
+```typescript
+function calculateConversionRate(totalLeads, convertedLeads) {
+  return convertedLeads / totalLeads;
+}
+```
+
+### Interface vs Type
+
+**✅ Use `interface` for:** Object shapes that may be extended
+```typescript
+interface Lead {
+  id: string;
+  name: string;
+  whatsappNumber: string;
+  status: LeadStatus;
+}
+
+// Can be extended
+interface QualifiedLead extends Lead {
+  score: number;
+  qualifiedAt: Date;
+}
+```
+
+**✅ Use `type` for:** Unions, intersections, primitives
+```typescript
+type LeadStatus = 'novo' | 'em_contato' | 'agendado' | 'fechado' | 'perdido';
+type APIResponse<T> = { success: true; data: T } | { success: false; error: string };
+```
+
+### Null Safety
+
+**✅ DO:** Use optional chaining and nullish coalescing
+```typescript
+const leadName = lead?.name ?? 'Unknown';
+const phoneNumber = lead.metadata?.whatsapp ?? lead.whatsapp_number;
+```
+
+**❌ DON'T:** Use ! (non-null assertion) without justification
+```typescript
+const leadName = lead!.name; // Dangerous if lead can be null
+```
+
+### Generic Types
+
+**✅ DO:** Use generics for reusable functions
+```typescript
+async function fetchData<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+  return response.json() as T;
+}
+
+const leads = await fetchData<Lead[]>('/api/leads');
+```
+
+---
+
+## 4. React and Next.js Patterns
+
+### Component Structure
+
+```typescript
+// lead-list.tsx
+'use client'; // Only if client-side features needed
+
+import { useState, useEffect } from 'react';
+import { Card } from '@/components/ui/card';
+import { LeadStatusBadge } from './lead-status-badge';
+import type { Lead } from '@/types';
+
+interface LeadListProps {
+  consultantId: string;
+  initialLeads?: Lead[];
+}
+
+export function LeadList({ consultantId, initialLeads = [] }: LeadListProps) {
+  const [leads, setLeads] = useState<Lead[]>(initialLeads);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Component logic...
+
+  return (
+    <div className="space-y-4">
+      {leads.map((lead) => (
+        <Card key={lead.id}>
+          {/* Component JSX */}
+        </Card>
+      ))}
+    </div>
+  );
+}
+```
+
+### Server vs Client Components
+
+**✅ Default to Server Components:**
+- Faster initial load
+- Better SEO
+- Reduced client bundle size
+
+```typescript
+// app/leads/page.tsx (Server Component)
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { LeadList } from '@/components/leads/lead-list';
+
+export default async function LeadsPage() {
+  const supabase = createServerComponentClient({ cookies });
+
+  const { data: leads } = await supabase
+    .from('leads')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  return <LeadList initialLeads={leads || []} />;
+}
+```
+
+**✅ Use 'use client' only when needed:**
+- User interactions (onClick, onChange)
+- Browser APIs (localStorage, navigator)
+- React hooks (useState, useEffect, useContext)
+- Third-party libraries that require client-side
+
+### Data Fetching
+
+**✅ DO:** Use React Server Components for initial data
+```typescript
+// Server Component
+async function getLeads(consultantId: string) {
+  const supabase = createServerComponentClient({ cookies });
+  const { data } = await supabase.from('leads').select('*');
+  return data;
+}
+```
+
+**✅ DO:** Use React Query for client-side mutations
+```typescript
+'use client';
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+export function useUpdateLeadStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ leadId, status }: UpdateStatusParams) => {
+      const response = await fetch(`/api/leads/${leadId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+    },
+  });
+}
+```
+
+### Form Handling
+
+**✅ DO:** Use React Hook Form + Zod for validation
+```typescript
+'use client';
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const leadSchema = z.object({
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  whatsappNumber: z.string().regex(/^\+55\d{11}$/, 'Número inválido'),
+  email: z.string().email('Email inválido').optional(),
+});
+
+type LeadFormData = z.infer<typeof leadSchema>;
+
+export function LeadForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LeadFormData>({
+    resolver: zodResolver(leadSchema),
+  });
+
+  const onSubmit = async (data: LeadFormData) => {
+    // Submit logic
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {/* Form fields */}
+    </form>
+  );
+}
+```
+
+---
+
+## 5. Supabase and Database
+
+### Client Initialization
+
+```typescript
+// lib/supabase/client.ts (Client-side)
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Database } from '@/types/database';
+
+export const createClient = () => {
+  return createClientComponentClient<Database>();
+};
+
+// lib/supabase/server.ts (Server-side)
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import type { Database } from '@/types/database';
+
+export const createServerClient = () => {
+  return createServerComponentClient<Database>({ cookies });
+};
+```
+
+### Query Patterns
+
+**✅ DO:** Use type-safe queries with generated types
+```typescript
+const { data, error } = await supabase
+  .from('leads')
+  .select('id, name, status, consultant:consultants(name, email)')
+  .eq('status', 'novo')
+  .order('created_at', { ascending: false })
+  .limit(20);
+
+// data is fully typed!
+```
+
+**✅ DO:** Handle errors explicitly
+```typescript
+const { data, error } = await supabase.from('leads').select('*');
+
+if (error) {
+  console.error('Database error:', error);
+  throw new Error('Failed to fetch leads');
+}
+
+return data;
+```
+
+**❌ DON'T:** Ignore errors
+```typescript
+const { data } = await supabase.from('leads').select('*');
+return data; // What if there was an error?
+```
+
+### Row-Level Security (RLS)
+
+**✅ ALWAYS enable RLS on all tables:**
+```sql
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Consultants can view own leads"
+  ON leads FOR SELECT
+  USING (consultant_id = auth.uid());
+
+CREATE POLICY "Consultants can update own leads"
+  ON leads FOR UPDATE
+  USING (consultant_id = auth.uid());
+```
+
+### Real-time Subscriptions
+
+```typescript
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+export function useLeadUpdates(consultantId: string) {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('leads-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'leads',
+          filter: `consultant_id=eq.${consultantId}`,
+        },
+        (payload) => {
+          // Handle real-time update
+          setLeads((prev) => updateLeadsArray(prev, payload));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [consultantId, supabase]);
+
+  return leads;
+}
+```
+
+---
+
+## 6. API Development
+
+### API Route Structure
+
+```typescript
+// app/api/leads/[id]/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { z } from 'zod';
+
+const updateLeadSchema = z.object({
+  name: z.string().optional(),
+  status: z.enum(['novo', 'em_contato', 'agendado', 'fechado']).optional(),
+});
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = createRouteHandlerClient({ cookies });
+
+    const { data, error } = await supabase
+      .from('leads')
+      .select('*')
+      .eq('id', params.id)
+      .single();
+
+    if (error) throw error;
+    if (!data) {
+      return NextResponse.json(
+        { success: false, error: 'Lead not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = createRouteHandlerClient({ cookies });
+    const body = await request.json();
+
+    // Validate input
+    const validatedData = updateLeadSchema.parse(body);
+
+    // Update database
+    const { data, error } = await supabase
+      .from('leads')
+      .update(validatedData)
+      .eq('id', params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Validation error',
+          details: error.errors,
+        },
+        { status: 400 }
+      );
+    }
+
+    console.error('API Error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+### Error Response Format
+
+**✅ Standard error response:**
+```typescript
+type ErrorResponse = {
+  success: false;
+  error: string;
+  details?: unknown;
+  meta: {
+    timestamp: string;
+    request_id?: string;
+  };
+};
+```
+
+### Rate Limiting
+
+```typescript
+// lib/rate-limit.ts
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+export const rateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, '10 s'), // 10 requests per 10 seconds
+  analytics: true,
+});
+
+// Usage in API route
+export async function POST(request: NextRequest) {
+  const ip = request.ip ?? '127.0.0.1';
+  const { success } = await rateLimit.limit(ip);
+
+  if (!success) {
+    return NextResponse.json(
+      { success: false, error: 'Rate limit exceeded' },
+      { status: 429 }
+    );
+  }
+
+  // Process request...
+}
+```
+
+---
+
+## 7. Error Handling
+
+### Custom Error Classes
+
+```typescript
+// lib/errors.ts
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number = 500,
+    public code?: string
+  ) {
+    super(message);
+    this.name = 'AppError';
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(message: string, public details?: unknown) {
+    super(message, 400, 'VALIDATION_ERROR');
+    this.name = 'ValidationError';
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(resource: string) {
+    super(`${resource} not found`, 404, 'NOT_FOUND');
+    this.name = 'NotFoundError';
+  }
+}
+
+export class UnauthorizedError extends AppError {
+  constructor(message = 'Unauthorized') {
+    super(message, 401, 'UNAUTHORIZED');
+    this.name = 'UnauthorizedError';
+  }
+}
+```
+
+### Error Boundaries
+
+```typescript
+// components/error-boundary.tsx
+'use client';
+
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+
+export function ErrorBoundary({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    // Log to error reporting service
+    console.error('Error boundary caught:', error);
+  }, [error]);
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <h2 className="text-2xl font-bold">Algo deu errado</h2>
+      <p className="mt-2 text-muted-foreground">
+        Ocorreu um erro inesperado. Por favor, tente novamente.
+      </p>
+      <Button onClick={reset} className="mt-4">
+        Tentar novamente
+      </Button>
+    </div>
+  );
+}
+```
+
+---
+
+## 8. Testing
+
+### Unit Tests (Vitest)
+
+```typescript
+// __tests__/lib/flow-engine/parser.test.ts
+import { describe, it, expect } from 'vitest';
+import { FlowParser } from '@/lib/flow-engine/parser';
+import { mockHealthPlanFlow } from '@/test-utils/fixtures';
+
+describe('FlowParser', () => {
+  it('should parse valid flow definition', () => {
+    const parser = new FlowParser(mockHealthPlanFlow);
+
+    expect(parser.isValid()).toBe(true);
+    expect(parser.getSteps()).toHaveLength(6);
+  });
+
+  it('should reject flow without initial step', () => {
+    const invalidFlow = { etapas: [] };
+    const parser = new FlowParser(invalidFlow);
+
+    expect(parser.isValid()).toBe(false);
+    expect(parser.getErrors()).toContain('No initial step defined');
+  });
+
+  it('should validate step transitions', () => {
+    const parser = new FlowParser(mockHealthPlanFlow);
+
+    expect(parser.canTransition('inicio', 'perfil')).toBe(true);
+    expect(parser.canTransition('inicio', 'resultado')).toBe(false);
+  });
+});
+```
+
+### Integration Tests
+
+```typescript
+// __tests__/api/leads.test.ts
+import { describe, it, expect, beforeEach } from 'vitest';
+import { createMocks } from 'node-mocks-http';
+import { POST } from '@/app/api/leads/route';
+
+describe('POST /api/leads', () => {
+  beforeEach(() => {
+    // Setup test database
+  });
+
+  it('should create a new lead', async () => {
+    const { req } = createMocks({
+      method: 'POST',
+      body: {
+        whatsapp_number: '+5511999999999',
+        consultant_id: 'test-consultant-id',
+      },
+    });
+
+    const response = await POST(req as any);
+    const json = await response.json();
+
+    expect(response.status).toBe(201);
+    expect(json.success).toBe(true);
+    expect(json.data).toHaveProperty('id');
+  });
+
+  it('should return 400 for invalid phone number', async () => {
+    const { req } = createMocks({
+      method: 'POST',
+      body: {
+        whatsapp_number: 'invalid',
+        consultant_id: 'test-consultant-id',
+      },
+    });
+
+    const response = await POST(req as any);
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json.success).toBe(false);
+  });
+});
+```
+
+### E2E Tests (Playwright)
+
+```typescript
+// tests/e2e/lead-management.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Lead Management', () => {
+  test.beforeEach(async ({ page }) => {
+    // Login
+    await page.goto('/login');
+    await page.fill('[name="email"]', 'test@example.com');
+    await page.fill('[name="password"]', 'password');
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL('/dashboard');
+  });
+
+  test('should display leads list', async ({ page }) => {
+    await page.goto('/leads');
+
+    await expect(page.locator('h1')).toContainText('Leads');
+    await expect(page.locator('[data-testid="lead-card"]')).toHaveCount(5);
+  });
+
+  test('should update lead status', async ({ page }) => {
+    await page.goto('/leads');
+
+    const firstLead = page.locator('[data-testid="lead-card"]').first();
+    await firstLead.click();
+
+    await page.selectOption('[name="status"]', 'em_contato');
+    await page.click('button:has-text("Salvar")');
+
+    await expect(page.locator('.toast')).toContainText('Lead atualizado');
+  });
+});
+```
+
+### Test Coverage Goals
+- **Unit tests:** > 80% coverage
+- **Integration tests:** All API endpoints
+- **E2E tests:** Critical user journeys
+
+---
+
+## 9. Performance
+
+### Next.js Optimization
+
+**✅ DO:** Use Image optimization
+```typescript
+import Image from 'next/image';
+
+<Image
+  src="/consultant-profile.jpg"
+  alt="Consultant profile"
+  width={200}
+  height={200}
+  priority // For above-the-fold images
+/>
+```
+
+**✅ DO:** Use dynamic imports for heavy components
+```typescript
+import dynamic from 'next/dynamic';
+
+const AnalyticsChart = dynamic(() => import('@/components/analytics-chart'), {
+  loading: () => <ChartSkeleton />,
+  ssr: false, // Only render client-side
+});
+```
+
+**✅ DO:** Implement pagination
+```typescript
+const LEADS_PER_PAGE = 20;
+
+async function getLeads(page: number = 1) {
+  const from = (page - 1) * LEADS_PER_PAGE;
+  const to = from + LEADS_PER_PAGE - 1;
+
+  const { data, count } = await supabase
+    .from('leads')
+    .select('*', { count: 'exact' })
+    .range(from, to);
+
+  return { data, totalPages: Math.ceil((count || 0) / LEADS_PER_PAGE) };
+}
+```
+
+### Database Optimization
+
+**✅ DO:** Use indexes for frequent queries
+```sql
+CREATE INDEX idx_leads_consultant_status ON leads(consultant_id, status);
+CREATE INDEX idx_leads_created_at ON leads(created_at DESC);
+```
+
+**✅ DO:** Use `select()` to limit returned columns
+```typescript
+// ❌ BAD: Fetches all columns
+const { data } = await supabase.from('leads').select('*');
+
+// ✅ GOOD: Only fetches needed columns
+const { data } = await supabase
+  .from('leads')
+  .select('id, name, status, created_at');
+```
+
+---
+
+## 10. Security
+
+### Environment Variables
+
+**✅ DO:** Never commit secrets
+```env
+# .env.local (gitignored)
+SUPABASE_SERVICE_ROLE_KEY=your-service-key
+GROQ_API_KEY=your-api-key
+CANVA_API_KEY=your-api-key
+WHATSAPP_WEBHOOK_SECRET=your-webhook-secret
+```
+
+**✅ DO:** Use `NEXT_PUBLIC_` prefix for client-side vars
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+### Input Validation
+
+**✅ ALWAYS validate user input with Zod
+```typescript
+import { z } from 'zod';
+
+const leadUpdateSchema = z.object({
+  name: z.string().min(2).max(100),
+  whatsappNumber: z.string().regex(/^\+55\d{11}$/),
+  email: z.string().email().optional(),
+});
+
+// In API route
+const validatedData = leadUpdateSchema.parse(await request.json());
+```
+
+### SQL Injection Prevention
+
+**✅ ALWAYS use parameterized queries** (Supabase does this automatically)
+```typescript
+// ✅ SAFE: Supabase parameterizes automatically
+const { data } = await supabase
+  .from('leads')
+  .select('*')
+  .eq('whatsapp_number', userInput);
+
+// ❌ NEVER do raw SQL with user input
+const result = await supabase.rpc('raw_query', {
+  query: `SELECT * FROM leads WHERE whatsapp_number = '${userInput}'`
+});
+```
+
+### XSS Prevention
+
+**✅ React escapes by default**, but be careful with `dangerouslySetInnerHTML`
+```typescript
+// ✅ SAFE: React escapes automatically
+<div>{userInput}</div>
+
+// ❌ DANGEROUS: Only use with sanitized content
+<div dangerouslySetInnerHTML={{ __html: userInput }} />
+```
+
+---
+
+## 11. Git Workflow
+
+### Branch Naming
+
+| Type | Format | Example |
+|------|--------|---------|
+| Feature | `feature/description` | `feature/add-lead-export` |
+| Bug fix | `fix/description` | `fix/dashboard-loading-error` |
+| Hotfix | `hotfix/description` | `hotfix/critical-auth-bug` |
+| Documentation | `docs/description` | `docs/update-api-spec` |
+
+### Commit Messages
+
+Follow Conventional Commits:
+
+```bash
+# Format: <type>(<scope>): <subject>
+
+feat(leads): add CSV export functionality
+fix(auth): resolve session timeout issue
+docs(api): update authentication endpoints
+refactor(flow-engine): simplify state management
+test(analytics): add unit tests for metrics calculation
+chore(deps): update Next.js to 14.1.0
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation only
+- `style`: Code style (formatting, no logic change)
+- `refactor`: Code restructuring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+
+### Pull Request Template
+
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing
+- [ ] Unit tests passing
+- [ ] Integration tests passing
+- [ ] E2E tests passing
+- [ ] Manual testing completed
+
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Comments added for complex logic
+- [ ] Documentation updated
+- [ ] No new warnings
+- [ ] Tests added/updated
+```
+
+---
+
+## 12. Code Review Checklist
+
+### Functionality
+- [ ] Code solves the intended problem
+- [ ] Edge cases handled
+- [ ] Error handling implemented
+- [ ] Input validation present
+
+### Code Quality
+- [ ] Follows TypeScript best practices
+- [ ] No `any` types (unless justified)
+- [ ] Proper error handling
+- [ ] No console.logs in production code
+- [ ] No commented-out code
+
+### Performance
+- [ ] No unnecessary re-renders
+- [ ] Database queries optimized
+- [ ] Proper use of caching
+- [ ] Images optimized
+
+### Security
+- [ ] Input validation with Zod
+- [ ] No hardcoded secrets
+- [ ] RLS policies enforced
+- [ ] No SQL injection risks
+
+### Testing
+- [ ] Unit tests added/updated
+- [ ] Tests passing
+- [ ] Coverage maintained > 80%
+
+### Documentation
+- [ ] JSDoc comments for public APIs
+- [ ] README updated if needed
+- [ ] CHANGELOG.md updated
+
+---
+
+## Additional Resources
+
+### Recommended Packages
+
+```json
+{
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "@supabase/supabase-js": "^2.38.0",
+    "@tanstack/react-query": "^5.0.0",
+    "zustand": "^4.4.0",
+    "zod": "^3.22.0",
+    "react-hook-form": "^7.48.0",
+    "@hookform/resolvers": "^3.3.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0",
+    "@playwright/test": "^1.40.0",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0"
+  }
+}
+```
+
+### Documentation Links
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Supabase Documentation](https://supabase.com/docs)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [React Documentation](https://react.dev/)
+
+---
+
+**Last Updated:** 2025-12-12
+**Version:** 1.0
+**Maintainer:** Consultor.AI Development Team
+**Next Review:** 2026-03-12

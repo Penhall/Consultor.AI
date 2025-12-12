@@ -1,0 +1,59 @@
+{
+  "id": "fluxo_plano_saude_v1",
+  "nome": "Triagem Básica - Planos de Saúde",
+  "descricao": "Fluxo para captar leads de planos de saúde com foco em perfil, idade e preferência por coparticipação.",
+  "etapas": [
+    {
+      "id": "inicio",
+      "tipo": "mensagem",
+      "conteudo": "Olá! 👋 Aqui é a assistente virtual da {{nome_vendedor}}, consultora especializada em planos de saúde.\n\nPara te ajudar da melhor forma, posso fazer 3 perguntinhas rápidas?",
+      "proxima": "perfil"
+    },
+    {
+      "id": "perfil",
+      "tipo": "escolha",
+      "pergunta": "Você busca plano para:",
+      "opcoes": [
+        { "rotulo": "Só eu", "valor": "individual" },
+        { "rotulo": "Eu + cônjuge", "valor": "casal" },
+        { "rotulo": "Família", "valor": "familia" },
+        { "rotulo": "Empresa", "valor": "corporativo" }
+      ],
+      "proxima": "idade"
+    },
+    {
+      "id": "idade",
+      "tipo": "escolha",
+      "pergunta": "Qual sua faixa etária?",
+      "opcoes": [
+        { "rotulo": "Até 30 anos", "valor": "ate_30" },
+        { "rotulo": "31 a 45 anos", "valor": "31_45" },
+        { "rotulo": "46 a 60 anos", "valor": "46_60" },
+        { "rotulo": "Acima de 60", "valor": "acima_60" }
+      ],
+      "proxima": "coparticipacao"
+    },
+    {
+      "id": "coparticipacao",
+      "tipo": "escolha",
+      "pergunta": "Prefere plano com coparticipação?",
+      "opcoes": [
+        { "rotulo": "Sim, quero valor mais baixo", "valor": "sim" },
+        { "rotulo": "Não, quero tudo incluso", "valor": "nao" }
+      ],
+      "proxima": "resultado"
+    },
+    {
+      "id": "resultado",
+      "tipo": "executar",
+      "acao": "gerar_resposta_ia",
+      "proxima": "final"
+    },
+    {
+      "id": "final",
+      "tipo": "mensagem",
+      "conteudo": "Quer que eu:\n1️⃣ Mostrar um comparativo em imagem?\n2️⃣ Agendar uma call gratuita com {{nome_vendedor}}?\n3️⃣ Mandar mais opções?",
+      "proxima": null
+    }
+  ]
+}
