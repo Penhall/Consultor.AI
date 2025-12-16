@@ -1,0 +1,149 @@
+# ==================================
+# Consultor.AI - Docker Compose para Desenvolvimento Local
+# ==================================
+#
+# Serviços incluídos:
+# - Supabase (PostgreSQL + Auth + Storage + Studio)
+# - MailHog (SMTP local com interface web)
+# - Redis (cache e rate limiting)
+# - Mock Server (para simular APIs externas)
+#
+# Uso:
+#   docker-compose -f docker-compose.dev.yml up -d
+#
+# Acesso:
+#   - Next.js App: http://localhost:3000
+#   - Supabase Studio: http://localhost:54323
+#   - MailHog UI: http://localhost:8025
+#   - Redis Commander: http://localhost:8081
+#   - Mock Server: http://localhost:3001
+
+version: '3.8'
+
+services:
+  # ----------------------------------
+  # Supabase Stack
+  # ----------------------------------
+  # Nota: O Supabase CLI já gerencia seu próprio Docker Compose
+  # Execute separadamente com: npx supabase start
+  # Este arquivo é para serviços complementares
+
+  # ----------------------------------
+  # MailHog - SMTP Local
+  # ----------------------------------
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: consultorai-mailhog
+    ports:
+      - "1025:1025"  # SMTP server
+      - "8025:8025"  # Web UI
+    networks:
+      - consultorai-network
+    restart: unless-stopped
+    environment:
+      MH_STORAGE: maildir
+      MH_MAILDIR_PATH: /maildir
+    volumes:
+      - mailhog-data:/maildir
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8025"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ----------------------------------
+  # Redis - Cache & Rate Limiting
+  # ----------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: consultorai-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - consultorai-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass consultorai_dev_password
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ----------------------------------
+  # Redis Commander - Redis UI
+  # ----------------------------------
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: consultorai-redis-commander
+    ports:
+      - "8081:8081"
+    networks:
+      - consultorai-network
+    restart: unless-stopped
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:consultorai_dev_password
+    depends_on:
+      - redis
+
+  # ----------------------------------
+  # Mock Server - APIs Externas
+  # ----------------------------------
+  # Simula WhatsApp API, Canva API, etc. para testes
+  mock-server:
+    image: mockserver/mockserver:latest
+    container_name: consultorai-mock-server
+    ports:
+      - "3001:1080"
+    networks:
+      - consultorai-network
+    restart: unless-stopped
+    environment:
+      MOCKSERVER_PROPERTY_FILE: /config/mockserver.properties
+      MOCKSERVER_INITIALIZATION_JSON_PATH: /config/initializerJson.json
+    volumes:
+      - ./docker/mock-server:/config
+
+  # ----------------------------------
+  # PostgreSQL (Standalone - Opcional)
+  # ----------------------------------
+  # Descomente se quiser usar PostgreSQL separado do Supabase
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: consultorai-postgres
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - consultorai-network
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: consultorai
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+# ----------------------------------
+# Volumes
+# ----------------------------------
+volumes:
+  mailhog-data:
+    driver: local
+  redis-data:
+    driver: local
+  # postgres-data:
+  #   driver: local
+
+# ----------------------------------
+# Networks
+# ----------------------------------
+networks:
+  consultorai-network:
+    driver: bridge
+    name: consultorai-dev

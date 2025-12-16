@@ -1,0 +1,111 @@
+[
+  {
+    "id": "whatsapp-send-message",
+    "httpRequest": {
+      "method": "POST",
+      "path": "/v1/messages"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": ["application/json"]
+      },
+      "body": {
+        "success": true,
+        "message_id": "wamid.mock123456789",
+        "status": "sent"
+      }
+    },
+    "times": {
+      "unlimited": true
+    }
+  },
+  {
+    "id": "whatsapp-webhook-validation",
+    "httpRequest": {
+      "method": "GET",
+      "path": "/webhook",
+      "queryStringParameters": {
+        "hub.mode": ["subscribe"],
+        "hub.verify_token": [".*"]
+      }
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": "${!request.queryStringParameters.hub.challenge[0]}"
+    }
+  },
+  {
+    "id": "google-ai-generate",
+    "httpRequest": {
+      "method": "POST",
+      "path": "/v1beta/models/.*:generateContent"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": ["application/json"]
+      },
+      "body": {
+        "candidates": [
+          {
+            "content": {
+              "parts": [
+                {
+                  "text": "Olá! Que ótimo que você está buscando um plano de saúde! Com base no seu perfil, tenho duas recomendações excelentes:\n\n1. **Plano Saúde Plus Individual** - Cobertura completa com rede credenciada de 5.000+ médicos e hospitais, consultas ilimitadas e sem coparticipação. Ideal para quem busca tranquilidade total.\n\n2. **Plano Bem-Estar Individual** - Opção mais econômica com coparticipação de R$30 por consulta. Mesma rede credenciada e qualidade, perfeito para quem visita médicos ocasionalmente.\n\nGostaria de agendar uma conversa rápida para detalhar os benefícios e tirar suas dúvidas?"
+                }
+              ]
+            },
+            "finishReason": "STOP",
+            "index": 0,
+            "safetyRatings": [
+              {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "probability": "NEGLIGIBLE"
+              }
+            ]
+          }
+        ],
+        "usageMetadata": {
+          "promptTokenCount": 150,
+          "candidatesTokenCount": 120,
+          "totalTokenCount": 270
+        }
+      },
+      "delay": {
+        "timeUnit": "MILLISECONDS",
+        "value": 800
+      }
+    }
+  },
+  {
+    "id": "canva-create-design",
+    "httpRequest": {
+      "method": "POST",
+      "path": "/v1/designs"
+    },
+    "httpResponse": {
+      "statusCode": 201,
+      "headers": {
+        "Content-Type": ["application/json"]
+      },
+      "body": {
+        "design": {
+          "id": "mock-design-123",
+          "title": "Plano de Saúde Comparação",
+          "thumbnail": {
+            "url": "https://via.placeholder.com/1200x630/4F46E5/FFFFFF?text=Planos+de+Saude"
+          },
+          "urls": {
+            "edit_url": "https://www.canva.com/design/mock-123/edit",
+            "view_url": "https://www.canva.com/design/mock-123/view"
+          }
+        }
+      },
+      "delay": {
+        "timeUnit": "MILLISECONDS",
+        "value": 1200
+      }
+    }
+  }
+]

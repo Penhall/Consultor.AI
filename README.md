@@ -64,7 +64,7 @@ See [Implementation Plan - Section 13.1](docs/technical/Implementation-Plan.md) 
 ### MVP (Phase 1 - Days 1-30)
 - ✅ Consultant registration and authentication
 - ✅ WhatsApp integration (Weni Cloud)
-- ✅ AI-powered conversation engine (Groq + Llama 3.1)
+- ✅ AI-powered conversation engine (Google AI + Gemini Pro)
 - ✅ Lead qualification flows (JSON-driven)
 - ✅ Lead management dashboard
 - ✅ Basic analytics
@@ -116,7 +116,7 @@ See [Implementation Plan - Section 13.1](docs/technical/Implementation-Plan.md) 
 
 External Integrations:
 ├── WhatsApp Business API (Weni Cloud)
-├── AI (Groq + Llama 3.1 70B)
+├── AI (Google AI + Gemini Pro)
 ├── Image Generation (Canva API)
 ├── Calendar (Google Calendar)
 └── CRM (RD Station, Pipedrive)
@@ -135,7 +135,7 @@ See [System Architecture Document](docs/architecture/SAD-System-Architecture-Doc
 | **Backend** | Supabase (PostgreSQL + Edge Functions) | All-in-one platform, generous free tier |
 | **Authentication** | Supabase Auth | Built-in JWT, RLS integration |
 | **Database** | PostgreSQL 14 | Relational data, JSONB support, battle-tested |
-| **AI** | Groq + Llama 3.1 70B | 3x faster than OpenAI, cost-effective |
+| **AI** | Google AI + Gemini Pro | Multimodal capabilities, fast, reliable |
 | **WhatsApp** | Weni Cloud (360dialog) | Official API, no blocking risk |
 | **Image Gen** | Canva API | Template-based, professional results |
 | **Hosting** | Vercel + Supabase Cloud | Zero-config deployment, global CDN |

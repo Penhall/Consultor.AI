@@ -89,18 +89,18 @@ NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<será gerado no próximo passo>
 
 # Estas você precisará obter dos serviços:
-GROQ_API_KEY=your-groq-api-key-here
+GOOGLE_AI_API_KEY=your-google-ai-api-key-here
 WHATSAPP_API_KEY=your-whatsapp-api-key-here
 ```
 
 ### Como obter as API keys:
 
-**Groq API:**
-1. Acesse: https://console.groq.com
-2. Crie uma conta (gratuito)
-3. Vá em "API Keys"
-4. Clique em "Create API Key"
-5. Copie e cole em `GROQ_API_KEY`
+**Google AI API:**
+1. Acesse: https://makersuite.google.com/app/apikey
+2. Faça login com sua conta Google
+3. Clique em "Create API Key"
+4. Selecione um projeto do Google Cloud (ou crie um novo)
+5. Copie e cole em `GOOGLE_AI_API_KEY`
 
 **WhatsApp API (Weni Cloud):**
 1. Acesse: https://weni.ai

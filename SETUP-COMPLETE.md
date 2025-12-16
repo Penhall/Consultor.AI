@@ -98,7 +98,7 @@ npm install
 cp .env.example .env.local
 
 # Editar .env.local e preencher:
-# - GROQ_API_KEY (obter em https://console.groq.com)
+# - GOOGLE_AI_API_KEY (obter em https://makersuite.google.com/app/apikey)
 # - WHATSAPP_API_KEY (obter em https://weni.ai)
 ```
 
@@ -242,8 +242,8 @@ Se todos passarem ✅, você está **100% pronto para desenvolvimento!**
         ┌────────────────────┼────────────────────┐
         │                    │                    │
 ┌───────▼────────┐  ┌────────▼────────┐  ┌───────▼────────┐
-│  Supabase Auth │  │ Supabase Client │  │   Groq API     │
-│   (JWT + RLS)  │  │  (PostgreSQL)   │  │  (Llama 3.1)   │
+│  Supabase Auth │  │ Supabase Client │  │  Google AI     │
+│   (JWT + RLS)  │  │  (PostgreSQL)   │  │  (Gemini Pro)  │
 └────────────────┘  └─────────────────┘  └────────────────┘
 ```
 
