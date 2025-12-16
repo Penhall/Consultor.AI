@@ -1,0 +1,11 @@
+# ==================================
+# Consultor.AI - Namespace
+# ==================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: consultorai
+  labels:
+    name: consultorai
+    environment: production

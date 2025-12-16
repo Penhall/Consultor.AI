@@ -1,0 +1,20 @@
+# ==================================
+# Consultor.AI - ConfigMap (Non-Secret Config)
+# ==================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consultorai-config
+  namespace: consultorai
+data:
+  # Application
+  NODE_ENV: "production"
+  NEXT_TELEMETRY_DISABLED: "1"
+  NEXT_PUBLIC_APP_URL: "https://consultor.ai"
+
+  # Google AI
+  GOOGLE_AI_MODEL: "gemini-1.5-flash"
+
+  # Redis
+  REDIS_URL: "redis://consultorai-redis:6379"

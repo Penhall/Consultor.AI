@@ -1,0 +1,169 @@
+# ==================================
+# Consultor.AI - Next.js Application Deployment
+# ==================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consultorai-app
+  namespace: consultorai
+  labels:
+    app: consultorai-app
+    component: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: consultorai-app
+  template:
+    metadata:
+      labels:
+        app: consultorai-app
+        component: frontend
+    spec:
+      containers:
+      - name: app
+        image: consultorai/app:latest # Replace with your registry
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        # ConfigMap values
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: consultorai-config
+              key: NODE_ENV
+        - name: NEXT_TELEMETRY_DISABLED
+          valueFrom:
+            configMapKeyRef:
+              name: consultorai-config
+              key: NEXT_TELEMETRY_DISABLED
+        - name: NEXT_PUBLIC_APP_URL
+          valueFrom:
+            configMapKeyRef:
+              name: consultorai-config
+              key: NEXT_PUBLIC_APP_URL
+        - name: GOOGLE_AI_MODEL
+          valueFrom:
+            configMapKeyRef:
+              name: consultorai-config
+              key: GOOGLE_AI_MODEL
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: consultorai-config
+              key: REDIS_URL
+
+        # Secret values
+        - name: NEXT_PUBLIC_SUPABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: NEXT_PUBLIC_SUPABASE_URL
+        - name: NEXT_PUBLIC_SUPABASE_ANON_KEY
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        - name: SUPABASE_SERVICE_ROLE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: SUPABASE_SERVICE_ROLE_KEY
+        - name: GOOGLE_AI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: GOOGLE_AI_API_KEY
+        - name: NEXT_PUBLIC_META_APP_ID
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: NEXT_PUBLIC_META_APP_ID
+        - name: META_APP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: META_APP_SECRET
+        - name: META_APP_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: META_APP_ACCESS_TOKEN
+        - name: NEXT_PUBLIC_META_CONFIG_ID
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: NEXT_PUBLIC_META_CONFIG_ID
+        - name: META_WEBHOOK_VERIFY_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: META_WEBHOOK_VERIFY_TOKEN
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: ENCRYPTION_KEY
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: REDIS_PASSWORD
+
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 45
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 10"]
+
+      # Wait for Redis to be ready
+      initContainers:
+      - name: wait-for-redis
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z consultorai-redis 6379; do echo waiting for redis; sleep 2; done']
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consultorai-app
+  namespace: consultorai
+  labels:
+    app: consultorai-app
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: consultorai-app

@@ -157,8 +157,19 @@ Consultor.AI/
 │   │   └── Database-Design-Document.md
 │   ├── api/                     # API specifications
 │   │   └── API-Specification.md
+│   ├── guides/                  # Getting started guides
+│   │   └── getting-started.md
 │   └── motivação/               # Conceptual planning & prototypes
 │       └── snippets de exemplo/ # Working prototypes (bot_mock.py, etc.)
+├── deployment/                  # 🚀 Deployment configurations
+│   ├── kubernetes/              # Kubernetes manifests
+│   │   ├── 00-namespace.yaml
+│   │   ├── 05-app-deployment.yaml
+│   │   └── README.md
+│   └── scripts/                 # Deployment scripts
+│       ├── build-and-push.sh
+│       ├── deploy-k8s.sh
+│       └── README.md
 ├── src/                         # 🚧 Source code (to be developed)
 │   ├── app/                     # Next.js app router
 │   ├── components/              # React components
@@ -171,6 +182,9 @@ Consultor.AI/
 │   ├── unit/                    # Unit tests
 │   ├── integration/             # Integration tests
 │   └── e2e/                     # End-to-end tests
+├── Dockerfile                   # Production Docker image
+├── Dockerfile.dev               # Development Docker image
+├── docker-compose.yml           # Docker Compose for production/staging
 ├── CLAUDE.md                    # 🤖 Guide for Claude Code
 └── README.md                    # This file
 ```
@@ -285,21 +299,91 @@ See [Implementation Plan - Section 5](docs/technical/Implementation-Plan.md) for
 
 ### Environments
 
-| Environment | URL | Purpose |
-|-------------|-----|---------|
-| **Development** | localhost:3000 | Local development |
-| **Staging** | staging.consultor.ai | QA/Testing |
-| **Production** | consultor.ai | Live users |
+| Environment | URL | Purpose | Deployment Method |
+|-------------|-----|---------|-------------------|
+| **Development** | localhost:3000 | Local development | `npm run dev` |
+| **Staging** | staging.consultor.ai | QA/Testing | Docker Compose |
+| **Production** | consultor.ai | Live users | Kubernetes |
+
+### Deployment Options
+
+#### 1. Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+#### 2. Docker Compose (Staging/Small Production)
+
+Perfect for staging environments or small production deployments.
+
+```bash
+# Build and start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+See [`docker-compose.yml`](docker-compose.yml) for configuration.
+
+**Includes:**
+- Next.js application
+- Redis cache
+- Health checks
+- Auto-restart policies
+
+#### 3. Kubernetes (Production)
+
+For high-availability production deployments with auto-scaling.
+
+```bash
+# Build and push Docker image
+./deployment/scripts/build-and-push.sh v1.0.0
+
+# Deploy to cluster
+./deployment/scripts/deploy-k8s.sh
+
+# Check status
+./deployment/scripts/status.sh
+```
+
+See [`deployment/kubernetes/README.md`](deployment/kubernetes/README.md) for detailed instructions.
+
+**Features:**
+- Horizontal Pod Autoscaling (3-10 replicas)
+- Rolling updates with zero downtime
+- TLS with Let's Encrypt
+- Network policies for security
+- Health checks and monitoring
+- Persistent Redis storage
+
+**Deployment Scripts:**
+- `build-and-push.sh` - Build and push Docker images
+- `deploy-k8s.sh` - Deploy to Kubernetes
+- `status.sh` - Check deployment status
+- `update.sh` - Update to new version
+- `rollback.sh` - Rollback to previous version
+- `logs.sh` - View application logs
+
+See [`deployment/scripts/README.md`](deployment/scripts/README.md) for script documentation.
 
 ### CI/CD Pipeline
 
 - **GitHub Actions** for automated testing and deployment
-- **Vercel** for frontend hosting with preview deployments
-- **Supabase** for backend and database
+- **Docker** for containerization
+- **Kubernetes** for orchestration
 - Automatic deployment to staging on `main` branch
 - Manual approval required for production
 
-See [Implementation Plan - Section 6](docs/technical/Implementation-Plan.md) for deployment procedures.
+See [Implementation Plan - Section 6](docs/technical/Implementation-Plan.md) for complete deployment procedures.
 
 ---
 
@@ -354,6 +438,6 @@ This project was designed with careful consideration of:
 
 ---
 
-**Status:** Technical Planning Phase ✅ | Development: Not Started ⏳
+**Status:** Technical Planning Phase ✅ | Deployment Infrastructure Ready ✅ | Development: Not Started ⏳
 
-*Last updated: 2025-12-12*
+*Last updated: 2025-12-16*

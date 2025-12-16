@@ -1,0 +1,82 @@
+# ==================================
+# Consultor.AI - Ingress (NGINX)
+# ==================================
+# Requires NGINX Ingress Controller to be installed
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: consultorai-ingress
+  namespace: consultorai
+  annotations:
+    # NGINX specific annotations
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+    # Rate limiting
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+
+    # Client body size (for file uploads)
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+
+    # CORS (if needed)
+    # nginx.ingress.kubernetes.io/enable-cors: "true"
+    # nginx.ingress.kubernetes.io/cors-allow-origin: "https://consultor.ai"
+
+    # Certificate management (cert-manager)
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+spec:
+  ingressClassName: nginx
+
+  tls:
+  - hosts:
+    - consultor.ai
+    - www.consultor.ai
+    secretName: consultorai-tls
+
+  rules:
+  - host: consultor.ai
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: consultorai-app
+            port:
+              number: 80
+
+  - host: www.consultor.ai
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: consultorai-app
+            port:
+              number: 80
+
+---
+# ==================================
+# ClusterIssuer for Let's Encrypt (cert-manager)
+# ==================================
+# Requires cert-manager to be installed:
+# kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@consultor.ai # Change this
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
