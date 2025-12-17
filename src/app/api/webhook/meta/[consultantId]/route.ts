@@ -92,7 +92,7 @@ export async function POST(
       .single()
 
     // Save incoming message
-    await supabase.from('messages').insert({
+    await (supabase as any).from('messages').insert({
       consultant_id: consultantId,
       lead_phone: message.from,
       content: message.text,
@@ -117,7 +117,7 @@ export async function POST(
     )
 
     // Save outbound message
-    await supabase.from('messages').insert({
+    await (supabase as any).from('messages').insert({
       consultant_id: consultantId,
       lead_phone: message.from,
       content: aiResponse,

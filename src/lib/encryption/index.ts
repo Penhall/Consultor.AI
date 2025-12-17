@@ -115,6 +115,11 @@ export function decrypt(encryptedData: string): string {
 
     const [ivHex, authTagHex, encrypted] = parts
 
+    // Validate parts exist
+    if (!ivHex || !authTagHex || !encrypted) {
+      throw new Error('Missing encrypted data components')
+    }
+
     // Validate part lengths
     if (ivHex.length !== IV_LENGTH * 2) {
       throw new Error(`Invalid IV length: ${ivHex.length} (expected ${IV_LENGTH * 2})`)
@@ -173,9 +178,9 @@ export function isEncrypted(data: string): boolean {
   const parts = data.split(':')
   return (
     parts.length === 3 &&
-    parts[0].length === IV_LENGTH * 2 &&
-    parts[1].length === AUTH_TAG_LENGTH * 2 &&
-    parts[2].length > 0
+    parts[0] !== undefined && parts[0].length === IV_LENGTH * 2 &&
+    parts[1] !== undefined && parts[1].length === AUTH_TAG_LENGTH * 2 &&
+    parts[2] !== undefined && parts[2].length > 0
   )
 }
 

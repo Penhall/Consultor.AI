@@ -56,7 +56,7 @@ spec:
               name: consultorai-config
               key: REDIS_URL
 
-        # Secret values
+        # Secret values - Supabase (supports both old and new naming)
         - name: NEXT_PUBLIC_SUPABASE_URL
           valueFrom:
             secretKeyRef:
@@ -72,6 +72,16 @@ spec:
             secretKeyRef:
               name: consultorai-secrets
               key: SUPABASE_SERVICE_ROLE_KEY
+        - name: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        - name: SUPABASE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: consultorai-secrets
+              key: SUPABASE_SECRET_KEY
         - name: GOOGLE_AI_API_KEY
           valueFrom:
             secretKeyRef:

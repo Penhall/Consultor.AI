@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { encrypt } from '@/lib/encryption'
 
 export async function POST(req: NextRequest) {
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing code' }, { status: 400 })
     }
 
-    const supabase = await createServerClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -50,7 +50,8 @@ export async function POST(req: NextRequest) {
     const phone = phones[0]
 
     // Save to database
-    const { data: integration } = await supabase
+    // TODO: Generate proper database types with: npm run db:types
+    await (supabase as any)
       .from('whatsapp_integrations')
       .insert({
         consultant_id: user.id,

@@ -2,21 +2,24 @@
 # Consultor.AI - Production Dockerfile
 # ==================================
 
-# Stage 1: Dependencies
+# Stage 1: Dependencies (Production only)
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Install dependencies based on lock file
+# Install production dependencies only
 COPY package.json package-lock.json ./
-RUN npm ci --only=production && \
+RUN npm ci --only=production --ignore-scripts && \
     npm cache clean --force
 
-# Stage 2: Builder
+# Stage 2: Builder (Needs all dependencies including dev)
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy dependencies
-COPY --from=deps /app/node_modules ./node_modules
+# Install ALL dependencies (including devDependencies for build)
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+
+# Copy source code
 COPY . .
 
 # Set environment for build
