@@ -259,16 +259,18 @@ Consultor.AI/
 
 **CRITICAL**: The root directory is kept intentionally clean. See `.rules/development-standards.md` Section 0 for complete rules.
 
-**Files in Root** (via symlinks to `configs/`):
-- `.eslintrc.json` → `configs/eslint/.eslintrc.json`
-- `.prettierrc` → `configs/prettier/.prettierrc`
-- `playwright.config.ts` → `configs/testing/playwright.config.ts`
-- `vitest.config.ts` → `configs/testing/vitest.config.ts`
-- `tailwind.config.ts` → `configs/build/tailwind.config.ts`
-- `postcss.config.js` → `configs/build/postcss.config.js`
+**Configuration Files in Root**:
+- `.eslintrc.json` - ESLint configuration
+- `.prettierrc`, `.prettierignore` - Prettier configuration
+- `playwright.config.ts` - Playwright E2E tests
+- `vitest.config.ts` - Vitest unit tests
+- `tailwind.config.ts` - Tailwind CSS
+- `postcss.config.js` - PostCSS
+
+**Note**: Configurations are also maintained in `configs/` for reference, but root files are the source of truth (WSL symlink compatibility).
 
 **Where Things Go**:
-- Configuration files → `configs/category/`
+- Configuration files → Root directory (required by tools)
 - Setup guides/tutorials → `docs/guides/`
 - Utility scripts → `scripts/`
 - Internal notes → `docs/internal/`
@@ -276,7 +278,7 @@ Consultor.AI/
 **Never Create in Root**:
 - ❌ `SETUP.md`, `NOTES.md` → Use `docs/guides/`
 - ❌ `deploy.sh`, `start.sh` → Use `scripts/`
-- ❌ Additional config files → Use `configs/category/`
+- ❌ Temporary files → Use `.gitignore`
 
 ---
 

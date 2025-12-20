@@ -1,1 +1,42 @@
-configs/prettier/.prettierignore
+# Dependencies
+node_modules/
+.pnp/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Test results
+test-results/
+playwright-report/
+
+# Misc
+.DS_Store
+*.pem
+
+# Logs
+*.log
+
+# Env files
+.env*
+
+# Supabase
+.supabase/
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+next-env.d.ts
+*.tsbuildinfo
+
+# Documentation (preserve formatting)
+CHANGELOG.md
