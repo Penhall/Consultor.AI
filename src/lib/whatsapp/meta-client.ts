@@ -10,7 +10,7 @@ const META_API_BASE_URL = 'https://graph.facebook.com'
 
 export interface WhatsAppMessage {
   to: string // Phone number with country code (+5561999999999)
-  type: 'text' | 'template' | 'image'
+  type: 'text' | 'template' | 'image' | 'interactive'
   text?: {
     body: string
     preview_url?: boolean
@@ -25,6 +25,13 @@ export interface WhatsAppMessage {
   image?: {
     link: string
     caption?: string
+  }
+  interactive?: {
+    type: 'button' | 'list'
+    body: {
+      text: string
+    }
+    action: any
   }
 }
 
@@ -189,6 +196,74 @@ export class MetaWhatsAppClient {
     }
 
     return cleaned
+  }
+
+  /**
+   * Sends an interactive button message
+   */
+  async sendButtonMessage(
+    to: string,
+    bodyText: string,
+    buttons: { id: string; title: string }[]
+  ): Promise<{ messageId: string }> {
+    const message: WhatsAppMessage = {
+      to: this.formatPhoneNumber(to),
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: {
+          text: bodyText,
+        },
+        action: {
+          buttons: buttons.map((btn) => ({
+            type: 'reply',
+            reply: {
+              id: btn.id,
+              title: btn.title.substring(0, 20), // Max 20 chars
+            },
+          })),
+        },
+      },
+    }
+
+    return this.sendMessage(message)
+  }
+
+  /**
+   * Sends an interactive list message
+   */
+  async sendListMessage(
+    to: string,
+    bodyText: string,
+    buttonText: string,
+    sections: {
+      title: string
+      rows: { id: string; title: string; description?: string }[]
+    }[]
+  ): Promise<{ messageId: string }> {
+    const message: WhatsAppMessage = {
+      to: this.formatPhoneNumber(to),
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: {
+          text: bodyText,
+        },
+        action: {
+          button: buttonText,
+          sections: sections.map((section) => ({
+            title: section.title,
+            rows: section.rows.map((row) => ({
+              id: row.id,
+              title: row.title.substring(0, 24), // Max 24 chars
+              description: row.description?.substring(0, 72), // Max 72 chars
+            })),
+          })),
+        },
+      },
+    }
+
+    return this.sendMessage(message)
   }
 
   /**

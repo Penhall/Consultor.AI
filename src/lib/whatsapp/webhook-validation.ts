@@ -3,7 +3,7 @@
  * Validates webhook signatures from Meta
  */
 
-import { createHmac } from 'crypto'
+import { createHmac, timingSafeEqual } from 'crypto'
 
 /**
  * Validates Meta webhook signature (HMAC SHA256)
@@ -42,35 +42,24 @@ export function validateMetaSignature(
 }
 
 /**
- * Timing-safe comparison of two buffers
- */
-function timingSafeEqual(a: Buffer, b: Buffer): boolean {
-  if (a.length !== b.length) {
-    return false
-  }
-
-  let result = 0
-  for (let i = 0; i < a.length; i++) {
-    result |= a[i] ^ b[i]
-  }
-
-  return result === 0
-}
-
-/**
  * Extracts message from Meta webhook payload
  */
 export interface ExtractedMessage {
   messageId: string
   from: string // Phone number
   timestamp: string
-  type: 'text' | 'image' | 'audio' | 'video' | 'document' | 'location' | 'contacts'
+  type: 'text' | 'image' | 'audio' | 'video' | 'document' | 'location' | 'contacts' | 'interactive'
   text?: string
   imageUrl?: string
   audioUrl?: string
   videoUrl?: string
   documentUrl?: string
   caption?: string
+  interactive?: {
+    type: 'button_reply' | 'list_reply'
+    buttonReply?: { id: string; title: string }
+    listReply?: { id: string; title: string; description?: string }
+  }
 }
 
 export function extractMessageFromWebhook(payload: any): ExtractedMessage | null {
@@ -115,6 +104,29 @@ export function extractMessageFromWebhook(payload: any): ExtractedMessage | null
       case 'document':
         extracted.documentUrl = message.document?.id
         extracted.caption = message.document?.caption
+        break
+
+      case 'interactive':
+        if (message.interactive?.type === 'button_reply') {
+          extracted.interactive = {
+            type: 'button_reply',
+            buttonReply: {
+              id: message.interactive.button_reply.id,
+              title: message.interactive.button_reply.title,
+            },
+          }
+          extracted.text = message.interactive.button_reply.id
+        } else if (message.interactive?.type === 'list_reply') {
+          extracted.interactive = {
+            type: 'list_reply',
+            listReply: {
+              id: message.interactive.list_reply.id,
+              title: message.interactive.list_reply.title,
+              description: message.interactive.list_reply.description,
+            },
+          }
+          extracted.text = message.interactive.list_reply.id
+        }
         break
     }
 

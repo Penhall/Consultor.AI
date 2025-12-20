@@ -1,0 +1,160 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
+import type { Database } from '@/types/database'
+
+type Consultant = Database['public']['Tables']['consultants']['Row']
+
+interface AuthState {
+  user: User | null
+  consultant: Consultant | null
+  isLoading: boolean
+  isAuthenticated: boolean
+}
+
+interface UseAuthReturn extends AuthState {
+  signOut: () => Promise<void>
+  refreshConsultant: () => Promise<void>
+}
+
+export function useAuth(): UseAuthReturn {
+  const router = useRouter()
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    consultant: null,
+    isLoading: true,
+    isAuthenticated: false,
+  })
+
+  // Fetch consultant profile
+  const fetchConsultant = async (userId: string): Promise<Consultant | null> => {
+    try {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('consultants')
+        .select('*')
+        .eq('user_id', userId)
+        .single()
+
+      if (error) {
+        console.error('Error fetching consultant:', error)
+        return null
+      }
+
+      return data
+    } catch (error) {
+      console.error('Error fetching consultant:', error)
+      return null
+    }
+  }
+
+  // Refresh consultant data
+  const refreshConsultant = async () => {
+    if (!state.user) {
+      return
+    }
+
+    const consultant = await fetchConsultant(state.user.id)
+    setState((prev) => ({ ...prev, consultant }))
+  }
+
+  // Sign out
+  const signOut = async () => {
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      setState({
+        user: null,
+        consultant: null,
+        isLoading: false,
+        isAuthenticated: false,
+      })
+      router.push('/auth/login')
+      router.refresh()
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
+  }
+
+  useEffect(() => {
+    const supabase = createClient()
+
+    // Get initial session
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (session?.user) {
+          const consultant = await fetchConsultant(session.user.id)
+          setState({
+            user: session.user,
+            consultant,
+            isLoading: false,
+            isAuthenticated: true,
+          })
+        } else {
+          setState({
+            user: null,
+            consultant: null,
+            isLoading: false,
+            isAuthenticated: false,
+          })
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error)
+        setState({
+          user: null,
+          consultant: null,
+          isLoading: false,
+          isAuthenticated: false,
+        })
+      }
+    }
+
+    initializeAuth()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          const consultant = await fetchConsultant(session.user.id)
+          setState({
+            user: session.user,
+            consultant,
+            isLoading: false,
+            isAuthenticated: true,
+          })
+        } else if (event === 'SIGNED_OUT') {
+          setState({
+            user: null,
+            consultant: null,
+            isLoading: false,
+            isAuthenticated: false,
+          })
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          // Optionally refresh consultant data on token refresh
+          const consultant = await fetchConsultant(session.user.id)
+          setState({
+            user: session.user,
+            consultant,
+            isLoading: false,
+            isAuthenticated: true,
+          })
+        }
+      }
+    )
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  return {
+    ...state,
+    signOut,
+    refreshConsultant,
+  }
+}

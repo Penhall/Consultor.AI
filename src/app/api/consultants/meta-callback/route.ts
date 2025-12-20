@@ -3,7 +3,7 @@
  * Handles the OAuth callback from Meta Embedded Signup
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { encrypt } from '@/lib/encryption'
 

@@ -1,71 +1,35 @@
-# Supabase Local Configuration
-# Documentation: https://supabase.com/docs/guides/cli/config
+# Supabase Configuration
+# Local development settings  
+# Version: 1.0.0
 
-[project]
-# A string used to distinguish different Supabase projects on the same host.
-# Defaults to the working directory name when running `supabase init`.
-project_id = "consultor-ai"
+project_id = "consultor-ai-local"
 
 [api]
-# Port to use for the API URL.
 enabled = true
 port = 54321
-# External URL of the API server that frontend connects to.
-external_url = "http://localhost:54321"
+schemas = ["public", "storage"]
+extra_search_path = ["public"]
+max_rows = 1000
 
 [db]
-# Port to use for the local database URL.
 port = 54322
-# External URL of the database that you can connect to.
-external_url = "postgresql://postgres:postgres@localhost:54322/postgres"
-# Port for the PostgreSQL database driver
-shadow_port = 54320
-# Size of the connection pool created by the database driver
-pool_size = 20
+major_version = 15
 
-[auth]
+[realtime]
 enabled = true
-# Port to use for the auth server
-port = 54323
-# External URL of the auth server
-external_url = "http://localhost:54323"
-# JWT expiry in seconds
-jwt_expiry = 3600
-# Allow signups
-enable_signup = true
-# Email provider (SMTP)
-[auth.email]
-enable_signup = true
-enable_confirmations = false
-
-[storage]
-enabled = true
-# Port to use for the storage server
-port = 54324
-# External URL of the storage server
-external_url = "http://localhost:54324"
-# Size limit for storage uploads in bytes (50MB)
-file_size_limit = 52428800
 
 [studio]
 enabled = true
-# Port to use for Supabase Studio
-port = 54325
-# External URL of the Studio
-external_url = "http://localhost:54325"
+port = 54323
 
-[inbucket]
+[auth]
 enabled = true
-# Port to use for the email testing server (Inbucket)
-port = 54326
-# External URL of the email testing server
-external_url = "http://localhost:54326"
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**"]
+jwt_expiry = 3600
+enable_signup = true
 
-[functions]
-# Path to your function code
-src = "supabase/functions"
-# Port to use for the functions server
-port = 54327
-
-[analytics]
-enabled = false
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false

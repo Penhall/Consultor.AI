@@ -10,6 +10,7 @@
 
 ## 📑 Table of Contents
 
+- [0. Root Directory Organization](#0-root-directory-organization)
 - [1. Language and Documentation](#1-language-and-documentation)
 - [2. Code Organization](#2-code-organization)
 - [3. TypeScript Standards](#3-typescript-standards)
@@ -22,6 +23,171 @@
 - [10. Security](#10-security)
 - [11. Git Workflow](#11-git-workflow)
 - [12. Code Review Checklist](#12-code-review-checklist)
+
+---
+
+## 0. Root Directory Organization
+
+### Keep Root Clean 🧹
+
+**CRITICAL RULE**: The root directory must remain clean and organized. Only essential files belong at the project root.
+
+### Allowed Files in Root Directory
+
+**Required Files** (MUST be in root):
+```
+.env                    # Environment variables (gitignored)
+.env.example            # Environment template
+.gitignore              # Git ignore rules
+.dockerignore           # Docker ignore rules
+README.md               # Project overview (Portuguese)
+CLAUDE.md               # AI assistant guide (English)
+package.json            # npm configuration
+package-lock.json       # npm lock file
+docker-compose.yml      # Production Docker setup
+Dockerfile              # Production container
+next.config.js          # Next.js configuration
+next-env.d.ts           # Next.js TypeScript declarations
+tsconfig.json           # TypeScript configuration
+```
+
+**Configuration Proxies** (symlinks to configs/):
+```
+.eslintrc.json         → configs/eslint/.eslintrc.json
+.prettierrc            → configs/prettier/.prettierrc
+.prettierignore        → configs/prettier/.prettierignore
+playwright.config.ts   → configs/testing/playwright.config.ts
+vitest.config.ts       → configs/testing/vitest.config.ts
+postcss.config.js      → configs/build/postcss.config.js
+tailwind.config.ts     → configs/build/tailwind.config.ts
+```
+
+### Forbidden in Root Directory
+
+**NEVER create these in root** (use proper directories instead):
+
+❌ **Documentation files**:
+- `SETUP.md`, `DEPLOYMENT.md`, `TROUBLESHOOTING.md` → Move to `docs/guides/`
+- `CHANGELOG.md` → Move to `docs/`
+- `TODO.md`, `NOTES.md` → Move to `docs/internal/`
+
+❌ **Script files**:
+- `setup.sh`, `deploy.sh`, `start-dev.sh` → Move to `scripts/`
+- `*.py`, `*.rb` scripts → Move to `scripts/`
+
+❌ **Configuration files**:
+- `jest.config.js` → Move to `configs/testing/`
+- `babel.config.js` → Move to `configs/build/`
+- `.editorconfig` → Move to `configs/editor/`
+- `docker-compose.dev.yml` → Move to `configs/docker/`
+
+❌ **Temporary/generated files**:
+- `.DS_Store`, `Thumbs.db` → Add to `.gitignore`
+- `debug.log`, `error.log` → Add to `.gitignore`
+- Build artifacts → Should be in `.gitignore`
+
+### Proper Directory Structure
+
+```
+Consultor.AI/
+├── configs/                  # All configuration files
+│   ├── docker/              # Docker configurations
+│   │   ├── docker-compose.dev.yml
+│   │   └── Dockerfile.dev
+│   ├── eslint/              # ESLint configuration
+│   │   └── .eslintrc.json
+│   ├── prettier/            # Prettier configuration
+│   │   ├── .prettierrc
+│   │   └── .prettierignore
+│   ├── testing/             # Test configurations
+│   │   ├── playwright.config.ts
+│   │   └── vitest.config.ts
+│   └── build/               # Build tool configs
+│       ├── postcss.config.js
+│       └── tailwind.config.ts
+│
+├── docs/                     # Documentation
+│   ├── guides/              # Setup guides, tutorials
+│   │   ├── DOCKER-SETUP.md
+│   │   ├── SUPABASE-MIGRATION.md
+│   │   └── NEXT-STEPS.md
+│   ├── technical/           # Technical specifications
+│   ├── architecture/        # Architecture docs
+│   ├── api/                 # API documentation
+│   └── internal/            # Internal notes, TODOs
+│
+├── scripts/                  # Utility scripts
+│   ├── dev-setup.sh
+│   ├── deploy.sh
+│   └── db-seed.js
+│
+├── src/                      # Source code
+├── tests/                    # Test files
+├── public/                   # Static assets
+└── supabase/                 # Supabase configuration
+```
+
+### Enforcement Rules
+
+1. **Before Creating a File in Root**:
+   - Ask: "Does this NEED to be in root for the tool to work?"
+   - If NO → Move to appropriate subdirectory
+   - If YES → Verify it's on the "Allowed Files" list
+
+2. **During Code Review**:
+   - Reject PRs that add unapproved files to root
+   - Request files be moved to proper directories
+   - Update `.gitignore` for generated/temp files
+
+3. **Cleanup Protocol**:
+   - Weekly review of root directory
+   - Move misplaced files to proper locations
+   - Update documentation if structure changes
+
+4. **Configuration File Pattern**:
+   - Actual config: `configs/category/config-file`
+   - Root symlink: `ln -sf configs/category/config-file config-file`
+   - Update scripts to reference new paths
+
+### Examples
+
+**✅ CORRECT**:
+```bash
+# Create new test configuration
+touch configs/testing/jest.config.js
+ln -sf configs/testing/jest.config.js jest.config.js
+
+# Add setup guide
+touch docs/guides/AWS-DEPLOYMENT.md
+
+# Create deployment script
+touch scripts/deploy-production.sh
+chmod +x scripts/deploy-production.sh
+```
+
+**❌ WRONG**:
+```bash
+# DON'T do this!
+touch SETUP-INSTRUCTIONS.md      # → Should be docs/guides/
+touch deploy.sh                  # → Should be scripts/
+touch jest.config.js             # → Should be configs/testing/
+touch NOTES.md                   # → Should be docs/internal/
+```
+
+### Migration Checklist
+
+When cleaning up an existing project:
+
+- [ ] Create `configs/`, `docs/guides/`, `scripts/` directories
+- [ ] Move all config files to `configs/` subdirectories
+- [ ] Create symlinks in root for required configs
+- [ ] Move documentation to `docs/guides/`
+- [ ] Move scripts to `scripts/` and make executable
+- [ ] Update `package.json` scripts with new paths
+- [ ] Update CI/CD configs with new paths
+- [ ] Test that all tools still work (linters, tests, build)
+- [ ] Update `.gitignore` if needed
+- [ ] Document new structure in README.md
 
 ---
 
