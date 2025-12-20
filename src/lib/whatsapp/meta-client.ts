@@ -297,12 +297,22 @@ export class MetaWhatsAppClient {
  */
 export async function createMetaClientFromIntegration(
   integration: {
-    phone_number_id: string
-    access_token: string
+    phone_number_id: string | null
+    access_token: string | null
   }
 ): Promise<MetaWhatsAppClient> {
+  // Import decrypt function
+  const { decrypt } = await import('@/lib/encryption')
+
+  if (!integration.phone_number_id || !integration.access_token) {
+    throw new Error('Invalid integration: missing phone_number_id or access_token')
+  }
+
+  // Decrypt access token
+  const decryptedToken = decrypt(integration.access_token)
+
   return new MetaWhatsAppClient({
     phoneNumberId: integration.phone_number_id,
-    accessToken: integration.access_token,
+    accessToken: decryptedToken,
   })
 }

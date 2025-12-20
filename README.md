@@ -163,30 +163,26 @@ Acesse: **http://localhost:3000**
 
 ## ⚙️ Configuração
 
-### 📱 Configurar WhatsApp Business (Meta API)
+### 📱 Configurar WhatsApp Business (Meta Embedded Signup)
 
-**Guia Completo:** [docs/guides/META-API-SETUP.md](./docs/guides/META-API-SETUP.md)
+**Guia Completo:** [docs/guides/WHATSAPP-EMBEDDED-SIGNUP.md](./docs/guides/WHATSAPP-EMBEDDED-SIGNUP.md)
 
-**Resumo Rápido**:
+**Resumo Rápido** (para consultores):
 
-1. **Criar Meta App**
-   - Acesse [Facebook Developers](https://developers.facebook.com)
-   - Crie novo app tipo "Business"
-   - Adicione produto "WhatsApp"
+1. **Acesse o Dashboard**
+   - Faça login no Consultor.AI
+   - Navegue para `/dashboard/perfil/whatsapp`
 
-2. **Configurar Webhook**
-   - URL: `https://your-domain.com/api/webhook/meta/[consultant_id]`
-   - Verify Token: (defina em `.env.local`)
-   - Subscribe: `messages`, `message_status`
+2. **Conecte com 3 Cliques**
+   - Clique em "Conectar WhatsApp Business"
+   - Faça login com sua conta Facebook
+   - Autorize as permissões
 
-3. **Obter Credenciais**
-   - Phone Number ID
-   - Access Token (temporário → permanente)
+3. **Pronto!**
+   - Seu WhatsApp está conectado
+   - Comece a receber leads imediatamente
 
-4. **Conectar no Dashboard**
-   - Acesse `/dashboard/perfil/whatsapp`
-   - Cole Phone Number ID e Access Token
-   - Teste conexão
+**Nota para Desenvolvedores**: A plataforma usa Meta Embedded Signup. Apenas o dono da plataforma precisa configurar o Meta App uma vez. Consultores conectam via OAuth 2.0.
 
 ### 🤖 Configurar Google AI
 
@@ -224,7 +220,7 @@ npm run flow:validate supabase/seed/default-health-flow.json
 ## 📖 Documentação
 
 ### 🚀 Guias de Setup
-- [📖 **Configuração Meta API**](./docs/guides/META-API-SETUP.md) ⭐ **NOVO**
+- [📖 **WhatsApp Embedded Signup**](./docs/guides/WHATSAPP-EMBEDDED-SIGNUP.md) ⭐ **NOVO**
 - [📖 Setup Completo](./docs/guides/SETUP-COMPLETE.md)
 - [📖 Docker Setup](./docs/guides/DOCKER-SETUP.md)
 - [📖 Supabase Migration](./docs/guides/SUPABASE-MIGRATION.md)

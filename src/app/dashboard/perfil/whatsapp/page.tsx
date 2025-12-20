@@ -5,23 +5,68 @@
 
 'use client'
 
-import { useState } from 'react'
-import { MetaConnectButton } from '@/components/whatsapp/MetaConnectButton'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { MetaEmbeddedSignup } from '@/components/whatsapp/MetaEmbeddedSignup'
+
+interface IntegrationData {
+  phone_number: string
+  display_name: string
+  status: string
+  verified_at: string
+}
 
 export default function WhatsAppSettingsPage() {
-  const [connected, setConnected] = useState(false)
-  const [integration, setIntegration] = useState<any>(null)
+  const { consultant, isLoading: authLoading } = useAuth()
+  const [integration, setIntegration] = useState<IntegrationData | null>(null)
+  const [isLoadingIntegration, setIsLoadingIntegration] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const handleSuccess = (data: any) => {
-    setConnected(true)
-    setIntegration(data)
+  // Fetch existing integration on mount
+  useEffect(() => {
+    async function fetchIntegration() {
+      if (!consultant?.id) {
+        setIsLoadingIntegration(false)
+        return
+      }
+
+      try {
+        const response = await fetch(
+          `/api/consultants/${consultant.id}/integrations/meta`
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.integration) {
+            setIntegration(data.integration)
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching integration:', err)
+      } finally {
+        setIsLoadingIntegration(false)
+      }
+    }
+
+    fetchIntegration()
+  }, [consultant?.id])
+
+  const handleSuccess = (data: { phone_number: string; display_name: string }) => {
+    setIntegration({
+      phone_number: data.phone_number,
+      display_name: data.display_name,
+      status: 'active',
+      verified_at: new Date().toISOString(),
+    })
     setError(null)
   }
 
-  const handleError = (err: Error) => {
-    setError(err.message)
+  const handleError = (errorMessage: string) => {
+    setError(errorMessage)
   }
+
+  const isLoading = authLoading || isLoadingIntegration
+  const isConnected = integration && integration.status === 'active'
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -30,8 +75,37 @@ export default function WhatsAppSettingsPage() {
         Conecte sua conta WhatsApp Business para começar a receber leads
       </p>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="mb-6 p-6 border rounded-lg">
+          <div className="flex items-center gap-3">
+            <svg
+              className="animate-spin h-5 w-5 text-gray-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+            <p className="text-gray-600">Carregando informações...</p>
+          </div>
+        </div>
+      )}
+
       {/* Status Card */}
-      {!connected ? (
+      {!isLoading && !isConnected && (
         <div className="mb-6 p-6 border-2 border-yellow-200 bg-yellow-50 rounded-lg">
           <div className="flex items-start gap-3">
             <svg
@@ -57,7 +131,9 @@ export default function WhatsAppSettingsPage() {
             </div>
           </div>
         </div>
-      ) : (
+      )}
+
+      {!isLoading && isConnected && (
         <div className="mb-6 p-6 border-2 border-green-200 bg-green-50 rounded-lg">
           <div className="flex items-start gap-3">
             <svg
@@ -73,12 +149,16 @@ export default function WhatsAppSettingsPage() {
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <div>
+            <div className="flex-1">
               <h3 className="font-semibold text-green-900">
                 WhatsApp conectado
               </h3>
               <p className="text-sm text-green-700 mt-1">
-                {integration?.phoneNumber} - {integration?.businessName}
+                {integration?.phone_number}
+                {integration?.display_name && ` - ${integration.display_name}`}
+              </p>
+              <p className="text-xs text-green-600 mt-1">
+                Conectado em {new Date(integration?.verified_at || '').toLocaleDateString('pt-BR')}
               </p>
             </div>
           </div>
@@ -194,32 +274,56 @@ export default function WhatsAppSettingsPage() {
         </ul>
       </div>
 
-      {/* CTA */}
-      <div className="p-6 border-2 border-blue-200 bg-blue-50 rounded-lg">
-        <div className="text-center">
-          <h3 className="text-xl font-bold mb-2">Tudo pronto?</h3>
-          <p className="text-gray-600 mb-6">
-            Clique no botão abaixo para iniciar a conexão com a Meta
-          </p>
+      {/* CTA - Only show if not connected and not loading */}
+      {!isLoading && !isConnected && consultant?.id && (
+        <div className="p-6 border-2 border-blue-200 bg-blue-50 rounded-lg">
+          <div className="text-center">
+            <h3 className="text-xl font-bold mb-2">Tudo pronto?</h3>
+            <p className="text-gray-600 mb-6">
+              Clique no botão abaixo para iniciar a conexão com a Meta
+            </p>
 
-          <MetaConnectButton
-            onSuccess={handleSuccess}
-            onError={handleError}
-            className="text-lg px-8 py-4"
-          />
+            <MetaEmbeddedSignup
+              consultantId={consultant.id}
+              onSuccess={handleSuccess}
+              onError={handleError}
+            />
 
-          <p className="text-xs text-gray-500 mt-4">
-            Ao conectar, você concorda com os{' '}
-            <a href="#" className="underline">
-              Termos de Serviço da Meta
-            </a>{' '}
-            e nossa{' '}
-            <a href="#" className="underline">
-              Política de Privacidade
-            </a>
-          </p>
+            <p className="text-xs text-gray-500 mt-4">
+              Ao conectar, você concorda com os{' '}
+              <a href="#" className="underline">
+                Termos de Serviço da Meta
+              </a>{' '}
+              e nossa{' '}
+              <a href="#" className="underline">
+                Política de Privacidade
+              </a>
+            </p>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Reconnect option if already connected */}
+      {!isLoading && isConnected && (
+        <div className="p-6 border rounded-lg">
+          <h3 className="font-semibold mb-2">Gerenciar conexão</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Sua conta WhatsApp Business está ativa. Caso precise reconectar ou atualizar
+            permissões, entre em contato com o suporte.
+          </p>
+          <button
+            className="text-sm text-red-600 hover:text-red-700 underline"
+            onClick={() => {
+              if (confirm('Tem certeza que deseja desconectar seu WhatsApp?')) {
+                // TODO: Implement disconnect functionality
+                alert('Funcionalidade de desconexão será implementada em breve')
+              }
+            }}
+          >
+            Desconectar WhatsApp
+          </button>
+        </div>
+      )}
     </div>
   )
 }

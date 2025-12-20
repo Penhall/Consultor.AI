@@ -203,6 +203,81 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_integrations: {
+        Row: {
+          id: string
+          consultant_id: string
+          provider: 'meta' | 'weni' | '360dialog' | 'twilio'
+          access_token: string | null
+          refresh_token: string | null
+          api_key: string | null
+          api_secret: string | null
+          webhook_secret: string | null
+          phone_number: string
+          phone_number_id: string | null
+          waba_id: string | null
+          display_name: string | null
+          status: 'active' | 'inactive' | 'suspended' | 'expired'
+          verified_at: string | null
+          expires_at: string | null
+          last_sync_at: string | null
+          webhook_url: string | null
+          metadata: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          consultant_id: string
+          provider: 'meta' | 'weni' | '360dialog' | 'twilio'
+          access_token?: string | null
+          refresh_token?: string | null
+          api_key?: string | null
+          api_secret?: string | null
+          webhook_secret?: string | null
+          phone_number: string
+          phone_number_id?: string | null
+          waba_id?: string | null
+          display_name?: string | null
+          status?: 'active' | 'inactive' | 'suspended' | 'expired'
+          verified_at?: string | null
+          expires_at?: string | null
+          last_sync_at?: string | null
+          metadata?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          consultant_id?: string
+          provider?: 'meta' | 'weni' | '360dialog' | 'twilio'
+          access_token?: string | null
+          refresh_token?: string | null
+          api_key?: string | null
+          api_secret?: string | null
+          webhook_secret?: string | null
+          phone_number?: string
+          phone_number_id?: string | null
+          waba_id?: string | null
+          display_name?: string | null
+          status?: 'active' | 'inactive' | 'suspended' | 'expired'
+          verified_at?: string | null
+          expires_at?: string | null
+          last_sync_at?: string | null
+          metadata?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_integrations_consultant_id_fkey"
+            columns: ["consultant_id"]
+            isOneToOne: false
+            referencedRelation: "consultants"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       conversations: {
         Row: {
           completed_at: string | null

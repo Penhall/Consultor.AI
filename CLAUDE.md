@@ -108,7 +108,7 @@ Consultor.AI/
 │
 ├── docs/                            # Technical documentation
 │   ├── guides/                      # Setup guides, tutorials, fixes
-│   │   ├── META-API-SETUP.md        # ⭐ WhatsApp Business API setup guide
+│   │   ├── WHATSAPP-EMBEDDED-SIGNUP.md  # ⭐ WhatsApp Business setup (3-click)
 │   │   ├── DOCKER-SETUP.md
 │   │   ├── DOCKER-BUILD-FIX.md
 │   │   ├── SUPABASE-MIGRATION.md
