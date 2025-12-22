@@ -98,3 +98,8 @@ storybook-static/
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+
+# Documentation with sensitive data
+docs/guides/WHATSAPP-SETUP-2025.md
+docs/guides/meta-app-setup.md
+docs/guides/WHATSAPP-EMBEDDED-SIGNUP.md
