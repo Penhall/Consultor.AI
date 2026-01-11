@@ -14,7 +14,7 @@
 -- SAMPLE CONSULTANT
 -- =====================================================
 
--- Insert demo consultant (UPDATE user_id with your test user's ID)
+-- Insert demo consultant (user_id will be set to NULL for development)
 INSERT INTO consultants (
     user_id,
     email,
@@ -28,7 +28,7 @@ INSERT INTO consultants (
     leads_count_current_month,
     settings
 ) VALUES (
-    '00000000-0000-0000-0000-000000000000'::UUID,  -- REPLACE with actual auth.users.id
+    NULL,  -- Will be linked to auth user later
     'demo@consultor.ai',
     'Consultor Demo',
     '+5511999887766',

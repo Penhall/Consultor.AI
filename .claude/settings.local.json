@@ -28,7 +28,18 @@
       "Bash(git config:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm run dev:*)",
+      "Bash(pkill:*)",
+      "Bash(docker network:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker exec:*)",
+      "Bash(./scripts/start-all.sh:*)",
+      "Bash(bash:*)",
+      "Bash(docker restart:*)",
+      "Bash(PGPASSWORD=postgres psql:*)",
+      "Bash(python3 -m json.tool:*)"
     ]
   }
 }

@@ -1,0 +1,62 @@
+# ==================================
+# Consultor.AI - Full Stack Docker Compose
+# ==================================
+# Sobe TUDO: Supabase + Aplicação Next.js
+# Uso: docker-compose -f docker-compose.full.yml up
+
+version: '3.8'
+
+services:
+  # ----------------------------------
+  # Next.js Application
+  # ----------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: consultorai-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Hot-reload: montar código fonte
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./.env:/app/.env
+
+      # Prevent overwriting
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+      # Supabase Local
+      - NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+      - SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+
+      # Google AI
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
+      - GOOGLE_AI_MODEL=${GOOGLE_AI_MODEL:-gemini-1.5-flash}
+
+      # Meta WhatsApp
+      - NEXT_PUBLIC_META_APP_ID=${NEXT_PUBLIC_META_APP_ID}
+      - META_APP_SECRET=${META_APP_SECRET}
+      - NEXT_PUBLIC_META_CONFIG_ID=${NEXT_PUBLIC_META_CONFIG_ID}
+      - META_WEBHOOK_VERIFY_TOKEN=${META_WEBHOOK_VERIFY_TOKEN}
+
+      # Encryption
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+
+      # Development
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s

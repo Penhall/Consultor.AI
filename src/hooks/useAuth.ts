@@ -30,14 +30,36 @@ export function useAuth(): UseAuthReturn {
   })
 
   // Fetch consultant profile
-  const fetchConsultant = async (userId: string): Promise<Consultant | null> => {
+  const fetchConsultant = async (userId: string, userEmail?: string): Promise<Consultant | null> => {
     try {
       const supabase = createClient()
-      const { data, error } = await supabase
+
+      // Try to find by user_id first
+      let { data, error } = await supabase
         .from('consultants')
         .select('*')
         .eq('user_id', userId)
         .single()
+
+      // If not found by user_id, try by email (for demo accounts)
+      if (error && userEmail) {
+        const result = await supabase
+          .from('consultants')
+          .select('*')
+          .eq('email', userEmail)
+          .single()
+
+        data = result.data
+        error = result.error
+
+        // If found by email, update user_id to link them
+        if (data && !error) {
+          await supabase
+            .from('consultants')
+            .update({ user_id: userId })
+            .eq('id', data.id)
+        }
+      }
 
       if (error) {
         console.error('Error fetching consultant:', error)
@@ -57,7 +79,7 @@ export function useAuth(): UseAuthReturn {
       return
     }
 
-    const consultant = await fetchConsultant(state.user.id)
+    const consultant = await fetchConsultant(state.user.id, state.user.email)
     setState((prev) => ({ ...prev, consultant }))
   }
 
@@ -88,7 +110,7 @@ export function useAuth(): UseAuthReturn {
         const { data: { session } } = await supabase.auth.getSession()
 
         if (session?.user) {
-          const consultant = await fetchConsultant(session.user.id)
+          const consultant = await fetchConsultant(session.user.id, session.user.email)
           setState({
             user: session.user,
             consultant,
@@ -120,7 +142,7 @@ export function useAuth(): UseAuthReturn {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session?.user) {
-          const consultant = await fetchConsultant(session.user.id)
+          const consultant = await fetchConsultant(session.user.id, session.user.email)
           setState({
             user: session.user,
             consultant,
@@ -136,7 +158,7 @@ export function useAuth(): UseAuthReturn {
           })
         } else if (event === 'TOKEN_REFRESHED' && session?.user) {
           // Optionally refresh consultant data on token refresh
-          const consultant = await fetchConsultant(session.user.id)
+          const consultant = await fetchConsultant(session.user.id, session.user.email)
           setState({
             user: session.user,
             consultant,
