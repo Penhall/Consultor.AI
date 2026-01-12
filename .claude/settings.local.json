@@ -39,7 +39,13 @@
       "Bash(bash:*)",
       "Bash(docker restart:*)",
       "Bash(PGPASSWORD=postgres psql:*)",
-      "Bash(python3 -m json.tool:*)"
+      "Bash(python3 -m json.tool:*)",
+      "Bash(git fetch:*)",
+      "Bash(if [ -d \"specs\" ])",
+      "Bash(then ls -d specs/[0-9]*-project-specs)",
+      "Bash(else echo \"No specs directory\")",
+      "Bash(fi)",
+      "Bash(powershell.exe:*)"
     ]
   }
 }
