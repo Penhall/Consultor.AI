@@ -1,42 +1,65 @@
-import '@testing-library/jest-dom';
-import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+/**
+ * Test Setup
+ * Configuração global para todos os testes
+ */
 
-// Cleanup after each test
-afterEach(() => {
-  cleanup();
-});
+import '@testing-library/jest-dom'
+import { afterEach, beforeAll, vi } from 'vitest'
+import { cleanup } from '@testing-library/react'
 
-// Mock Next.js router
+// =============================================================================
+// Environment Variables
+// =============================================================================
+beforeAll(() => {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321'
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key-for-testing'
+  process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key'
+  process.env.ENCRYPTION_KEY = 'test-encryption-key-32-chars!!'
+  process.env.GOOGLE_AI_API_KEY = 'test-google-ai-key'
+  process.env.META_APP_SECRET = 'test-meta-secret'
+  process.env.META_WEBHOOK_VERIFY_TOKEN = 'test-verify-token'
+})
+
+// =============================================================================
+// Global Mocks
+// =============================================================================
+
+// Mock Supabase
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({
+    auth: {
+      getSession: vi.fn().mockResolvedValue({
+        data: { session: { user: { id: 'test-user-id' } } },
+        error: null,
+      }),
+    },
+    from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null, error: null }),
+    })),
+  })),
+}))
+
+// Mock Next.js Navigation
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
-    prefetch: vi.fn(),
-    back: vi.fn(),
-    forward: vi.fn(),
     refresh: vi.fn(),
   }),
-  usePathname: () => '/',
+  usePathname: () => '/dashboard',
   useSearchParams: () => new URLSearchParams(),
   useParams: () => ({}),
-}));
+}))
 
-// Mock Next.js headers
-vi.mock('next/headers', () => ({
-  cookies: vi.fn(() => ({
-    get: vi.fn(),
-    set: vi.fn(),
-    delete: vi.fn(),
-  })),
-  headers: vi.fn(() => ({
-    get: vi.fn(),
-  })),
-}));
-
-// Suppress console errors in tests (optional)
-global.console = {
-  ...console,
-  error: vi.fn(),
-  warn: vi.fn(),
-};
+// =============================================================================
+// Cleanup
+// =============================================================================
+afterEach(() => {
+  cleanup()
+  vi.clearAllMocks()
+})

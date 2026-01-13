@@ -45,7 +45,12 @@
       "Bash(then ls -d specs/[0-9]*-project-specs)",
       "Bash(else echo \"No specs directory\")",
       "Bash(fi)",
-      "Bash(powershell.exe:*)"
+      "Bash(powershell.exe:*)",
+      "Bash(if [ -d \"E:\\\\PROJETOS\\\\Consultor.AI\\\\specs\\\\001-project-specs\\\\checklists\" ])",
+      "Bash(then find \"E:\\\\PROJETOS\\\\Consultor.AI\\\\specs\\\\001-project-specs\\\\checklists\" -name \"*.md\" -type f)",
+      "Bash(else echo \"No checklists directory\")",
+      "Bash(.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)",
+      "Bash(awk:*)"
     ]
   }
 }
