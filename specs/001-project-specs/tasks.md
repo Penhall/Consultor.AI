@@ -72,15 +72,15 @@ SETUP (Phase 1) → FOUNDATIONAL (Phase 2) → USER STORIES (Phase 3+) → POLIS
 
 ### Tasks
 
-- [ ] T001 Verify Next.js 14.2.35 project structure matches plan.md in src/app directory
-- [ ] T002 [P] Configure TypeScript strict mode in tsconfig.json (strict: true, noImplicitAny: true, noUnusedLocals: true)
-- [ ] T003 [P] Configure ESLint with Next.js, TypeScript, and React rules in .eslintrc.json
-- [ ] T004 [P] Configure Prettier with Tailwind CSS plugin in .prettierrc
-- [ ] T005 [P] Set up Vitest config in vitest.config.ts with coverage thresholds (80% overall, 90% unit)
-- [ ] T006 [P] Set up Playwright config in playwright.config.ts for E2E tests (3 browsers: Chrome, Firefox, Safari)
-- [ ] T007 [P] Configure Tailwind CSS in tailwind.config.ts with shadcn/ui presets
-- [ ] T008 Install and configure React Query (TanStack Query v5) provider in src/components/providers.tsx
-- [ ] T009 [P] Set up environment variables template in .env.example (SUPABASE_URL, META_APP_SECRET, GROQ_API_KEY, etc.)
+- [x] T001 Verify Next.js 14.2.35 project structure matches plan.md in src/app directory
+- [x] T002 [P] Configure TypeScript strict mode in tsconfig.json (strict: true, noImplicitAny: true, noUnusedLocals: true)
+- [x] T003 [P] Configure ESLint with Next.js, TypeScript, and React rules in .eslintrc.json
+- [x] T004 [P] Configure Prettier with Tailwind CSS plugin in .prettierrc
+- [x] T005 [P] Set up Vitest config in vitest.config.ts with coverage thresholds (80% overall, 90% unit)
+- [x] T006 [P] Set up Playwright config in playwright.config.ts for E2E tests (3 browsers: Chrome, Firefox, Safari)
+- [x] T007 [P] Configure Tailwind CSS in tailwind.config.ts with shadcn/ui presets
+- [x] T008 Install and configure React Query (TanStack Query v5) provider in src/components/providers.tsx
+- [x] T009 [P] Set up environment variables template in .env.example (SUPABASE_URL, META_APP_SECRET, GROQ_API_KEY, etc.)
 - [ ] T010 [P] Configure GitHub Actions workflow in .github/workflows/ci.yml (test, lint, build on PR)
 - [ ] T011 [P] Set up pre-commit Git hooks with Husky (run lint + type-check before commit)
 - [ ] T012 Create test directory structure: tests/unit/, tests/integration/, tests/e2e/, tests/mocks/, tests/fixtures/
@@ -95,17 +95,17 @@ SETUP (Phase 1) → FOUNDATIONAL (Phase 2) → USER STORIES (Phase 3+) → POLIS
 
 ### Tasks
 
-- [ ] T013 Initialize Supabase project and apply initial schema migration from supabase/migrations/20251217000001_initial_schema.sql
-- [ ] T014 Apply RLS policies migration from supabase/migrations/20251217000002_rls_policies.sql
+- [x] T013 Initialize Supabase project and apply initial schema migration from supabase/migrations/20251217000001_initial_schema.sql
+- [x] T014 Apply RLS policies migration from supabase/migrations/20251217000002_rls_policies.sql
 - [ ] T015 Apply performance indexes migration from supabase/migrations/20251217000003_performance_indexes.sql
-- [ ] T016 Verify all 5 core tables created: consultants, leads, conversations, messages, flows
-- [ ] T017 [P] Implement Supabase client wrapper in src/lib/supabase/client.ts (SSR-safe for Client Components)
-- [ ] T018 [P] Implement Supabase server wrapper in src/lib/supabase/server.ts (for Server Components & API routes)
-- [ ] T019 [P] Implement auth middleware in src/middleware.ts (JWT validation, protected route enforcement)
-- [ ] T020 [P] Implement encryption utility in src/lib/encryption/index.ts (AES-256-GCM for Meta tokens)
-- [ ] T021 [P] Create Zod validation schemas in src/lib/validations/lead.ts (leadCreateSchema, leadUpdateSchema)
+- [x] T016 Verify all 5 core tables created: consultants, leads, conversations, messages, flows
+- [x] T017 [P] Implement Supabase client wrapper in src/lib/supabase/client.ts (SSR-safe for Client Components)
+- [x] T018 [P] Implement Supabase server wrapper in src/lib/supabase/server.ts (for Server Components & API routes)
+- [x] T019 [P] Implement auth middleware in src/middleware.ts (JWT validation, protected route enforcement)
+- [x] T020 [P] Implement encryption utility in src/lib/encryption/index.ts (AES-256-GCM for Meta tokens)
+- [x] T021 [P] Create Zod validation schemas in src/lib/validations/lead.ts (leadCreateSchema, leadUpdateSchema)
 - [ ] T022 [P] Create custom error classes in src/lib/errors.ts (ValidationError, NotFoundError, UnauthorizedError)
-- [ ] T023 Generate TypeScript types from Supabase schema in src/types/database.ts (run: supabase gen types typescript)
+- [x] T023 Generate TypeScript types from Supabase schema in src/types/database.ts (run: supabase gen types typescript)
 
 **Tests** (30% coverage - integration):
 - [ ] T024 [P] Write integration test for Supabase client in tests/integration/supabase-client.test.ts (connection, auth, RLS)
@@ -125,18 +125,18 @@ SETUP (Phase 1) → FOUNDATIONAL (Phase 2) → USER STORIES (Phase 3+) → POLIS
 ### Tasks
 
 **Flow Engine (Core Architecture)**:
-- [ ] T027 [P] [US1] Implement Flow types in src/lib/flow-engine/types.ts (FlowDefinition, Step, ConversationState)
-- [ ] T028 [P] [US1] Implement Flow parser in src/lib/flow-engine/parser.ts (validate JSON, check cycles, verify proxima references)
-- [ ] T029 [P] [US1] Implement State Manager in src/lib/flow-engine/state-manager.ts (persist/retrieve conversation state from Supabase)
-- [ ] T030 [US1] Implement Step Executors in src/lib/flow-engine/executors.ts (MessageExecutor, ChoiceExecutor, ExecuteExecutor)
+- [x] T027 [P] [US1] Implement Flow types in src/lib/flow-engine/types.ts (FlowDefinition, Step, ConversationState)
+- [x] T028 [P] [US1] Implement Flow parser in src/lib/flow-engine/parser.ts (validate JSON, check cycles, verify proxima references)
+- [x] T029 [P] [US1] Implement State Manager in src/lib/flow-engine/state-manager.ts (persist/retrieve conversation state from Supabase)
+- [x] T030 [US1] Implement Step Executors in src/lib/flow-engine/executors.ts (MessageExecutor, ChoiceExecutor, ExecuteExecutor)
 - [ ] T031 [US1] Implement Flow Engine in src/lib/flow-engine/engine.ts (orchestrate execution, call executors based on step type)
-- [ ] T032 [US1] Create index barrel export in src/lib/flow-engine/index.ts
+- [x] T032 [US1] Create index barrel export in src/lib/flow-engine/index.ts
 
 **WhatsApp Integration**:
-- [ ] T033 [P] [US1] Implement Meta API client in src/lib/whatsapp/meta-client.ts (sendMessage, sendButtons, sendList, getMessageStatus)
-- [ ] T034 [P] [US1] Implement webhook validation in src/lib/whatsapp/webhook-validation.ts (HMAC SHA-256 signature verification, timestamp check)
-- [ ] T035 [US1] Implement webhook route in src/app/api/webhook/meta/[consultantId]/route.ts (async processing pattern, idempotency)
-- [ ] T036 [US1] Implement lead auto-create service in src/lib/services/lead-auto-create.ts (create lead from new WhatsApp number)
+- [x] T033 [P] [US1] Implement Meta API client in src/lib/whatsapp/meta-client.ts (sendMessage, sendButtons, sendList, getMessageStatus)
+- [x] T034 [P] [US1] Implement webhook validation in src/lib/whatsapp/webhook-validation.ts (HMAC SHA-256 signature verification, timestamp check)
+- [x] T035 [US1] Implement webhook route in src/app/api/webhook/meta/[consultantId]/route.ts (async processing pattern, idempotency)
+- [x] T036 [US1] Implement lead auto-create service in src/lib/services/lead-auto-create.ts (create lead from new WhatsApp number)
 
 **Tests** (60% coverage - unit tests):
 - [ ] T037 [P] [US1] Write unit tests for Flow Parser in tests/unit/lib/flow-engine/parser.test.ts (valid/invalid JSON, cycle detection)
@@ -162,15 +162,15 @@ SETUP (Phase 1) → FOUNDATIONAL (Phase 2) → USER STORIES (Phase 3+) → POLIS
 ### Tasks
 
 **Authentication & Onboarding**:
-- [ ] T044 [P] [US3] Implement signup page in src/app/auth/signup/page.tsx (form with email, password, name, phone)
-- [ ] T045 [P] [US3] Implement login page in src/app/auth/login/page.tsx (email/password form, magic link option)
+- [x] T044 [P] [US3] Implement signup page in src/app/auth/signup/page.tsx (form with email, password, name, phone)
+- [x] T045 [P] [US3] Implement login page in src/app/auth/login/page.tsx (email/password form, magic link option)
 - [ ] T046 [US3] Implement signup form component in src/components/auth/signup-form.tsx (React Hook Form + Zod validation)
 - [ ] T047 [US3] Implement login form component in src/components/auth/login-form.tsx (React Hook Form + Zod validation)
-- [ ] T048 [US3] Implement profile setup page in src/app/dashboard/perfil/page.tsx (bio, credentials, vertical selection)
-- [ ] T049 [US3] Implement WhatsApp integration page in src/app/dashboard/perfil/whatsapp/page.tsx (Meta Embedded Signup button)
-- [ ] T050 [US3] Implement Meta Connect Button component in src/components/whatsapp/MetaConnectButton.tsx (OAuth flow initiation)
-- [ ] T051 [US3] Implement Meta callback route in src/app/api/consultants/meta-callback/route.ts (handle OAuth callback, encrypt token, register webhook)
-- [ ] T052 [US3] Implement useMetaSignup hook in src/hooks/useMetaSignup.ts (manage OAuth state, handle errors)
+- [x] T048 [US3] Implement profile setup page in src/app/dashboard/perfil/page.tsx (bio, credentials, vertical selection)
+- [x] T049 [US3] Implement WhatsApp integration page in src/app/dashboard/perfil/whatsapp/page.tsx (Meta Embedded Signup button)
+- [x] T050 [US3] Implement Meta Connect Button component in src/components/whatsapp/MetaConnectButton.tsx (OAuth flow initiation)
+- [x] T051 [US3] Implement Meta callback route in src/app/api/consultants/meta-callback/route.ts (handle OAuth callback, encrypt token, register webhook)
+- [x] T052 [US3] Implement useMetaSignup hook in src/hooks/useMetaSignup.ts (manage OAuth state, handle errors)
 
 **Tests**:
 - [ ] T053 [P] [US3] Write unit tests for signup form in tests/unit/components/auth/signup-form.test.ts (validation, submit handling)
@@ -191,9 +191,9 @@ SETUP (Phase 1) → FOUNDATIONAL (Phase 2) → USER STORIES (Phase 3+) → POLIS
 ### Tasks
 
 **AI Integration & Compliance**:
-- [ ] T057 [P] [US4] Implement Gemini client in src/lib/ai/gemini.ts (Google AI SDK wrapper, prompt construction, rate limiting)
+- [x] T057 [P] [US4] Implement Gemini client in src/lib/ai/gemini.ts (Google AI SDK wrapper, prompt construction, rate limiting)
 - [ ] T058 [P] [US4] Implement Groq client in src/lib/api/groq.ts (Groq SDK wrapper for fallback provider)
-- [ ] T059 [US4] Implement AI service in src/lib/services/ai-service.ts (generateCompliantResponse, detectComplianceViolations, fallback logic)
+- [x] T059 [US4] Implement AI service in src/lib/services/ai-service.ts (generateCompliantResponse, detectComplianceViolations, fallback logic)
 - [ ] T060 [US4] Create fallback response templates in src/lib/ai/templates.ts (per perfil type: individual, familia, empresa, casal)
 - [ ] T061 [US4] Implement AI compliance validator in src/lib/ai/compliance.ts (regex patterns for pricing, illegal claims, sensitive data)
 
@@ -216,19 +216,19 @@ SETUP (Phase 1) → FOUNDATIONAL (Phase 2) → USER STORIES (Phase 3+) → POLIS
 ### Tasks
 
 **Dashboard UI**:
-- [ ] T066 [P] [US2] Implement dashboard layout in src/app/dashboard/layout.tsx (navigation, sidebar, header)
-- [ ] T067 [P] [US2] Implement dashboard home page in src/app/dashboard/page.tsx (overview metrics, recent activity)
-- [ ] T068 [US2] Implement leads list page in src/app/dashboard/leads/page.tsx (sortable, filterable table, status badges)
+- [x] T066 [P] [US2] Implement dashboard layout in src/app/dashboard/layout.tsx (navigation, sidebar, header)
+- [x] T067 [P] [US2] Implement dashboard home page in src/app/dashboard/page.tsx (overview metrics, recent activity)
+- [x] T068 [US2] Implement leads list page in src/app/dashboard/leads/page.tsx (sortable, filterable table, status badges)
 - [ ] T069 [US2] Implement lead detail page in src/app/dashboard/leads/[id]/page.tsx (profile, responses, conversation history, status update)
 - [ ] T070 [US2] Implement lead list component in src/components/leads/lead-list.tsx (table with sorting, filtering, pagination)
 - [ ] T071 [US2] Implement lead card component in src/components/leads/lead-card.tsx (compact lead view with status badge)
 - [ ] T072 [US2] Implement lead detail component in src/components/leads/lead-detail.tsx (full profile, conversation history, status update form)
 
 **Lead Management API**:
-- [ ] T073 [US2] Implement leads list route in src/app/api/leads/route.ts (GET with filters, POST for manual lead creation)
-- [ ] T074 [US2] Implement lead detail route in src/app/api/leads/[id]/route.ts (GET, PATCH for status update, DELETE)
-- [ ] T075 [US2] Implement lead stats route in src/app/api/leads/stats/route.ts (GET count by status, average score, conversion rate)
-- [ ] T076 [US2] Implement lead service in src/lib/services/lead-service.ts (CRUD operations, score calculation, status transitions)
+- [x] T073 [US2] Implement leads list route in src/app/api/leads/route.ts (GET with filters, POST for manual lead creation)
+- [x] T074 [US2] Implement lead detail route in src/app/api/leads/[id]/route.ts (GET, PATCH for status update, DELETE)
+- [x] T075 [US2] Implement lead stats route in src/app/api/leads/stats/route.ts (GET count by status, average score, conversion rate)
+- [x] T076 [US2] Implement lead service in src/lib/services/lead-service.ts (CRUD operations, score calculation, status transitions)
 
 **Tests**:
 - [ ] T077 [P] [US2] Write unit tests for lead service in tests/unit/lib/services/lead-service.test.ts (CRUD, scoring algorithm, status validation)
@@ -249,17 +249,17 @@ SETUP (Phase 1) → FOUNDATIONAL (Phase 2) → USER STORIES (Phase 3+) → POLIS
 ### Tasks
 
 **Analytics UI**:
-- [ ] T081 [P] [US6] Implement analytics page in src/app/dashboard/analytics/page.tsx (metrics grid, charts, date filters)
-- [ ] T082 [P] [US6] Implement metric card component in src/components/dashboard/metric-card.tsx (display single metric with label, value, trend)
-- [ ] T083 [P] [US6] Implement pie chart component in src/components/dashboard/pie-chart.tsx (SVG-based, status distribution)
-- [ ] T084 [P] [US6] Implement bar chart component in src/components/dashboard/bar-chart.tsx (SVG-based, leads over time)
-- [ ] T085 [P] [US6] Implement recent leads table in src/components/dashboard/recent-leads-table.tsx (last 10 interactions with timestamps)
+- [x] T081 [P] [US6] Implement analytics page in src/app/dashboard/analytics/page.tsx (metrics grid, charts, date filters)
+- [x] T082 [P] [US6] Implement metric card component in src/components/dashboard/metric-card.tsx (display single metric with label, value, trend)
+- [x] T083 [P] [US6] Implement pie chart component in src/components/dashboard/pie-chart.tsx (SVG-based, status distribution)
+- [x] T084 [P] [US6] Implement bar chart component in src/components/dashboard/bar-chart.tsx (SVG-based, leads over time)
+- [x] T085 [P] [US6] Implement recent leads table in src/components/dashboard/recent-leads-table.tsx (last 10 interactions with timestamps)
 
 **Analytics API**:
-- [ ] T086 [US6] Implement analytics overview route in src/app/api/analytics/overview/route.ts (GET 6 key metrics with date filter)
-- [ ] T087 [US6] Implement analytics charts route in src/app/api/analytics/charts/route.ts (GET pie chart data, bar chart data)
-- [ ] T088 [US6] Implement analytics activity route in src/app/api/analytics/activity/route.ts (GET recent lead interactions)
-- [ ] T089 [US6] Implement analytics service in src/lib/services/analytics-service.ts (calculate metrics, aggregate data, format chart data)
+- [x] T086 [US6] Implement analytics overview route in src/app/api/analytics/overview/route.ts (GET 6 key metrics with date filter)
+- [x] T087 [US6] Implement analytics charts route in src/app/api/analytics/charts/route.ts (GET pie chart data, bar chart data)
+- [x] T088 [US6] Implement analytics activity route in src/app/api/analytics/activity/route.ts (GET recent lead interactions)
+- [x] T089 [US6] Implement analytics service in src/lib/services/analytics-service.ts (calculate metrics, aggregate data, format chart data)
 
 **Tests**:
 - [ ] T090 [P] [US6] Write unit tests for analytics service in tests/unit/lib/services/analytics-service.test.ts (metric calculations, date filtering, aggregations)
