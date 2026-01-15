@@ -62,14 +62,16 @@ export async function GET(request: NextRequest) {
     const consultantId = (consultantResult as any).data.id as string
 
     // Parse query params
+    // Note: searchParams.get() returns null if param doesn't exist,
+    // but Zod .optional() expects undefined. Use ?? to convert null to undefined.
     const searchParams = request.nextUrl.searchParams
     const params = {
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit'),
-      status: searchParams.get('status'),
-      search: searchParams.get('search'),
-      orderBy: searchParams.get('orderBy'),
-      order: searchParams.get('order'),
+      page: searchParams.get('page') ?? undefined,
+      limit: searchParams.get('limit') ?? undefined,
+      status: searchParams.get('status') ?? undefined,
+      search: searchParams.get('search') ?? undefined,
+      orderBy: searchParams.get('orderBy') ?? undefined,
+      order: searchParams.get('order') ?? undefined,
     }
 
     // Validate params
