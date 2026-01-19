@@ -7,15 +7,15 @@
 
 import { useEffect, useState, useCallback } from 'react'
 
-declare global {
-  interface Window {
-    FB: any
-    fbAsyncInit: () => void
-  }
+// Facebook SDK types are defined in src/types/facebook-sdk.d.ts
+
+export interface MetaSignupResult {
+  phone_number: string
+  display_name: string
 }
 
 export interface MetaSignupOptions {
-  onSuccess: (data: any) => void
+  onSuccess: (data: MetaSignupResult) => void
   onError: (error: Error) => void
 }
 
@@ -32,12 +32,15 @@ export function useMetaSignup() {
 
     // Initialize Facebook SDK
     window.fbAsyncInit = function() {
-      window.FB.init({
-        appId: process.env.NEXT_PUBLIC_META_APP_ID,
-        cookie: true,
-        xfbml: true,
-        version: 'v18.0'
-      })
+      const appId = process.env.NEXT_PUBLIC_META_APP_ID
+      if (window.FB && appId) {
+        window.FB.init({
+          appId,
+          cookie: true,
+          xfbml: true,
+          version: 'v18.0'
+        })
+      }
       setIsSDKLoaded(true)
     }
 
@@ -67,7 +70,7 @@ export function useMetaSignup() {
 
     try {
       window.FB.login(
-        async (response: any) => {
+        async (response) => {
           if (response.authResponse) {
             const code = response.authResponse.code
 

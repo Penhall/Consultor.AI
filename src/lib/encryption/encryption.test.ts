@@ -76,7 +76,9 @@ describe('Encryption', () => {
 
       // Tamper with ciphertext
       const parts = encrypted.split(':')
-      parts[2] = parts[2].replace('a', 'b')
+      if (parts[2]) {
+        parts[2] = parts[2].replace('a', 'b')
+      }
       const tampered = parts.join(':')
 
       expect(() => decrypt(tampered)).toThrow('Decryption failed')

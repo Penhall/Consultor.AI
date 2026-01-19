@@ -15,8 +15,11 @@ export const mockConversationState: ConversationState = {
     nome: 'João Silva',
     perfil: 'individual',
   },
-  stepHistory: ['inicio', 'step-1'],
-  completedAt: null,
+  responses: {},
+  history: [
+    { stepId: 'inicio', timestamp: new Date().toISOString() },
+    { stepId: 'step-1', timestamp: new Date().toISOString() },
+  ],
 }
 
 /**

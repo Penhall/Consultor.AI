@@ -25,7 +25,7 @@ export default function LeadsPage() {
       const data = await res.json()
       const items: Lead[] = data?.data ?? []
       setLeads(items)
-      if (items.length > 0) setSelectedLead(items[0])
+      if (items.length > 0 && items[0]) setSelectedLead(items[0])
     } catch (err) {
       console.error(err)
       setError('Não foi possível carregar os leads.')

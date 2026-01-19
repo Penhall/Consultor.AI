@@ -5,7 +5,7 @@
  * Returns the Meta WhatsApp integration status for a consultant
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getIntegration } from '@/lib/services/whatsapp-integration-service'
 
@@ -16,7 +16,7 @@ interface RouteContext {
 }
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   context: RouteContext
 ) {
   try {

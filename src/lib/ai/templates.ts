@@ -15,5 +15,8 @@ const templates: Record<string, string> = {
 }
 
 export function getFallbackTemplate(vertical: string = 'saude'): string {
-  return templates[vertical] ?? templates.saude
+  const template = templates[vertical]
+  if (template) return template
+  // Fallback to saude template (always defined)
+  return templates.saude as string
 }

@@ -57,7 +57,10 @@
       "Bash(npm run test:coverage:*)",
       "Bash(./scripts/setup-api-tests.sh:*)",
       "Bash(npm test:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm run lint:*)",
+      "Bash(echo:*)",
+      "Bash(npm run type-check:*)"
     ]
   }
 }

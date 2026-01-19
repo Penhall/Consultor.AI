@@ -46,7 +46,7 @@ export function LeadList({ leads, onSelect }: LeadListProps) {
         <Input
           placeholder="Buscar por nome ou WhatsApp"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
         />
         <div className="flex flex-wrap gap-2">
           {statuses.map((option) => (

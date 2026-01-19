@@ -4,8 +4,7 @@
  * Validates and parses conversation flow definitions
  */
 
-import type { FlowDefinition, FlowStep } from './types'
-import { flowDefinitionSchema } from './types'
+import { flowDefinitionSchema, type FlowDefinition, type FlowStep } from './types'
 
 type ParseResult<T> =
   | { success: true; data: T }

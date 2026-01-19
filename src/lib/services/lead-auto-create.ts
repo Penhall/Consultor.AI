@@ -139,11 +139,11 @@ function formatWhatsAppNumber(number: string): string {
 
   // If doesn't start with country code, assume Brazil (55)
   if (!cleaned.startsWith('55')) {
-    cleaned = '55' + cleaned
+    cleaned = `55${cleaned}`
   }
 
   // Add + prefix
-  return '+' + cleaned
+  return `+${cleaned}`
 }
 
 /**

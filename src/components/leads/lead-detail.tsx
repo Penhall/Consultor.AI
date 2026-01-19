@@ -32,7 +32,7 @@ export function LeadDetail({ lead, onStatusChange }: LeadDetailProps) {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>{lead.name || lead.whatsapp_number}</span>
-            <Badge>{lead.status.replace('_', ' ')}</Badge>
+            <Badge>{(lead.status ?? 'novo').replace('_', ' ')}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -47,11 +47,11 @@ export function LeadDetail({ lead, onStatusChange }: LeadDetailProps) {
             </div>
             <div>
               <p className="text-gray-500">Criado</p>
-              <p>{new Date(lead.created_at).toLocaleString('pt-BR')}</p>
+              <p>{lead.created_at ? new Date(lead.created_at).toLocaleString('pt-BR') : '—'}</p>
             </div>
             <div>
               <p className="text-gray-500">Atualizado</p>
-              <p>{new Date(lead.updated_at).toLocaleString('pt-BR')}</p>
+              <p>{lead.updated_at ? new Date(lead.updated_at).toLocaleString('pt-BR') : '—'}</p>
             </div>
           </div>
 
