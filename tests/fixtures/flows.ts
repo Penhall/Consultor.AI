@@ -1,23 +1,28 @@
 /**
  * Test Fixtures: Flows
  * Mock data para fluxos de conversação
+ *
+ * Schema esperado por FlowDefinition:
+ * - versao: string
+ * - inicio: string (ID do primeiro passo)
+ * - passos: FlowStep[]
  */
 
-export const mockFlowHealthBasic = {
-  id: 'flow-health-basic',
-  nome: 'Qualificação Saúde Básica',
+import type { FlowDefinition } from '@/lib/flow-engine/types'
+
+export const mockFlowHealthBasic: FlowDefinition = {
   versao: '1.0.0',
-  vertical: 'saude',
-  etapas: [
+  inicio: 'inicio',
+  passos: [
     {
       id: 'inicio',
-      tipo: 'mensagem' as const,
+      tipo: 'mensagem',
       mensagem: 'Olá! Sou assistente virtual. Vou te ajudar a encontrar o plano ideal.',
       proxima: 'perfil',
     },
     {
       id: 'perfil',
-      tipo: 'escolha' as const,
+      tipo: 'escolha',
       pergunta: 'Qual seu perfil?',
       opcoes: [
         { texto: 'Individual', valor: 'individual', proxima: 'idade' },
@@ -28,7 +33,7 @@ export const mockFlowHealthBasic = {
     },
     {
       id: 'idade',
-      tipo: 'escolha' as const,
+      tipo: 'escolha',
       pergunta: 'Qual sua faixa etária?',
       opcoes: [
         { texto: 'Até 30 anos', valor: 'ate_30', proxima: 'coparticipacao' },
@@ -39,7 +44,7 @@ export const mockFlowHealthBasic = {
     },
     {
       id: 'coparticipacao',
-      tipo: 'escolha' as const,
+      tipo: 'escolha',
       pergunta: 'Prefere plano com coparticipação?',
       opcoes: [
         { texto: 'Sim (mensalidade menor, paga consultas)', valor: 'sim', proxima: 'gerar_resposta' },
@@ -48,7 +53,7 @@ export const mockFlowHealthBasic = {
     },
     {
       id: 'gerar_resposta',
-      tipo: 'executar' as const,
+      tipo: 'executar',
       acao: 'gerar_resposta_ia',
       parametros: {},
       proxima: null,
@@ -56,38 +61,51 @@ export const mockFlowHealthBasic = {
   ],
 }
 
-export const mockFlowCircular = {
-  id: 'flow-circular-invalid',
-  nome: 'Fluxo Circular (Inválido)',
+export const mockFlowCircular: FlowDefinition = {
   versao: '1.0.0',
-  vertical: 'saude',
-  etapas: [
+  inicio: 'step1',
+  passos: [
     {
       id: 'step1',
-      tipo: 'mensagem' as const,
+      tipo: 'mensagem',
       mensagem: 'Passo 1',
       proxima: 'step2',
     },
     {
       id: 'step2',
-      tipo: 'mensagem' as const,
+      tipo: 'mensagem',
       mensagem: 'Passo 2',
       proxima: 'step1', // Circular reference!
     },
   ],
 }
 
-export const mockFlowMissingReference = {
-  id: 'flow-missing-ref-invalid',
-  nome: 'Fluxo com Referência Inválida',
+export const mockFlowMissingReference: FlowDefinition = {
   versao: '1.0.0',
-  vertical: 'saude',
-  etapas: [
+  inicio: 'step1',
+  passos: [
     {
       id: 'step1',
-      tipo: 'mensagem' as const,
+      tipo: 'mensagem',
       mensagem: 'Passo 1',
       proxima: 'nonexistent-step', // Missing reference!
+    },
+  ],
+}
+
+// Aliases para compatibilidade com testes antigos que usavam formato diferente
+export const mockDefaultFlow = mockFlowHealthBasic
+
+// Flow mínimo para testes simples
+export const mockMinimalFlow: FlowDefinition = {
+  versao: '1.0.0',
+  inicio: 'inicio',
+  passos: [
+    {
+      id: 'inicio',
+      tipo: 'mensagem',
+      mensagem: 'Olá!',
+      proxima: null,
     },
   ],
 }

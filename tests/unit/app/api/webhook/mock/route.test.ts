@@ -6,11 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { POST } from '@/app/api/webhook/mock/route'
 import { NextRequest } from 'next/server'
-import * as supabaseServer from '@/lib/supabase/server'
-import * as leadAutoCreate from '@/lib/services/lead-auto-create'
-import * as aiService from '@/lib/services/ai-service'
 import {
   mockWebhookConsultant,
   mockWhatsAppLead,
@@ -18,17 +14,38 @@ import {
   mockActiveConversation,
 } from '@tests/fixtures/webhooks'
 
-// Mock modules
-vi.mock('@/lib/supabase/server')
-vi.mock('@/lib/services/lead-auto-create')
-vi.mock('@/lib/services/ai-service')
-
-// Mock FlowEngine class
-vi.mock('@/lib/flow-engine', () => ({
-  FlowEngine: vi.fn(),
+// Use vi.hoisted() to ensure mock functions are available before vi.mock runs
+const {
+  mockAutoCreateLead,
+  mockGenerateAIResponse,
+  mockCreateClient,
+  MockFlowEngine,
+} = vi.hoisted(() => ({
+  mockAutoCreateLead: vi.fn(),
+  mockGenerateAIResponse: vi.fn(),
+  mockCreateClient: vi.fn(),
+  MockFlowEngine: vi.fn(),
 }))
 
-import { FlowEngine } from '@/lib/flow-engine'
+// Mock modules with explicit factories
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: mockCreateClient,
+}))
+
+vi.mock('@/lib/services/lead-auto-create', () => ({
+  autoCreateLead: mockAutoCreateLead,
+}))
+
+vi.mock('@/lib/services/ai-service', () => ({
+  generateAIResponse: mockGenerateAIResponse,
+}))
+
+vi.mock('@/lib/flow-engine', () => ({
+  FlowEngine: MockFlowEngine,
+}))
+
+// Import after mocking
+import { POST } from '@/app/api/webhook/mock/route'
 
 describe('POST /api/webhook/mock', () => {
   let mockSupabase: any
@@ -40,7 +57,7 @@ describe('POST /api/webhook/mock', () => {
     mockSupabase = {
       from: vi.fn(),
     }
-    vi.mocked(supabaseServer.createClient).mockResolvedValue(mockSupabase)
+    mockCreateClient.mockResolvedValue(mockSupabase)
   })
 
   it('deve retornar 400 se parâmetros obrigatórios faltando', async () => {
@@ -176,10 +193,10 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     }
-    ;(FlowEngine as any).mockImplementation(function(this: any) {
+    MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
-    vi.mocked(leadAutoCreate.autoCreateLead).mockResolvedValue(mockWhatsAppLead as any)
+    mockAutoCreateLead.mockResolvedValue(mockWhatsAppLead)
 
     const insertMessageMock = vi.fn().mockResolvedValue({ data: null, error: null })
     const insertConversationMock = vi.fn().mockReturnValue({
@@ -219,20 +236,6 @@ describe('POST /api/webhook/mock', () => {
         }
       }
       if (table === 'conversations') {
-        if (vi.mocked(leadAutoCreate.autoCreateLead).mock.calls.length > 0) {
-          // After lead creation
-          return {
-            select: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                eq: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: null, error: null }),
-                }),
-              }),
-            }),
-            insert: insertConversationMock,
-            update: updateConversationMock,
-          }
-        }
         return {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
@@ -241,6 +244,8 @@ describe('POST /api/webhook/mock', () => {
               }),
             }),
           }),
+          insert: insertConversationMock,
+          update: updateConversationMock,
         }
       }
       if (table === 'flows') {
@@ -285,7 +290,7 @@ describe('POST /api/webhook/mock', () => {
     // Assert
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(leadAutoCreate.autoCreateLead).toHaveBeenCalledWith({
+    expect(mockAutoCreateLead).toHaveBeenCalledWith({
       whatsappNumber: '5511988888888',
       consultantId: mockWebhookConsultant.id,
       initialMessage: 'Olá',
@@ -302,7 +307,7 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     }
-    ;(FlowEngine as any).mockImplementation(function(this: any) {
+    MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
 
@@ -410,10 +415,10 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     }
-    ;(FlowEngine as any).mockImplementation(function(this: any) {
+    MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
-    vi.mocked(aiService.generateAIResponse).mockResolvedValue(
+    mockGenerateAIResponse.mockResolvedValue(
       'Recomendo o plano Premium Individual sem coparticipação.'
     )
 
@@ -502,7 +507,7 @@ describe('POST /api/webhook/mock', () => {
     // Assert
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(aiService.generateAIResponse).toHaveBeenCalledWith({
+    expect(mockGenerateAIResponse).toHaveBeenCalledWith({
       leadData: {
         profile: 'individual',
         ageRange: '31 a 45 anos',
@@ -534,7 +539,7 @@ describe('POST /api/webhook/mock', () => {
         ],
       }),
     }
-    ;(FlowEngine as any).mockImplementation(function(this: any) {
+    MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
 
@@ -636,7 +641,7 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     }
-    ;(FlowEngine as any).mockImplementation(function(this: any) {
+    MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
 

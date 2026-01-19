@@ -29,7 +29,16 @@ export async function POST(req: NextRequest) {
       `client_secret=${process.env.META_APP_SECRET}&code=${code}`
     )
 
+    if (!tokenRes.ok) {
+      const detail = await tokenRes.text().catch(() => '')
+      console.error('Meta token exchange failed:', detail)
+      return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    }
+
     const { access_token } = await tokenRes.json()
+    if (!access_token) {
+      return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    }
 
     // Get WABA info
     const debugRes = await fetch(
@@ -37,8 +46,17 @@ export async function POST(req: NextRequest) {
       `input_token=${access_token}&access_token=${process.env.META_APP_ACCESS_TOKEN}`
     )
 
+    if (!debugRes.ok) {
+      const detail = await debugRes.text().catch(() => '')
+      console.error('Meta debug token failed:', detail)
+      return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    }
+
     const debugData = await debugRes.json()
     const wabaId = debugData.data?.granular_scopes?.[0]?.target_ids?.[0]
+    if (!wabaId) {
+      return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    }
 
     // Get phone numbers
     const phoneRes = await fetch(
@@ -46,7 +64,17 @@ export async function POST(req: NextRequest) {
       { headers: { 'Authorization': `Bearer ${access_token}` } }
     )
 
-    const { data: phones } = await phoneRes.json()
+    if (!phoneRes.ok) {
+      const detail = await phoneRes.text().catch(() => '')
+      console.error('Meta phone fetch failed:', detail)
+      return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    }
+
+    const phonesData = await phoneRes.json()
+    const phones = phonesData?.data
+    if (!phones || phones.length === 0) {
+      return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    }
     const phone = phones[0]
 
     // Save to database

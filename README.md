@@ -375,21 +375,31 @@ vercel
 vercel --prod
 ```
 
-### Opção 2: Docker
+### Opção 2: Docker (prod)
 
 ```bash
-# Build
+# 1) Gere .env com SUPABASE/AI/META/REDIS
+cp .env.example .env
+# Preencha NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, GOOGLE_AI_API_KEY ou GROQ_API_KEY, META_APP_SECRET, ENCRYPTION_KEY, REDIS_PASSWORD.
+
+# 2) Build
 docker build -t consultor-ai .
 
-# Run
-docker run -p 3000:3000 consultor-ai
+# 3) Run
+docker run --env-file .env -p 3000:3000 consultor-ai
 ```
 
 ### Opção 3: Docker Compose
 
 ```bash
-docker-compose up -d
+# Produção (app + redis)
+docker-compose up -d --build
+
+# Desenvolvimento (hot-reload, usa Dockerfile.dev)
+docker-compose -f docker-compose.dev.yml up --build
 ```
+
+> Dicas: a aplicação usa Supabase Cloud por padrão; se quiser Postgres local, habilite o serviço `postgres` comentado em `docker-compose.yml` e atualize as variáveis do .env. O healthcheck usa `/api/health` (não depende do banco).
 
 ---
 

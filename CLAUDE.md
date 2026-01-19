@@ -15,9 +15,10 @@ The system combines conversational AI with personalized content generation to cr
 
 ## Current Status
 
-**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** (100%)
-**Última Atualização:** 2025-12-20
+**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** | Fase 1.5 (Testes) - 🔄 **EM ANDAMENTO**
+**Última Atualização:** 2026-01-15
 **Versão:** 0.1.0
+**Branch Atual:** `001-project-specs`
 
 ### MVP Completo ✅
 
@@ -37,19 +38,50 @@ The system combines conversational AI with personalized content generation to cr
 - ✅ **Database Schema**: RLS policies ativas, migrations aplicadas
 - ✅ **Encryption**: Tokens criptografados com AES-256-GCM
 - ✅ **Webhook Validation**: HMAC SHA-256 para segurança
-- ✅ **API Routes**: 13 endpoints REST completos
+- ✅ **API Routes**: 14 endpoints REST completos
 - ✅ **Pages**: 19 páginas renderizadas
 
-**Build Status**: ✅ 19 páginas, 13 API routes, ~45s build time
+**Build Status**: ✅ 19 páginas, 14 API routes, ~45s build time
+
+### Fase 1.5 - Testes 🔄 (Em Andamento)
+
+**Status dos Testes** (2026-01-14):
+- 🔄 **Cobertura**: 90 suites de teste | 200 testes no total
+- ✅ **API Routes**: 129/131 testes passando (98.5%)
+- ✅ **14/14 rotas** com cobertura de teste (100% das rotas)
+- ⚠️ **48 testes falhando** (necessitam correção de mocks)
+- 📝 **11 testes TODO** (implementação pendente)
+
+**Progresso por Sprint**:
+- ✅ **Sprint 1**: Infraestrutura de testes (COMPLETO)
+- 🔄 **Sprint 2**: Testes unitários críticos (EM ANDAMENTO)
+- ⏳ **Sprint 3**: Testes de integração (PENDENTE)
+- ⏳ **Sprint 4**: CI/CD + E2E (PENDENTE)
+
+**Arquivos de Teste Criados**:
+- `tests/unit/app/api/**` - Testes de API routes
+- `tests/fixtures/` - Fixtures reutilizáveis
+- `tests/mocks/` - Mocks globais (Supabase, Next.js)
+- `tests/setup.ts` - Configuração global
 
 ### Próximas Fases 📋
 
+**Fase 1.5 - Testes** (Em Andamento - Meta: 80% coverage):
+- [x] Estrutura de testes configurada
+- [x] Fixtures e mocks criados
+- [x] Testes de API routes (14/14 rotas)
+- [ ] Corrigir 48 testes falhando
+- [ ] Implementar 11 testes TODO
+- [ ] GitHub Actions CI/CD
+- [ ] Pre-commit hooks (Husky)
+- [ ] Teste E2E (lead qualification flow)
+
 **Fase 2 - Polimento** (Planejado):
+- [ ] Lead detail page completo (`/dashboard/leads/[id]`)
 - [ ] Exportação de Leads (CSV/Excel)
 - [ ] Follow-up Automático
 - [ ] Templates de Mensagens
 - [ ] Filtros Avançados
-- [ ] Testes E2E completos
 
 **Fase 3 - Expansão** (Futuro):
 - [ ] Segundo Vertical (Imóveis)
@@ -57,6 +89,17 @@ The system combines conversational AI with personalized content generation to cr
 - [ ] Voice Cloning (ElevenLabs)
 - [ ] Image Generation (Canva API)
 - [ ] Multi-tenant
+
+### Especificações do Projeto 📋
+
+**Localização**: `specs/001-project-specs/`
+
+| Arquivo | Descrição | Status |
+|---------|-----------|--------|
+| `spec.md` | Especificação completa (7 user stories, 55 FRs) | ✅ Completo |
+| `plan.md` | Plano de implementação técnico | ✅ Completo |
+| `tasks.md` | 85 tasks organizadas por user story | ✅ Completo |
+| `checklists/requirements.md` | Checklist de qualidade | ✅ Aprovado |
 
 ---
 

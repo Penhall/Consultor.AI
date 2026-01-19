@@ -1,24 +1,24 @@
 /**
  * AI Service
  *
- * Generates AI-powered responses based on conversation context
+ * Generates AI-powered responses with compliance safeguards and provider fallback.
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { generateWithGroq } from '@/lib/api/groq'
+import { detectComplianceViolations } from '@/lib/ai/compliance'
+import { getFallbackTemplate } from '@/lib/ai/templates'
 import type { ConversationState } from '@/lib/flow-engine/types'
 import type { Database } from '@/types/database'
 
 type Lead = Database['public']['Tables']['leads']['Row']
-
-// Initialize Gemini API
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
 
 const MODEL_NAME = process.env.GOOGLE_AI_MODEL || 'gemini-1.5-flash'
 const TEMPERATURE = parseFloat(process.env.GOOGLE_AI_TEMPERATURE || '0.7')
 const MAX_TOKENS = parseInt(process.env.GOOGLE_AI_MAX_TOKENS || '500')
 
 /**
- * Configuration for AI generation
+ * Configuration for AI generation (Gemini).
  */
 const generationConfig = {
   temperature: TEMPERATURE,
@@ -28,25 +28,13 @@ const generationConfig = {
 }
 
 /**
- * Safety settings to prevent inappropriate content
+ * Safety settings to prevent inappropriate content (Gemini).
  */
 const safetySettings = [
-  {
-    category: 'HARM_CATEGORY_HARASSMENT',
-    threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-  },
-  {
-    category: 'HARM_CATEGORY_HATE_SPEECH',
-    threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-  },
-  {
-    category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-    threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-  },
-  {
-    category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-    threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-  },
+  { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+  { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+  { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+  { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
 ]
 
 export interface GenerateResponseParams {
@@ -64,28 +52,76 @@ type ServiceResult<T> =
   | { success: true; data: T }
   | { success: false; error: string }
 
+function isGeminiConfigured(): boolean {
+  return Boolean(process.env.GOOGLE_AI_API_KEY)
+}
+
+async function generateWithGemini(prompt: string): Promise<string> {
+  if (!process.env.GOOGLE_AI_API_KEY) {
+    throw new Error('GOOGLE_AI_API_KEY is not configured')
+  }
+
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY)
+  const model = genAI.getGenerativeModel({
+    model: MODEL_NAME,
+    generationConfig,
+    safetySettings: safetySettings as any,
+  })
+
+  const result = await model.generateContent(prompt)
+  const response = result.response
+  const text = response.text()
+  if (!text) {
+    throw new Error('Gemini returned empty response')
+  }
+  return text.trim()
+}
+
 /**
- * Generates AI response based on conversation state
+ * Generates AI response based on conversation state with compliance & fallback.
  */
 export async function generateContextualResponse(
   params: GenerateResponseParams
 ): Promise<ServiceResult<string>> {
   try {
     const { state, lead, consultantData, context = {} } = params
-
-    // Build prompt based on vertical
     const vertical = consultantData?.vertical || 'saude'
     const prompt = buildPrompt(vertical, state, lead, consultantData, context)
 
-    const model = genAI.getGenerativeModel({
-      model: MODEL_NAME,
-      generationConfig,
-      safetySettings: safetySettings as any,
-    })
+    let text: string | undefined
 
-    const result = await model.generateContent(prompt)
-    const response = result.response
-    const text = response.text()
+    // Primary: Gemini
+    if (isGeminiConfigured()) {
+      try {
+        text = await generateWithGemini(prompt)
+      } catch (error) {
+        console.warn('Gemini failed, falling back to Groq:', error)
+      }
+    }
+
+    // Fallback: Groq
+    if (!text) {
+      try {
+        text = await generateWithGroq(prompt, {
+          temperature: TEMPERATURE,
+          maxTokens: MAX_TOKENS,
+        })
+      } catch (error) {
+        console.warn('Groq fallback failed:', error)
+      }
+    }
+
+    // Final fallback: template
+    if (!text) {
+      return { success: true, data: getFallbackTemplate(vertical) }
+    }
+
+    // Compliance check
+    const violations = detectComplianceViolations(text)
+    if (violations.length > 0) {
+      console.error('Compliance violations detected:', violations)
+      return { success: true, data: getFallbackTemplate(vertical) }
+    }
 
     return {
       success: true,
@@ -95,7 +131,9 @@ export async function generateContextualResponse(
     console.error('Error generating AI response:', error)
     return {
       success: false,
-      error: `Failed to generate AI response: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      error: `Failed to generate AI response: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`,
     }
   }
 }
@@ -136,17 +174,17 @@ function buildBasePrompt(vertical: string, consultantData?: any): string {
     saude: `${intro}
 
 REGRAS OBRIGATÓRIAS (COMPLIANCE):
-❌ NUNCA mencione preços exatos de planos (proibido pela ANS)
-❌ NUNCA peça CPF, dados médicos ou condições pré-existentes
-❌ NUNCA prometa "zero carência" ou "cobertura imediata"
-❌ NUNCA faça afirmações enganosas sobre cobertura
+- NUNCA mencione preços exatos de planos (proibido pela ANS)
+- NUNCA peça CPF, dados médicos ou condições pré-existentes
+- NUNCA prometa "zero carência" ou "cobertura imediata"
+- NUNCA faça afirmações enganosas sobre cobertura
 
-✅ PERMITIDO:
+PERMITIDO:
 - Faixas de valores genéricas ("a partir de", "entre X e Y")
 - Perguntar perfil (individual/família/casal/empresarial)
 - Perguntar faixa etária (até 30, 31-45, 46-60, acima de 60)
 - Perguntar preferência de coparticipação (sim/não)
-- Recomendar planos baseado no perfil
+- Recomendar tipos de planos baseado no perfil
 
 TOM E ESTILO:
 - Acolhedor e empático (saúde é sensível)
@@ -157,7 +195,7 @@ TOM E ESTILO:
     imoveis: `${intro}
 
 FOCO:
-- Entender necessidade: tipo, localização, orçamento, finalidade
+- Entender necessidade: tipo, localização, orçamento aproximado, finalidade
 - Destacar diferenciais das propriedades
 - Ser consultivo e transparente
 
@@ -201,12 +239,10 @@ TOM:
 function buildConversationContext(state: ConversationState, lead: Lead): string {
   let context = 'CONTEXTO DA CONVERSA:\n'
 
-  // Lead info
   if (lead.name) {
     context += `Nome do lead: ${lead.name}\n`
   }
 
-  // Conversation variables
   if (Object.keys(state.variables).length > 0) {
     context += '\nVariáveis coletadas:\n'
     for (const [key, value] of Object.entries(state.variables)) {
@@ -214,7 +250,6 @@ function buildConversationContext(state: ConversationState, lead: Lead): string 
     }
   }
 
-  // Recent responses
   if (Object.keys(state.responses).length > 0) {
     context += '\nRespostas do lead:\n'
     for (const [stepId, response] of Object.entries(state.responses)) {
@@ -253,13 +288,11 @@ function buildHealthInstructions(
 
   let instructions = 'INSTRUÇÕES PARA RESPOSTA:\n'
 
-  // Check what info we have
   const hasProfile = Boolean(profile)
   const hasAge = Boolean(age)
   const hasCoparticipation = Boolean(coparticipation)
 
   if (!hasProfile && !hasAge && !hasCoparticipation) {
-    // First interaction - welcome
     instructions += `
 1. Dê boas-vindas de forma calorosa
 2. Apresente-se brevemente como assistente virtual
@@ -267,7 +300,6 @@ function buildHealthInstructions(
 4. Pergunte sobre o perfil (individual, casal, família ou empresarial)
 5. Máximo 3-4 linhas`
   } else if (hasProfile && hasAge && hasCoparticipation) {
-    // All info collected - generate recommendation
     instructions += `
 PERFIL COMPLETO COLETADO:
 - Perfil: ${profile}
@@ -280,9 +312,9 @@ TAREFA:
    - Exemplo: "Planos com rede credenciada regional" ou "Planos com abrangência nacional"
    - NÃO mencione marcas específicas (Amil, Bradesco, etc)
    - NÃO mencione valores exatos
-3. Explique BREVEMENTE os benefícios para esse perfil
+3. Explique brevemente os benefícios para esse perfil
 4. Inclua um call-to-action claro ("Posso te enviar as opções por WhatsApp?")
-5. Tom: validação → recomendação → próximo passo
+5. Tom: validação + recomendação + próximo passo
 6. Máximo 5-6 linhas
 
 IMPORTANTE:
@@ -290,7 +322,6 @@ IMPORTANTE:
 - Mencione benefícios relevantes (ex: coparticipação = mensalidade menor)
 - Crie senso de movimento ("Vou preparar algumas opções")`
   } else {
-    // Partial info - ask for missing data
     const missing = []
     if (!hasProfile) missing.push('perfil')
     if (!hasAge) missing.push('faixa etária')
@@ -306,45 +337,31 @@ FALTANDO: ${missing.join(', ')}
 
 TAREFA:
 1. Agradeça a informação recebida
-2. Explique BREVEMENTE por que precisa da próxima info
+2. Explique brevemente por que precisa da próxima info
 3. Pergunte sobre ${missing[0]}
 4. Máximo 2-3 linhas
-5. Tom: agradecimento → explicação → pergunta`
+5. Tom: agradecimento + explicação + pergunta`
   }
 
   return instructions
 }
 
 /**
- * Fallback response when AI fails
+ * Fallback response when AI fails or is non-compliant.
  */
 export function getFallbackResponse(vertical: string = 'saude'): string {
-  const fallbacks = {
-    saude:
-      'Olá! 👋 Obrigado por entrar em contato. Estou aqui para te ajudar a encontrar o plano de saúde ideal. Para começar, me conta: você está buscando um plano individual, para casal, família ou empresarial?',
-    imoveis:
-      'Olá! 👋 Seja bem-vindo(a)! Estou aqui para te ajudar a encontrar o imóvel ideal. O que você está procurando?',
-    automoveis:
-      'Olá! 👋 Obrigado pelo contato. Vou te ajudar a encontrar o veículo perfeito. Qual tipo de veículo você tem em mente?',
-    financeiro:
-      'Olá! 👋 Obrigado por entrar em contato. Como posso te ajudar com seus objetivos financeiros?',
-  }
-
-  if (vertical in fallbacks) {
-    return fallbacks[vertical as keyof typeof fallbacks]
-  }
-  return fallbacks.saude
+  return getFallbackTemplate(vertical)
 }
 
 /**
- * Checks if Gemini is properly configured
+ * Checks if at least one AI provider is configured.
  */
 export function isAIConfigured(): boolean {
-  return Boolean(process.env.GOOGLE_AI_API_KEY)
+  return Boolean(process.env.GOOGLE_AI_API_KEY || process.env.GROQ_API_KEY)
 }
 
 /**
- * Gets AI model information
+ * Gets AI model information.
  */
 export function getAIModelInfo() {
   return {
@@ -352,5 +369,9 @@ export function getAIModelInfo() {
     temperature: TEMPERATURE,
     maxTokens: MAX_TOKENS,
     configured: isAIConfigured(),
+    providers: {
+      gemini: Boolean(process.env.GOOGLE_AI_API_KEY),
+      groq: Boolean(process.env.GROQ_API_KEY),
+    },
   }
 }
