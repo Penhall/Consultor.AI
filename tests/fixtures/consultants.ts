@@ -34,15 +34,18 @@ export const mockOtherConsultant = {
 export const mockWhatsAppIntegration = {
   id: '123e4567-e89b-12d3-a456-426614174030',
   consultant_id: '123e4567-e89b-12d3-a456-426614174010',
-  provider: 'meta',
+  provider: 'meta' as const,
   access_token: 'encrypted_token_abc123',
   refresh_token: null,
+  api_key: null,
+  api_secret: null,
   webhook_secret: 'encrypted_webhook_secret',
+  webhook_url: 'https://api.example.com/webhook/meta/123e4567-e89b-12d3-a456-426614174010',
   phone_number: '+5511987654321',
   phone_number_id: '123456789',
   waba_id: '987654321',
   display_name: 'Consultor Teste',
-  status: 'active',
+  status: 'active' as const,
   verified_at: '2026-01-14T10:00:00Z',
   expires_at: null,
   last_sync_at: null,
@@ -151,7 +154,7 @@ export const mockMetaPhoneNumbersEmptyResponse = {
  * Mock createMetaIntegration success result
  */
 export const mockCreateMetaIntegrationSuccess = {
-  success: true,
+  success: true as const,
   data: mockWhatsAppIntegration,
 }
 
@@ -159,7 +162,7 @@ export const mockCreateMetaIntegrationSuccess = {
  * Mock createMetaIntegration duplicate error
  */
 export const mockCreateMetaIntegrationDuplicateError = {
-  success: false,
+  success: false as const,
   error: 'Meta integration already exists for this consultant',
 }
 
@@ -167,7 +170,7 @@ export const mockCreateMetaIntegrationDuplicateError = {
  * Mock createMetaIntegration generic error
  */
 export const mockCreateMetaIntegrationError = {
-  success: false,
+  success: false as const,
   error: 'Database error',
 }
 
@@ -175,7 +178,7 @@ export const mockCreateMetaIntegrationError = {
  * Mock getIntegration success result
  */
 export const mockGetIntegrationSuccess = {
-  success: true,
+  success: true as const,
   data: mockWhatsAppIntegration,
 }
 
@@ -183,7 +186,7 @@ export const mockGetIntegrationSuccess = {
  * Mock getIntegration not found
  */
 export const mockGetIntegrationNotFound = {
-  success: false,
+  success: false as const,
   error: 'Integration not found',
 }
 
@@ -191,7 +194,7 @@ export const mockGetIntegrationNotFound = {
  * Mock getIntegration error
  */
 export const mockGetIntegrationError = {
-  success: false,
+  success: false as const,
   error: 'Database connection error',
 }
 
