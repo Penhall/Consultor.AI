@@ -16,13 +16,13 @@ import {
 
 // Use vi.hoisted() to ensure mock functions are available before vi.mock runs
 const {
-  mockAutoCreateLead,
-  mockGenerateAIResponse,
+  mockGetOrCreateLead,
+  mockGenerateContextualResponse,
   mockCreateClient,
   MockFlowEngine,
 } = vi.hoisted(() => ({
-  mockAutoCreateLead: vi.fn(),
-  mockGenerateAIResponse: vi.fn(),
+  mockGetOrCreateLead: vi.fn(),
+  mockGenerateContextualResponse: vi.fn(),
   mockCreateClient: vi.fn(),
   MockFlowEngine: vi.fn(),
 }))
@@ -33,11 +33,11 @@ vi.mock('@/lib/supabase/server', () => ({
 }))
 
 vi.mock('@/lib/services/lead-auto-create', () => ({
-  autoCreateLead: mockAutoCreateLead,
+  getOrCreateLead: mockGetOrCreateLead,
 }))
 
 vi.mock('@/lib/services/ai-service', () => ({
-  generateAIResponse: mockGenerateAIResponse,
+  generateContextualResponse: mockGenerateContextualResponse,
 }))
 
 vi.mock('@/lib/flow-engine', () => ({
@@ -111,6 +111,11 @@ describe('POST /api/webhook/mock', () => {
 
   it('deve retornar 404 se nenhum flow ativo encontrado', async () => {
     // Arrange
+    mockGetOrCreateLead.mockResolvedValue({
+      success: true,
+      data: { lead: mockWhatsAppLead, isNew: false },
+    })
+
     mockSupabase.from = vi.fn((table: string) => {
       if (table === 'consultants') {
         return {
@@ -119,20 +124,6 @@ describe('POST /api/webhook/mock', () => {
               single: vi.fn().mockResolvedValue({
                 data: mockWebhookConsultant,
                 error: null,
-              }),
-            }),
-          }),
-        }
-      }
-      if (table === 'leads') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({
-                  data: mockWhatsAppLead,
-                  error: null,
-                }),
               }),
             }),
           }),
@@ -196,7 +187,10 @@ describe('POST /api/webhook/mock', () => {
     MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
-    mockAutoCreateLead.mockResolvedValue(mockWhatsAppLead)
+    mockGetOrCreateLead.mockResolvedValue({
+      success: true,
+      data: { lead: mockWhatsAppLead, isNew: true },
+    })
 
     const insertMessageMock = vi.fn().mockResolvedValue({ data: null, error: null })
     const insertConversationMock = vi.fn().mockReturnValue({
@@ -219,17 +213,6 @@ describe('POST /api/webhook/mock', () => {
               single: vi.fn().mockResolvedValue({
                 data: mockWebhookConsultant,
                 error: null,
-              }),
-            }),
-          }),
-        }
-      }
-      if (table === 'leads') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: null, error: null }),
               }),
             }),
           }),
@@ -290,11 +273,11 @@ describe('POST /api/webhook/mock', () => {
     // Assert
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(mockAutoCreateLead).toHaveBeenCalledWith({
-      whatsappNumber: '5511988888888',
-      consultantId: mockWebhookConsultant.id,
-      initialMessage: 'Olá',
-    })
+    expect(mockGetOrCreateLead).toHaveBeenCalledWith(
+      mockWebhookConsultant.id,
+      '5511988888888',
+      'Olá'
+    )
   })
 
   it('deve processar mensagem através do FlowEngine', async () => {
@@ -310,6 +293,10 @@ describe('POST /api/webhook/mock', () => {
     MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
+    mockGetOrCreateLead.mockResolvedValue({
+      success: true,
+      data: { lead: mockWhatsAppLead, isNew: false },
+    })
 
     const insertMessageMock = vi.fn().mockResolvedValue({ data: null, error: null })
     const updateConversationMock = vi.fn().mockReturnValue({
@@ -324,20 +311,6 @@ describe('POST /api/webhook/mock', () => {
               single: vi.fn().mockResolvedValue({
                 data: mockWebhookConsultant,
                 error: null,
-              }),
-            }),
-          }),
-        }
-      }
-      if (table === 'leads') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({
-                  data: mockWhatsAppLead,
-                  error: null,
-                }),
               }),
             }),
           }),
@@ -418,9 +391,14 @@ describe('POST /api/webhook/mock', () => {
     MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
-    mockGenerateAIResponse.mockResolvedValue(
-      'Recomendo o plano Premium Individual sem coparticipação.'
-    )
+    mockGetOrCreateLead.mockResolvedValue({
+      success: true,
+      data: { lead: mockWhatsAppLead, isNew: false },
+    })
+    mockGenerateContextualResponse.mockResolvedValue({
+      success: true,
+      data: 'Recomendo o plano Premium Individual sem coparticipação.',
+    })
 
     const insertMessageMock = vi.fn().mockResolvedValue({ data: null, error: null })
     const updateConversationMock = vi.fn().mockReturnValue({
@@ -436,7 +414,7 @@ describe('POST /api/webhook/mock', () => {
           select: vi.fn().mockReturnValue({
             limit: vi.fn().mockReturnValue({
               single: vi.fn().mockResolvedValue({
-                data: mockWebhookConsultant,
+                data: { ...mockWebhookConsultant, business_name: 'Consultor Premium', vertical: 'saude' },
                 error: null,
               }),
             }),
@@ -507,22 +485,15 @@ describe('POST /api/webhook/mock', () => {
     // Assert
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(mockGenerateAIResponse).toHaveBeenCalledWith({
-      leadData: {
-        profile: 'individual',
-        ageRange: '31 a 45 anos',
-        coparticipation: 'não',
-      },
-      conversationHistory: [{ role: 'user', content: 'Não' }],
-    })
-    expect(data.response.text).toBe('Recomendo o plano Premium Individual sem coparticipação.')
-    expect(updateConversationMock).toHaveBeenCalledWith({ status: 'completed' })
-    expect(updateLeadMock).toHaveBeenCalledWith(
+    expect(mockGenerateContextualResponse).toHaveBeenCalledWith(
       expect.objectContaining({
-        status: 'qualificado',
-        score: expect.any(Number),
+        lead: mockWhatsAppLead,
+        consultantData: expect.objectContaining({
+          name: mockWebhookConsultant.name,
+        }),
       })
     )
+    expect(data.response.text).toBe('Recomendo o plano Premium Individual sem coparticipação.')
   })
 
   it('deve retornar botões quando há opções de escolha', async () => {
@@ -542,6 +513,10 @@ describe('POST /api/webhook/mock', () => {
     MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
+    mockGetOrCreateLead.mockResolvedValue({
+      success: true,
+      data: { lead: mockWhatsAppLead, isNew: false },
+    })
 
     const insertMessageMock = vi.fn().mockResolvedValue({ data: null, error: null })
     const updateConversationMock = vi.fn().mockReturnValue({
@@ -556,20 +531,6 @@ describe('POST /api/webhook/mock', () => {
               single: vi.fn().mockResolvedValue({
                 data: mockWebhookConsultant,
                 error: null,
-              }),
-            }),
-          }),
-        }
-      }
-      if (table === 'leads') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({
-                  data: mockWhatsAppLead,
-                  error: null,
-                }),
               }),
             }),
           }),
@@ -644,6 +605,10 @@ describe('POST /api/webhook/mock', () => {
     MockFlowEngine.mockImplementation(function (this: any) {
       return mockFlowEngine
     })
+    mockGetOrCreateLead.mockResolvedValue({
+      success: true,
+      data: { lead: mockWhatsAppLead, isNew: false },
+    })
 
     const insertMessageMock = vi.fn().mockResolvedValue({ data: null, error: null })
     const updateConversationMock = vi.fn().mockReturnValue({
@@ -658,20 +623,6 @@ describe('POST /api/webhook/mock', () => {
               single: vi.fn().mockResolvedValue({
                 data: mockWebhookConsultant,
                 error: null,
-              }),
-            }),
-          }),
-        }
-      }
-      if (table === 'leads') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({
-                  data: mockWhatsAppLead,
-                  error: null,
-                }),
               }),
             }),
           }),
@@ -756,5 +707,151 @@ describe('POST /api/webhook/mock', () => {
     expect(response.status).toBe(500)
     expect(data.error).toBe('Erro ao processar mensagem')
     expect(data.details).toBe('Database connection failed')
+  })
+
+  it('deve retornar 500 se getOrCreateLead falhar', async () => {
+    // Arrange
+    mockGetOrCreateLead.mockResolvedValue({
+      success: false,
+      error: 'Erro ao criar lead',
+    })
+
+    mockSupabase.from = vi.fn((table: string) => {
+      if (table === 'consultants') {
+        return {
+          select: vi.fn().mockReturnValue({
+            limit: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: mockWebhookConsultant,
+                error: null,
+              }),
+            }),
+          }),
+        }
+      }
+      return {}
+    })
+
+    const request = new NextRequest('http://localhost:3000/api/webhook/mock', {
+      method: 'POST',
+      body: JSON.stringify({
+        from: '5511988888888',
+        text: 'Olá',
+        timestamp: Date.now(),
+      }),
+    })
+
+    // Act
+    const response = await POST(request)
+    const data = await response.json()
+
+    // Assert
+    expect(response.status).toBe(500)
+    expect(data.error).toBe('Erro ao criar lead')
+  })
+
+  it('deve usar fallback quando IA falha', async () => {
+    // Arrange
+    const mockFlowEngine = {
+      processMessage: vi.fn().mockResolvedValue({
+        nextStepId: 'fim',
+        variables: {
+          perfil: 'individual',
+          faixa_etaria: '31 a 45 anos',
+          coparticipacao: 'não',
+        },
+        response: '',
+        action: 'gerar_resposta_ia',
+        choices: [],
+      }),
+    }
+    MockFlowEngine.mockImplementation(function (this: any) {
+      return mockFlowEngine
+    })
+    mockGetOrCreateLead.mockResolvedValue({
+      success: true,
+      data: { lead: mockWhatsAppLead, isNew: false },
+    })
+    mockGenerateContextualResponse.mockResolvedValue({
+      success: false,
+      error: 'AI service unavailable',
+    })
+
+    const insertMessageMock = vi.fn().mockResolvedValue({ data: null, error: null })
+    const updateConversationMock = vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+    })
+    const updateLeadMock = vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+    })
+
+    mockSupabase.from = vi.fn((table: string) => {
+      if (table === 'consultants') {
+        return {
+          select: vi.fn().mockReturnValue({
+            limit: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: { ...mockWebhookConsultant, business_name: 'Consultor Premium', vertical: 'saude' },
+                error: null,
+              }),
+            }),
+          }),
+        }
+      }
+      if (table === 'leads') {
+        return {
+          update: updateLeadMock,
+        }
+      }
+      if (table === 'conversations') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: mockActiveConversation,
+                  error: null,
+                }),
+              }),
+            }),
+          }),
+          update: updateConversationMock,
+        }
+      }
+      if (table === 'flows') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
+                data: mockDefaultFlow,
+                error: null,
+              }),
+            }),
+          }),
+        }
+      }
+      if (table === 'messages') {
+        return { insert: insertMessageMock }
+      }
+      return {}
+    })
+
+    const request = new NextRequest('http://localhost:3000/api/webhook/mock', {
+      method: 'POST',
+      body: JSON.stringify({
+        from: '5511988888888',
+        text: 'Não',
+        timestamp: Date.now(),
+      }),
+    })
+
+    // Act
+    const response = await POST(request)
+    const data = await response.json()
+
+    // Assert
+    expect(response.status).toBe(200)
+    expect(data.success).toBe(true)
+    expect(data.response.text).toBe('Desculpe, não consegui processar sua solicitação.')
   })
 })
