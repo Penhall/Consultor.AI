@@ -15,14 +15,15 @@ The system combines conversational AI with personalized content generation to cr
 
 ## Current Status
 
-**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** | Fase 1.5 (Testes) - ✅ **95% COMPLETO**
-**Última Atualização:** 2026-01-18
+**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** | Fase 1.5 (Testes) - ✅ **100% COMPLETO**
+**Última Atualização:** 2026-01-20
 **Versão:** 0.1.0
 **Branch Atual:** `001-project-specs`
 
 ### MVP Completo ✅
 
 **Core Features**:
+
 - ✅ **CRUD Completo de Leads**: Criação, leitura, atualização, exclusão com validação Zod
 - ✅ **Flow Engine Conversacional**: Parser, State Manager, Executors para fluxos JSON
 - ✅ **Integração WhatsApp Business**: Meta Cloud API com mensagens interativas (botões/listas)
@@ -33,6 +34,7 @@ The system combines conversational AI with personalized content generation to cr
 - ✅ **Auto-criação de Leads**: Leads criados automaticamente via WhatsApp
 
 **Infrastructure**:
+
 - ✅ **Build Pipeline**: Next.js builds successfully (0 erros TypeScript)
 - ✅ **Supabase Integration**: Client SSR + Server + Middleware configurados
 - ✅ **Database Schema**: RLS policies ativas, migrations aplicadas
@@ -43,21 +45,26 @@ The system combines conversational AI with personalized content generation to cr
 
 **Build Status**: ✅ 19 páginas, 14 API routes, ~45s build time
 
-### Fase 1.5 - Testes ✅ (95% Completo)
+### Fase 1.5 - Testes ✅ (100% Completo)
 
-**Status dos Testes** (2026-01-18):
-- ✅ **Cobertura**: 22 suites de teste | 238 testes no total
-- ✅ **Testes Passando**: 227/238 (95.4%)
+**Status dos Testes** (2026-01-20):
+
+- ✅ **Cobertura**: 22 suites de teste | 240 testes no total
+- ✅ **Testes Passando**: 240/240 (100%)
 - ✅ **14/14 rotas** com cobertura de teste (100% das rotas)
-- ⚠️ **11 testes falhando** (webhook mock route - necessita correção)
+- ✅ **CI/CD**: GitHub Actions configurado e funcionando
+- ✅ **Husky**: Pre-commit hooks configurados
+- ⚠️ **TypeScript**: ~15 erros em arquivos de teste (produção OK)
 
 **Progresso por Sprint**:
+
 - ✅ **Sprint 1**: Infraestrutura de testes (COMPLETO)
 - ✅ **Sprint 2**: Testes unitários críticos (COMPLETO)
-- ✅ **Sprint 3**: Testes de integração (95% COMPLETO)
-- ⏳ **Sprint 4**: CI/CD + E2E (PENDENTE)
+- ✅ **Sprint 3**: Testes de integração (COMPLETO)
+- ✅ **Sprint 4**: CI/CD + E2E (COMPLETO)
 
 **Arquivos de Teste Criados**:
+
 - `tests/unit/app/api/**` - Testes de API routes (14 arquivos)
 - `tests/unit/lib/flow-engine/**` - Testes do Flow Engine (4 arquivos)
 - `tests/unit/lib/services/**` - Testes de serviços (3 arquivos)
@@ -67,26 +74,31 @@ The system combines conversational AI with personalized content generation to cr
 
 ### Próximas Fases 📋
 
-**Fase 1.5 - Testes** (Quase Completo - 95.4% passando):
+**Fase 1.5 - Testes** ✅ (100% Completo):
+
 - [x] Estrutura de testes configurada
 - [x] Fixtures e mocks criados
 - [x] Testes de API routes (14/14 rotas)
 - [x] Testes unitários críticos (Flow Engine, AI, Lead, Analytics)
-- [ ] Corrigir 11 testes falhando (webhook mock)
-- [ ] GitHub Actions CI/CD
-- [ ] Pre-commit hooks (Husky)
-- [ ] Teste E2E (lead qualification flow)
+- [x] GitHub Actions CI/CD configurado
+- [x] Pre-commit hooks (Husky)
+- [x] Teste E2E (lead qualification flow)
+- [ ] Corrigir erros TypeScript em arquivos de teste
 
-**Fase 2 - Polimento** (Próximo):
+**Fase 2 - Polimento** (Próximo - Em Andamento):
+
 - [ ] Lead detail page completo (`/dashboard/leads/[id]`)
 - [ ] Exportação de Leads (CSV/Excel)
 - [ ] Follow-up Automático
 - [ ] Templates de Mensagens
 - [ ] Filtros Avançados
+- [ ] Sentry para monitoramento de erros
+- [ ] Otimização de performance
 
 **Fase 3 - Expansão** (Futuro):
+
 - [ ] Segundo Vertical (Imóveis)
-- [ ] Integração CRM (RD Station)
+- [ ] Integração CRM (RD Station, Pipedrive)
 - [ ] Voice Cloning (ElevenLabs)
 - [ ] Image Generation (Canva API)
 - [ ] Multi-tenant
@@ -95,18 +107,19 @@ The system combines conversational AI with personalized content generation to cr
 
 **Localização**: `specs/001-project-specs/`
 
-| Arquivo | Descrição | Status |
-|---------|-----------|--------|
-| `spec.md` | Especificação completa (7 user stories, 55 FRs) | ✅ Completo |
-| `plan.md` | Plano de implementação técnico | ✅ Completo |
-| `tasks.md` | 85 tasks organizadas por user story | ✅ Completo |
-| `checklists/requirements.md` | Checklist de qualidade | ✅ Aprovado |
+| Arquivo                      | Descrição                                       | Status      |
+| ---------------------------- | ----------------------------------------------- | ----------- |
+| `spec.md`                    | Especificação completa (7 user stories, 55 FRs) | ✅ Completo |
+| `plan.md`                    | Plano de implementação técnico                  | ✅ Completo |
+| `tasks.md`                   | 85 tasks organizadas por user story             | ✅ Completo |
+| `checklists/requirements.md` | Checklist de qualidade                          | ✅ Aprovado |
 
 ---
 
 ## Tech Stack
 
 ### Core Technologies
+
 - **Frontend**: Next.js 14 (App Router) + React 18 + TypeScript 5.3
 - **Styling**: Tailwind CSS + shadcn/ui components
 - **Backend**: Supabase (PostgreSQL + Edge Functions + Realtime)
@@ -134,10 +147,10 @@ Consultor.AI/
 │   ├── architecture-rules.md        # System architecture patterns
 │   └── testing-standards.md         # Testing philosophy and patterns
 │
-├── configs/                         # All configuration files (NOT in root!)
-│   ├── docker/                      # Docker configurations
-│   │   ├── docker-compose.dev.yml
-│   │   └── Dockerfile.dev
+├── configs/                         # Additional configuration files
+│   ├── docker/                      # Docker configurations (legacy, use root files)
+│   │   ├── docker-compose.dev.yml   # ⚠️ Deprecated - use root docker-compose.dev.yml
+│   │   └── Dockerfile.dev           # ⚠️ Deprecated - use root Dockerfile.dev
 │   ├── eslint/                      # ESLint configuration
 │   │   └── .eslintrc.json
 │   ├── prettier/                    # Prettier configuration
@@ -289,8 +302,12 @@ Consultor.AI/
 ├── public/                          # Static assets
 │   └── .gitkeep
 │
-├── docker-compose.yml               # Docker orchestration
-├── Dockerfile                       # Production container
+├── docker-compose.yml               # Docker production orchestration
+├── docker-compose.dev.yml           # Docker development (hot-reload)
+├── docker-compose.full.yml          # Docker full stack
+├── Dockerfile                       # Production container (multi-stage)
+├── Dockerfile.dev                   # Development container
+├── Dockerfile.test                  # Test container
 ├── next.config.js                   # Next.js configuration
 ├── tailwind.config.ts               # Tailwind CSS config
 ├── tsconfig.json                    # TypeScript config
@@ -304,22 +321,27 @@ Consultor.AI/
 **CRITICAL**: The root directory is kept intentionally clean. See `.rules/development-standards.md` Section 0 for complete rules.
 
 **Configuration Files in Root**:
+
 - `.eslintrc.json` - ESLint configuration
 - `.prettierrc`, `.prettierignore` - Prettier configuration
 - `playwright.config.ts` - Playwright E2E tests
 - `vitest.config.ts` - Vitest unit tests
 - `tailwind.config.ts` - Tailwind CSS
 - `postcss.config.js` - PostCSS
+- `docker-compose.yml`, `docker-compose.dev.yml` - Docker orchestration
+- `Dockerfile`, `Dockerfile.dev`, `Dockerfile.test` - Docker containers
 
-**Note**: Configurations are also maintained in `configs/` for reference, but root files are the source of truth (WSL symlink compatibility).
+**Note**: Docker files in `configs/docker/` are deprecated. Use root files as source of truth.
 
 **Where Things Go**:
+
 - Configuration files → Root directory (required by tools)
 - Setup guides/tutorials → `docs/guides/`
 - Utility scripts → `scripts/`
 - Internal notes → `docs/internal/`
 
 **Never Create in Root**:
+
 - ❌ `SETUP.md`, `NOTES.md` → Use `docs/guides/`
 - ❌ `deploy.sh`, `start.sh` → Use `scripts/`
 - ❌ Temporary files → Use `.gitignore`
@@ -385,11 +407,10 @@ Before writing any code, familiarize yourself with the guidelines in `.rules/`:
 ### Key Conventions
 
 #### Language Rules
+
 ```typescript
 // ✅ CORRECT: Code in English
-export async function analyzeConversation(
-  leadId: string
-): Promise<AnalysisResult> {
+export async function analyzeConversation(leadId: string): Promise<AnalysisResult> {
   // Process conversation
 }
 
@@ -400,20 +421,20 @@ const messages = {
 };
 
 // ❌ WRONG: Mixed languages
-export async function analisarConversa(
-  leadId: string
-): Promise<AnalysisResult> {
+export async function analisarConversa(leadId: string): Promise<AnalysisResult> {
   // This mixes Portuguese function name with English types
 }
 ```
 
 #### File Naming
+
 - **Components**: `lead-card.tsx`, `metrics-dashboard.tsx`
 - **Utilities**: `date-utils.ts`, `format-number.ts`
 - **Types**: `database.ts`, `api-types.ts`
 - **Constants**: `MAX_LEADS_PER_PAGE`, `API_TIMEOUT_MS`
 
 #### Component Patterns
+
 ```typescript
 // Server Component (default)
 // app/leads/page.tsx
@@ -480,6 +501,7 @@ export function LeadList({ initialData }: Props) {
 ### Quick Reference
 
 **When you need to:**
+
 - **Understand requirements** → Read **SRS** sections 3-4
 - **Design a feature** → Check **SAD** section 4 + **`.rules/architecture-rules.md`**
 - **Create database tables** → Reference **Database Design** section 3
@@ -534,35 +556,39 @@ npm run format:check
 
 ### Development Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server (localhost:3000) |
-| `npm run build` | Build for production |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run lint:fix` | Auto-fix ESLint issues |
-| `npm run format` | Format with Prettier |
-| `npm run type-check` | TypeScript type checking |
-| `npm test` | Run all tests |
-| `npm run test:unit` | Unit tests only |
-| `npm run test:integration` | Integration tests only |
-| `npm run test:e2e` | E2E tests with Playwright |
-| `npm run test:coverage` | Tests with coverage report |
-| `npm run test:watch` | Watch mode for tests |
-| `npm run test:ui` | Vitest UI |
-| `docker:up` | Start Docker containers |
-| `docker:down` | Stop Docker containers |
-| `docker:logs` | View container logs |
+| Command                    | Description                               |
+| -------------------------- | ----------------------------------------- |
+| `npm run dev`              | Start development server (localhost:3000) |
+| `npm run build`            | Build for production                      |
+| `npm run start`            | Start production server                   |
+| `npm run lint`             | Run ESLint                                |
+| `npm run lint:fix`         | Auto-fix ESLint issues                    |
+| `npm run format`           | Format with Prettier                      |
+| `npm run type-check`       | TypeScript type checking                  |
+| `npm test`                 | Run all tests                             |
+| `npm run test:unit`        | Unit tests only                           |
+| `npm run test:integration` | Integration tests only                    |
+| `npm run test:e2e`         | E2E tests with Playwright                 |
+| `npm run test:coverage`    | Tests with coverage report                |
+| `npm run test:watch`       | Watch mode for tests                      |
+| `npm run test:ui`          | Vitest UI                                 |
+| `npm run docker:up`        | Start dev Docker containers               |
+| `npm run docker:down`      | Stop dev Docker containers                |
+| `npm run docker:logs`      | View container logs                       |
+| `npm run docker:prod`      | Start production Docker                   |
+| `npm run docker:build`     | Build Docker images                       |
 
 ### Git Workflow
 
 #### Branch Naming
+
 - `feature/add-lead-export`
 - `fix/dashboard-loading-error`
 - `hotfix/critical-auth-bug`
 - `docs/update-api-spec`
 
 #### Commit Messages
+
 Follow Conventional Commits:
 
 ```bash
@@ -581,6 +607,7 @@ chore(deps): update Next.js to 14.2.35
 ### 1. Conversation Flow System
 
 JSON-driven conversation engine with three step types:
+
 - **`mensagem`**: Bot sends a message (supports `{{variables}}`)
 - **`escolha`**: Multiple choice with predefined options
 - **`executar`**: Triggers actions (e.g., `gerar_resposta_ia`)
@@ -590,6 +617,7 @@ Each step has a `proxima` field defining next step ID.
 ### 2. Lead Qualification Flow (Health Plans)
 
 Collects three critical data points:
+
 1. **Profile**: Individual / Couple / Family / Corporate
 2. **Age Range**: Up to 30 / 31-45 / 46-60 / Above 60
 3. **Coparticipation**: Yes (lower cost) / No (full coverage)
@@ -599,6 +627,7 @@ AI generates personalized recommendations based on responses.
 ### 3. AI Response Generation
 
 Prompt template enforces:
+
 - **Tone**: Welcoming, clear, empathetic, jargon-free
 - **Structure**:
   1. Empathetic validation
@@ -618,6 +647,7 @@ Prompt template enforces:
 ## Implementation Roadmap
 
 ### Phase 1: MVP Foundation (Days 1-30) ✅
+
 **Status**: **COMPLETO** - 2025-12-20
 
 - [x] Project setup (Next.js, TypeScript, Tailwind)
@@ -638,6 +668,7 @@ Prompt template enforces:
 - [x] **Score calculation** system
 
 **Deliverables**:
+
 - ✅ 19 páginas renderizadas
 - ✅ 13 API endpoints
 - ✅ 20+ componentes React
@@ -647,6 +678,7 @@ Prompt template enforces:
 **Goal**: ✅ Sistema 100% funcional e pronto para testes com consultores beta
 
 ### Phase 2: Polimento (Days 31-60)
+
 **Status**: Planejado
 
 - [ ] **Exportação de Leads** (CSV/Excel com filtros)
@@ -659,6 +691,7 @@ Prompt template enforces:
 **Goal**: 20 consultores ativos, 500+ leads processados, 90% satisfação
 
 ### Phase 3: Scale (Days 61-90)
+
 - [ ] Second vertical (real estate)
 - [ ] Calendar integration
 - [ ] CRM integration (RD Station, Pipedrive)
@@ -669,6 +702,7 @@ Prompt template enforces:
 **Goal**: 100 active consultants, 5,000+ leads, 99.5% uptime
 
 ### Phase 4: Iterate (Days 90+)
+
 - [ ] Voice cloning (ElevenLabs)
 - [ ] Template marketplace
 - [ ] White-label options
@@ -750,6 +784,7 @@ See `docs/architecture/Database-Design-Document.md` for complete schema with ind
 ## Security & Compliance
 
 ### Security Measures
+
 - **Authentication**: Supabase Auth with JWT
 - **Authorization**: Row-Level Security (RLS) policies
 - **Input Validation**: Zod schemas for all inputs
@@ -761,6 +796,7 @@ See `docs/architecture/Database-Design-Document.md` for complete schema with ind
 - **Webhook Validation**: HMAC SHA256 signatures
 
 ### Compliance
+
 - **LGPD** (Brazilian GDPR): Audit logs, data retention policies
 - **ANS Regulations**: No pricing promises, no illegal claims
 - **WhatsApp Business Policy**: 24-hour message window, opt-in required
@@ -770,6 +806,7 @@ See `docs/architecture/Database-Design-Document.md` for complete schema with ind
 ## Testing
 
 ### Test Structure
+
 ```
 tests/
 ├── unit/                    # 60% - Functions, utilities, hooks
@@ -778,12 +815,14 @@ tests/
 ```
 
 ### Coverage Requirements
+
 - **Overall**: > 80%
 - **Unit Tests**: > 90%
 - **Integration Tests**: > 70%
 - **E2E Tests**: All P0 user flows
 
 ### Running Tests
+
 ```bash
 npm test                    # All tests
 npm run test:unit          # Unit tests only
@@ -801,13 +840,15 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 ## Business Model
 
 ### Pricing Tiers
-| Tier | Price | Features |
-|------|-------|----------|
-| **Freemium** | R$0/mês | 20 leads/month, basic flow, text-only |
-| **Pro** | R$47/mês | 200 leads/month, images, auto follow-up, CSV |
-| **Agência** | R$147/mês | 1000 leads, custom flows, dashboard, CRM |
+
+| Tier         | Price     | Features                                     |
+| ------------ | --------- | -------------------------------------------- |
+| **Freemium** | R$0/mês   | 20 leads/month, basic flow, text-only        |
+| **Pro**      | R$47/mês  | 200 leads/month, images, auto follow-up, CSV |
+| **Agência**  | R$147/mês | 1000 leads, custom flows, dashboard, CRM     |
 
 ### Upsell Opportunities
+
 - Voice cloning: +R$15/month
 - Interactive quizzes: +R$20/month
 - Real-time plan pricing: +R$50/month
@@ -830,16 +871,19 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 ## Important Constraints
 
 ### Regulatory Compliance
+
 - **No Pricing Promises**: AI must never quote exact plan prices
 - **No Sensitive Data**: Never request CPF, medical history via WhatsApp
 - **No Illegal Claims**: No "zero waiting period" or "immediate coverage"
 
 ### WhatsApp Compliance
+
 - **24-Hour Window**: Non-template messages only within 24h of user message
 - **Opt-In Required**: Users must initiate conversation
 - **Business Policy**: Follow Meta's Business Policy strictly
 
 ### Technical Constraints
+
 - **Build Time**: Must complete in < 5 minutes
 - **Cold Start**: API routes < 500ms first response
 - **AI Response Time**: < 3s for 95th percentile
@@ -850,6 +894,7 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 ## Resources
 
 ### Documentation
+
 - [Next.js Docs](https://nextjs.org/docs)
 - [Supabase Docs](https://supabase.com/docs)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
@@ -857,12 +902,14 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 - [Meta WhatsApp API](https://developers.facebook.com/docs/whatsapp)
 
 ### Internal Docs
+
 - **Complete Specs**: `/docs/` directory
 - **Development Rules**: `/.rules/` directory
 - **API Reference**: `/docs/api/API-Specification.md`
 - **Implementation Plan**: `/docs/technical/Implementation-Plan.md`
 
 ### Tools & Services
+
 - **AI**: [Google AI Studio](https://ai.google.dev/) | [Groq Console](https://console.groq.com/)
 - **WhatsApp**: [Weni Cloud](https://weni.ai/cloud) | [360dialog](https://www.360dialog.com/)
 - **Image Generation**: [Canva API](https://www.canva.com/developers)
@@ -873,12 +920,14 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 ## Getting Help
 
 ### Issue Types
+
 - **Bug**: Something not working as expected
 - **Feature**: New functionality request
 - **Documentation**: Docs improvement
 - **Question**: General questions
 
 ### Before Opening an Issue
+
 1. Check existing issues
 2. Review relevant documentation in `/docs/`
 3. Check development guidelines in `/.rules/`
@@ -889,6 +938,7 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 ## Contributing
 
 ### Before Contributing
+
 1. Read **ALL** files in `/.rules/` directory
 2. Follow the Git workflow outlined above
 3. Ensure tests pass (`npm test`)
@@ -897,6 +947,7 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 6. Update documentation if needed
 
 ### Pull Request Checklist
+
 - [ ] Code follows style guidelines (`.rules/`)
 - [ ] Self-review completed
 - [ ] Comments added for complex logic
