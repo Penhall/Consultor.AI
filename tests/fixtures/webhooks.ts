@@ -4,7 +4,7 @@
  * Mock data for Meta WhatsApp webhook testing
  */
 
-import type { ExtractedMessage, MessageStatus } from '@/lib/whatsapp/webhook-validation'
+import type { ExtractedMessage, MessageStatus } from '@/lib/whatsapp/webhook-validation';
 
 /**
  * Mock Meta webhook payload - text message
@@ -47,7 +47,7 @@ export const mockMetaTextMessagePayload = {
       ],
     },
   ],
-}
+};
 
 /**
  * Mock Meta webhook payload - interactive button reply
@@ -94,7 +94,7 @@ export const mockMetaInteractiveButtonPayload = {
       ],
     },
   ],
-}
+};
 
 /**
  * Mock Meta webhook payload - interactive list reply
@@ -142,7 +142,7 @@ export const mockMetaInteractiveListPayload = {
       ],
     },
   ],
-}
+};
 
 /**
  * Mock Meta webhook payload - status update
@@ -174,7 +174,7 @@ export const mockMetaStatusUpdatePayload = {
       ],
     },
   ],
-}
+};
 
 /**
  * Mock Meta webhook payload - status update with error
@@ -212,7 +212,7 @@ export const mockMetaStatusErrorPayload = {
       ],
     },
   ],
-}
+};
 
 /**
  * Mock Meta webhook payload - unsupported message type (image)
@@ -256,7 +256,7 @@ export const mockMetaImageMessagePayload = {
       ],
     },
   ],
-}
+};
 
 /**
  * Mock extracted message - text
@@ -267,7 +267,7 @@ export const mockExtractedTextMessage: ExtractedMessage = {
   timestamp: '1234567890',
   type: 'text',
   text: 'Olá, quero informações sobre planos',
-}
+};
 
 /**
  * Mock extracted message - interactive button
@@ -285,7 +285,7 @@ export const mockExtractedInteractiveMessage: ExtractedMessage = {
       title: 'Individual',
     },
   },
-}
+};
 
 /**
  * Mock message status - read
@@ -295,7 +295,7 @@ export const mockMessageStatus: MessageStatus = {
   status: 'read',
   timestamp: '1234567893',
   recipientId: '5511988888888',
-}
+};
 
 /**
  * Mock message status - failed
@@ -309,7 +309,7 @@ export const mockMessageStatusError: MessageStatus = {
     code: 131026,
     title: 'Message Undeliverable',
   },
-}
+};
 
 /**
  * Mock WhatsApp integration (Meta)
@@ -325,7 +325,7 @@ export const mockWhatsAppIntegration = {
   status: 'active',
   created_at: '2026-01-14T10:00:00Z',
   updated_at: '2026-01-14T10:00:00Z',
-}
+};
 
 /**
  * Mock lead (auto-created from WhatsApp)
@@ -335,13 +335,19 @@ export const mockWhatsAppLead = {
   consultant_id: '123e4567-e89b-12d3-a456-426614174010',
   name: 'João Silva',
   whatsapp_number: '+5511988888888',
-  status: 'novo',
+  email: null,
+  status: 'novo' as const,
   source: 'whatsapp',
   score: 0,
+  qualified_at: null,
+  last_contacted_at: null,
+  utm_source: null,
+  utm_medium: null,
+  utm_campaign: null,
   metadata: {},
   created_at: '2026-01-14T10:00:00Z',
   updated_at: '2026-01-14T10:00:00Z',
-}
+};
 
 /**
  * Mock default flow
@@ -359,7 +365,7 @@ export const mockDefaultFlow = {
   },
   created_at: '2026-01-14T10:00:00Z',
   updated_at: '2026-01-14T10:00:00Z',
-}
+};
 
 /**
  * Mock active conversation
@@ -379,7 +385,7 @@ export const mockActiveConversation = {
   created_at: '2026-01-14T10:00:00Z',
   updated_at: '2026-01-14T10:05:00Z',
   completed_at: null,
-}
+};
 
 /**
  * Mock consultant
@@ -391,7 +397,7 @@ export const mockWebhookConsultant = {
   email: 'webhook@test.com',
   whatsapp_number: '+5511999999999',
   created_at: '2026-01-14T09:00:00Z',
-}
+};
 
 /**
  * Mock webhook event log
@@ -405,7 +411,7 @@ export const mockWebhookEvent = {
   processed: true,
   error: null,
   created_at: '2026-01-14T10:00:00Z',
-}
+};
 
 /**
  * Mock Meta WhatsApp client responses
@@ -426,4 +432,4 @@ export const mockWhatsAppClientResponses = {
   markAsRead: {
     success: true,
   },
-}
+};

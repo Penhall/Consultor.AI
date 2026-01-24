@@ -103,3 +103,6 @@ storybook-static/
 docs/guides/WHATSAPP-SETUP-2025.md
 docs/guides/meta-app-setup.md
 docs/guides/WHATSAPP-EMBEDDED-SIGNUP.md
+
+# Docker volumes (persistent data)
+docker/volumes/

@@ -45,9 +45,18 @@
     "docker:prod": "docker-compose up -d",
     "docker:prod:down": "docker-compose down",
     "docker:build": "docker-compose build",
+    "docker:full:up": "docker-compose --env-file .env.docker -f docker-compose.full.yml up -d",
+    "docker:full:down": "docker-compose -f docker-compose.full.yml down",
+    "docker:full:logs": "docker-compose -f docker-compose.full.yml logs -f",
+    "docker:full:ps": "docker-compose -f docker-compose.full.yml ps",
+    "docker:full:clean": "docker-compose -f docker-compose.full.yml down -v --rmi local",
+    "docker:full:rebuild": "docker-compose -f docker-compose.full.yml build --no-cache && npm run docker:full:up",
+    "docker:full:restart": "npm run docker:full:down && npm run docker:full:up",
     "local:start": "npm run docker:up && npm run db:start",
     "local:stop": "npm run docker:down && npm run db:stop",
     "local:dev": "npm run local:start && npm run dev",
+    "local:full": "npm run docker:full:up",
+    "local:full:stop": "npm run docker:full:down",
     "prepare": "husky install"
   },
   "dependencies": {

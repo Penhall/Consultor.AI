@@ -190,14 +190,14 @@ export const testData = {
   coparticipation: ['sim', 'nao'],
 
   randomProfile(): string {
-    return this.profiles[Math.floor(Math.random() * this.profiles.length)];
+    return this.profiles[Math.floor(Math.random() * this.profiles.length)]!;
   },
 
   randomAge(): string {
-    return this.ages[Math.floor(Math.random() * this.ages.length)];
+    return this.ages[Math.floor(Math.random() * this.ages.length)]!;
   },
 
   randomCoparticipation(): string {
-    return this.coparticipation[Math.floor(Math.random() * this.coparticipation.length)];
+    return this.coparticipation[Math.floor(Math.random() * this.coparticipation.length)]!;
   },
 };
