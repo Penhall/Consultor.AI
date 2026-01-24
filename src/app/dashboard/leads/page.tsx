@@ -7,6 +7,7 @@ import { LeadDetail } from '@/components/leads/lead-detail'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Download, RefreshCw } from 'lucide-react'
 
 type Lead = Database['public']['Tables']['leads']['Row']
 
@@ -14,6 +15,7 @@ export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [loading, setLoading] = useState(true)
+  const [exporting, setExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const fetchLeads = async () => {
@@ -58,6 +60,31 @@ export default function LeadsPage() {
     }
   }
 
+  const handleExport = async () => {
+    setExporting(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/leads/export', { credentials: 'include' })
+      if (!res.ok) throw new Error('Falha ao exportar leads')
+
+      // Get the blob and create download link
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `leads-${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (err) {
+      console.error(err)
+      setError('Nao foi possivel exportar os leads.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
@@ -65,9 +92,16 @@ export default function LeadsPage() {
           <h1 className="text-3xl font-bold mb-1">Leads</h1>
           <p className="text-gray-600 dark:text-gray-400">Gerencie e avance seus leads.</p>
         </div>
-        <Button variant="outline" onClick={fetchLeads} disabled={loading}>
-          {loading ? 'Atualizando...' : 'Atualizar'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleExport} disabled={exporting || leads.length === 0}>
+            <Download className="h-4 w-4 mr-2" />
+            {exporting ? 'Exportando...' : 'Exportar CSV'}
+          </Button>
+          <Button variant="outline" onClick={fetchLeads} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Atualizar
+          </Button>
+        </div>
       </div>
 
       {error && (
