@@ -4,20 +4,21 @@
  * Displays a single metric with title, value, and optional trend
  */
 
-'use client'
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MetricCardProps {
-  title: string
-  value: string | number
-  description?: string
+  title: string;
+  value: string | number;
+  description?: string;
   trend?: {
-    value: number
-    label: string
-  }
-  icon?: React.ReactNode
-  loading?: boolean
+    value: number;
+    label: string;
+  };
+  icon?: React.ReactNode;
+  loading?: boolean;
 }
 
 export function MetricCard({
@@ -36,13 +37,11 @@ export function MetricCard({
           {icon}
         </CardHeader>
         <CardContent>
-          <div className="h-8 w-24 animate-pulse rounded bg-gray-200" />
-          {description && (
-            <div className="mt-2 h-4 w-32 animate-pulse rounded bg-gray-100" />
-          )}
+          <Skeleton className="h-8 w-24" />
+          {description && <Skeleton className="mt-2 h-4 w-32" />}
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -53,16 +52,10 @@ export function MetricCard({
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-xs text-muted-foreground">{description}</p>}
         {trend && (
           <div className="mt-2 flex items-center text-xs">
-            <span
-              className={
-                trend.value >= 0 ? 'text-green-600' : 'text-red-600'
-              }
-            >
+            <span className={trend.value >= 0 ? 'text-green-600' : 'text-red-600'}>
               {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}%
             </span>
             <span className="ml-1 text-muted-foreground">{trend.label}</span>
@@ -70,5 +63,5 @@ export function MetricCard({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

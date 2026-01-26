@@ -11,9 +11,16 @@ export function Providers({ children }: { children: ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1 minute
+            staleTime: 60 * 1000, // 1 minute - data considered fresh
+            gcTime: 5 * 60 * 1000, // 5 minutes - keep in cache after unmount
             refetchOnWindowFocus: false,
+            refetchOnReconnect: true,
             retry: 1,
+            retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+          },
+          mutations: {
+            retry: 1,
+            retryDelay: 1000,
           },
         },
       })
