@@ -15,9 +15,9 @@ The system combines conversational AI with personalized content generation to cr
 
 ## Current Status
 
-**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** | Fase 1.5 (Testes) - ✅ **100% COMPLETO**
-**Última Atualização:** 2026-01-20
-**Versão:** 0.1.0
+**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** | Fase 1.5 (Testes) - ✅ **COMPLETO** | Fase 2 (Polish) - ✅ **COMPLETO**
+**Última Atualização:** 2026-01-25
+**Versão:** 0.2.1
 **Branch Atual:** `001-project-specs`
 
 ### MVP Completo ✅
@@ -32,6 +32,8 @@ The system combines conversational AI with personalized content generation to cr
 - ✅ **Fluxo Padrão de Saúde**: 7 passos de qualificação (perfil → idade → coparticipação)
 - ✅ **Sistema de Scores**: Cálculo automático baseado em respostas
 - ✅ **Auto-criação de Leads**: Leads criados automaticamente via WhatsApp
+- ✅ **Sistema de Follow-ups**: Agendamento automático e manual de follow-ups
+- ✅ **Exportação CSV**: Export de leads com filtros e BOM UTF-8
 
 **Infrastructure**:
 
@@ -40,10 +42,12 @@ The system combines conversational AI with personalized content generation to cr
 - ✅ **Database Schema**: RLS policies ativas, migrations aplicadas
 - ✅ **Encryption**: Tokens criptografados com AES-256-GCM
 - ✅ **Webhook Validation**: HMAC SHA-256 para segurança
-- ✅ **API Routes**: 14 endpoints REST completos
-- ✅ **Pages**: 19 páginas renderizadas
+- ✅ **API Routes**: 20 endpoints REST completos
+- ✅ **Pages**: 21 páginas renderizadas
+- ✅ **Monitoring**: Logger, Performance Tracking, Sentry Integration
+- ✅ **Performance**: Skeleton loading, React Query caching, optimized hooks
 
-**Build Status**: ✅ 19 páginas, 14 API routes, ~45s build time
+**Build Status**: ✅ 21 páginas, 20 API routes, ~45s build time
 
 ### Fase 1.5 - Testes ✅ (100% Completo)
 
@@ -85,15 +89,16 @@ The system combines conversational AI with personalized content generation to cr
 - [x] Teste E2E (lead qualification flow)
 - [ ] Corrigir erros TypeScript em arquivos de teste
 
-**Fase 2 - Polimento** (Próximo - Em Andamento):
+**Fase 2 - Polimento** ✅ (100% Completo):
 
-- [ ] Lead detail page completo (`/dashboard/leads/[id]`)
-- [ ] Exportação de Leads (CSV/Excel)
-- [ ] Follow-up Automático
-- [ ] Templates de Mensagens
-- [ ] Filtros Avançados
-- [ ] Sentry para monitoramento de erros
-- [ ] Otimização de performance
+- [x] Lead detail page completo (`/dashboard/leads/[id]`) - Timeline de conversas, edição inline
+- [x] Exportação de Leads (CSV/Excel) - `/api/leads/export` com filtros
+- [x] Follow-up Automático - Migration, service, API, UI completos
+- [x] Monitoring Infrastructure - Sentry, Performance, Logging (`src/lib/monitoring/`)
+- [x] Docker Networking Fix - Supabase interno via Kong
+- [x] Templates de Mensagens - CRUD completo, picker UI, página de gerenciamento
+- [x] Filtros Avançados - Busca, status multi-select, date range, score range, source
+- [x] Otimização de Performance - Skeletons, React Query caching, useLeads hook
 
 **Fase 3 - Expansão** (Futuro):
 
