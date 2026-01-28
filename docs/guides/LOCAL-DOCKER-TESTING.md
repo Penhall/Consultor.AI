@@ -1,6 +1,6 @@
 # Guia de Teste Local com Docker
 
-**Ultima Atualizacao**: 2026-01-20
+**Ultima Atualizacao**: 2026-01-28
 
 Este guia explica como configurar e testar o Consultor.AI localmente usando Docker.
 
@@ -210,8 +210,8 @@ curl http://localhost:3000/api/health
 ```json
 {
   "status": "ok",
-  "timestamp": "2026-01-20T...",
-  "version": "0.1.0"
+  "timestamp": "2026-01-28T...",
+  "version": "0.3.0"
 }
 ```
 

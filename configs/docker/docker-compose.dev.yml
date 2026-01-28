@@ -32,7 +32,7 @@ services:
   # MailHog - SMTP Local
   # ----------------------------------
   mailhog:
-    image: mailhog/mailhog:latest
+    image: mailhog/mailhog:v1.0.1
     container_name: consultorai-mailhog
     ports:
       - "1025:1025"  # SMTP server
@@ -55,7 +55,7 @@ services:
   # Redis - Cache & Rate Limiting
   # ----------------------------------
   redis:
-    image: redis:7-alpine
+    image: redis:7.4.7-alpine
     container_name: consultorai-redis
     ports:
       - "6379:6379"
@@ -92,7 +92,7 @@ services:
   # ----------------------------------
   # Simula WhatsApp API, Canva API, etc. para testes
   mock-server:
-    image: mockserver/mockserver:latest
+    image: mockserver/mockserver:5.14.0
     container_name: consultorai-mock-server
     ports:
       - "3001:1080"
