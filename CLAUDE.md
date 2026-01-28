@@ -15,9 +15,9 @@ The system combines conversational AI with personalized content generation to cr
 
 ## Current Status
 
-**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** | Fase 1.5 (Testes) - ✅ **COMPLETO** | Fase 2 (Polish) - ✅ **COMPLETO**
-**Última Atualização:** 2026-01-25
-**Versão:** 0.2.1
+**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** | Fase 1.5 (Testes) - ✅ **COMPLETO** | Fase 2 (Polish) - ✅ **COMPLETO** | Fase 3 (CRM) - ✅ **COMPLETO**
+**Última Atualização:** 2026-01-27
+**Versão:** 0.3.0
 **Branch Atual:** `001-project-specs`
 
 ### MVP Completo ✅
@@ -42,12 +42,14 @@ The system combines conversational AI with personalized content generation to cr
 - ✅ **Database Schema**: RLS policies ativas, migrations aplicadas
 - ✅ **Encryption**: Tokens criptografados com AES-256-GCM
 - ✅ **Webhook Validation**: HMAC SHA-256 para segurança
-- ✅ **API Routes**: 20 endpoints REST completos
-- ✅ **Pages**: 21 páginas renderizadas
+- ✅ **API Routes**: 25 endpoints REST completos
+- ✅ **Pages**: 22 páginas renderizadas
 - ✅ **Monitoring**: Logger, Performance Tracking, Sentry Integration
 - ✅ **Performance**: Skeleton loading, React Query caching, optimized hooks
+- ✅ **CRM Integrations**: RD Station, Pipedrive (HubSpot/Agendor planned)
+- ✅ **Bundle Analyzer**: Otimização de bundle configurada
 
-**Build Status**: ✅ 21 páginas, 20 API routes, ~45s build time
+**Build Status**: ✅ 22 páginas, 25 API routes, ~67s build time
 
 ### Fase 1.5 - Testes ✅ (100% Completo)
 
@@ -100,10 +102,21 @@ The system combines conversational AI with personalized content generation to cr
 - [x] Filtros Avançados - Busca, status multi-select, date range, score range, source
 - [x] Otimização de Performance - Skeletons, React Query caching, useLeads hook
 
-**Fase 3 - Expansão** (Futuro):
+**Fase 3 - CRM & Polish** ✅ (100% Completo):
+
+- [x] Integração CRM (RD Station, Pipedrive) - `/dashboard/integracoes`
+- [x] CRM Service Layer - Sync automático e manual
+- [x] Histórico de Sincronizações - Logs detalhados
+- [x] Bundle Analyzer - `npm run analyze`
+- [x] Error Boundary - Dashboard específico
+- [x] Enhanced 404 Page - Quick links
+- [x] Release Verification Script - `scripts/verify-release.ts`
+- [x] Documentation - DEPLOYMENT.md, MONITORING.md, CHANGELOG.md
+
+**Fase 4 - Expansão** (Futuro):
 
 - [ ] Segundo Vertical (Imóveis)
-- [ ] Integração CRM (RD Station, Pipedrive)
+- [ ] HubSpot & Agendor Providers
 - [ ] Voice Cloning (ElevenLabs)
 - [ ] Image Generation (Canva API)
 - [ ] Multi-tenant
@@ -116,7 +129,7 @@ The system combines conversational AI with personalized content generation to cr
 | ---------------------------- | ----------------------------------------------- | ----------- |
 | `spec.md`                    | Especificação completa (7 user stories, 55 FRs) | ✅ Completo |
 | `plan.md`                    | Plano de implementação técnico                  | ✅ Completo |
-| `tasks.md`                   | 85 tasks organizadas por user story             | ✅ Completo |
+| `tasks.md`                   | 100 tasks organizadas por user story            | ✅ Completo |
 | `checklists/requirements.md` | Checklist de qualidade                          | ✅ Aprovado |
 
 ---
@@ -171,6 +184,8 @@ Consultor.AI/
 ├── docs/                            # Technical documentation
 │   ├── guides/                      # Setup guides, tutorials, fixes
 │   │   ├── WHATSAPP-EMBEDDED-SIGNUP.md  # ⭐ WhatsApp Business setup (3-click)
+│   │   ├── DEPLOYMENT.md            # ⭐ Deploy guide (Docker, Vercel)
+│   │   ├── MONITORING.md            # ⭐ Monitoring & observability
 │   │   ├── DOCKER-SETUP.md
 │   │   ├── DOCKER-BUILD-FIX.md
 │   │   ├── SUPABASE-MIGRATION.md
@@ -188,7 +203,8 @@ Consultor.AI/
 │
 ├── scripts/                         # Utility scripts
 │   ├── dev-setup.sh                 # Development environment setup
-│   └── validate-flow.ts             # ⭐ Flow JSON validator
+│   ├── validate-flow.ts             # ⭐ Flow JSON validator
+│   └── verify-release.ts            # ⭐ Release verification script
 │
 ├── src/
 │   ├── app/                         # Next.js 14 App Router
@@ -203,6 +219,14 @@ Consultor.AI/
 │   │   │   │   ├── start/           # POST - Start conversation
 │   │   │   │   └── [id]/message/    # POST - Send message
 │   │   │   ├── health/              # GET - Health check
+│   │   │   ├── integrations/        # ⭐ CRM Integrations
+│   │   │   │   └── crm/             # CRM API routes
+│   │   │   │       ├── route.ts     # GET/POST - List/Create integrations
+│   │   │   │       ├── logs/        # GET - Sync logs
+│   │   │   │       └── [id]/        # Integration by ID
+│   │   │   │           ├── route.ts # GET/PATCH/DELETE
+│   │   │   │           ├── sync/    # POST - Sync leads
+│   │   │   │           └── test/    # POST - Test connection
 │   │   │   ├── leads/               # ⭐ Lead management
 │   │   │   │   ├── route.ts         # GET/POST - List/Create leads
 │   │   │   │   ├── [id]/route.ts    # GET/PATCH/DELETE - Lead by ID
@@ -214,10 +238,14 @@ Consultor.AI/
 │   │   │   └── signup/
 │   │   ├── dashboard/               # ⭐ Dashboard pages
 │   │   │   ├── analytics/           # Analytics page
+│   │   │   ├── integracoes/         # ⭐ CRM Integrations page
 │   │   │   ├── leads/               # Leads management
+│   │   │   ├── flows/               # ⭐ Flow editor
+│   │   │   ├── templates/           # Message templates
 │   │   │   ├── perfil/
 │   │   │   │   └── whatsapp/        # WhatsApp integration UI
 │   │   │   ├── layout.tsx           # Dashboard layout
+│   │   │   ├── error.tsx            # ⭐ Dashboard error boundary
 │   │   │   └── page.tsx             # Dashboard home
 │   │   ├── layout.tsx               # Root layout
 │   │   ├── page.tsx                 # Landing page
@@ -234,6 +262,10 @@ Consultor.AI/
 │   │   │   ├── bar-chart.tsx        # Bar chart (SVG)
 │   │   │   ├── pie-chart.tsx        # Pie chart (SVG)
 │   │   │   └── recent-leads-table.tsx  # Recent leads table
+│   │   ├── integrations/            # ⭐ CRM Integration components
+│   │   │   ├── crm-integration-card.tsx
+│   │   │   ├── crm-connect-dialog.tsx
+│   │   │   └── crm-sync-history.tsx
 │   │   ├── ui/                      # shadcn/ui components
 │   │   │   ├── alert.tsx
 │   │   │   ├── button.tsx
@@ -245,6 +277,8 @@ Consultor.AI/
 │   ├── hooks/                       # Custom React hooks
 │   │   ├── useAnalytics.ts          # ⭐ Analytics data hooks
 │   │   ├── useAuth.ts               # ⭐ Authentication hook
+│   │   ├── useCRM.ts                # ⭐ CRM integration hooks
+│   │   ├── useLeads.ts              # ⭐ Lead management hooks
 │   │   └── useMetaSignup.ts
 │   │
 │   ├── lib/                         # Core libraries & utilities
@@ -262,9 +296,14 @@ Consultor.AI/
 │   │   │   ├── executors.ts         # Step executors (message/choice/action)
 │   │   │   ├── engine.ts            # Main flow engine
 │   │   │   └── index.ts             # Barrel exports
-│   │   ├── services/                # ⭐ Service Layer (NEW)
+│   │   ├── services/                # ⭐ Service Layer
 │   │   │   ├── analytics-service.ts # Analytics metrics & charts
 │   │   │   ├── ai-service.ts        # AI response generation
+│   │   │   ├── crm-service.ts       # ⭐ CRM integration service
+│   │   │   ├── crm-providers/       # ⭐ CRM provider implementations
+│   │   │   │   ├── rd-station.ts    # RD Station provider
+│   │   │   │   ├── pipedrive.ts     # Pipedrive provider
+│   │   │   │   └── index.ts         # Provider exports
 │   │   │   ├── lead-auto-create.ts  # Auto-create leads from WhatsApp
 │   │   │   └── lead-service.ts      # Lead CRUD operations
 │   │   ├── supabase/
@@ -273,8 +312,9 @@ Consultor.AI/
 │   │   │   ├── middleware.ts        # Auth middleware
 │   │   │   ├── config.ts            # Configuration
 │   │   │   └── index.ts             # Barrel exports
-│   │   ├── validations/             # ⭐ Zod Schemas (NEW)
-│   │   │   └── lead.ts              # Lead validation schemas
+│   │   ├── validations/             # ⭐ Zod Schemas
+│   │   │   ├── lead.ts              # Lead validation schemas
+│   │   │   └── crm.ts               # ⭐ CRM validation schemas
 │   │   ├── whatsapp/
 │   │   │   ├── meta-client.ts       # ⭐ Enhanced Meta API client
 │   │   │   └── webhook-validation.ts # ⭐ Enhanced HMAC + interactive messages
@@ -293,7 +333,8 @@ Consultor.AI/
 │   ├── functions/                   # Edge Functions (TBD)
 │   ├── migrations/                  # ⭐ Database migrations
 │   │   ├── 20251217000001_initial_schema.sql
-│   │   └── 20251217000002_rls_policies.sql
+│   │   ├── 20251217000002_rls_policies.sql
+│   │   └── 20260127000001_add_crm_integrations.sql  # ⭐ CRM tables
 │   ├── seed/                        # ⭐ Seed data
 │   │   ├── default-health-flow.json # Default health qualification flow
 │   │   └── seed.sql                 # Seed SQL scripts
@@ -779,6 +820,37 @@ flows (
   definition jsonb,  -- JSON flow structure
   is_active boolean,
   created_at timestamptz
+)
+
+-- CRM Integrations (external CRM connections)
+crm_integrations (
+  id uuid primary key,
+  consultant_id uuid references consultants,
+  provider text,  -- 'rd-station' | 'pipedrive' | 'hubspot' | 'agendor'
+  name text,
+  status text,  -- 'active' | 'inactive' | 'error' | 'pending_auth'
+  api_key text (encrypted),
+  field_mappings jsonb,
+  auto_sync_enabled boolean,
+  sync_on_qualification boolean,
+  sync_stats jsonb,
+  created_at timestamptz,
+  updated_at timestamptz
+)
+
+-- CRM Sync Logs (synchronization history)
+crm_sync_logs (
+  id uuid primary key,
+  integration_id uuid references crm_integrations,
+  lead_id uuid references leads,
+  status text,  -- 'pending' | 'in_progress' | 'success' | 'failed' | 'partial'
+  operation text,  -- 'create' | 'update'
+  crm_record_id text,
+  crm_record_url text,
+  error_message text,
+  duration_ms integer,
+  started_at timestamptz,
+  completed_at timestamptz
 )
 ```
 

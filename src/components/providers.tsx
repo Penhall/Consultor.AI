@@ -3,9 +3,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from 'next-themes';
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { initSentry } from '@/lib/monitoring';
 
 export function Providers({ children }: { children: ReactNode }) {
+  // Initialize Sentry on mount
+  useEffect(() => {
+    initSentry().catch(console.error);
+  }, []);
   const [queryClient] = useState(
     () =>
       new QueryClient({
