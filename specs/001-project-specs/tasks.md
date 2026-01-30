@@ -1,16 +1,19 @@
 # Implementation Tasks: Consultor.AI - AI-Powered WhatsApp Sales Assistant Platform
 
-**Branch**: `001-project-specs` | **Date**: 2026-01-12 | **Updated**: 2026-01-27
+**Branch**: `001-project-specs` | **Date**: 2026-01-12 | **Updated**: 2026-01-30
 **Spec**: [spec.md](./spec.md) | **Plan**: [plan.md](./plan.md)
 
 ## Overview
 
 This document organizes implementation tasks by user story to enable independent, parallel development. The MVP (Phase 1) is **100% complete**, testing phase (Fase 1.5) is **complete**, and **Phase 3 (CRM Integrations)** is now **100% complete**.
 
-**Total Tasks**: 100 tasks (85 original + 15 Phase 3)
-**Completed Tasks**: 94 tasks (94%) ✅
-**Parallelizable Tasks**: 42 tasks (42%)
+**Total Tasks**: 124 tasks (100 MVP + 24 Phase 4 planning)
+**Completed Tasks**: 94 tasks (MVP: 94/100 = 94%) ✅
+**Phase 4 Planned Tasks**: 24 tasks (T121-T144)
+**Parallelizable Tasks**: 54 tasks (44%)
 **User Stories**: 7 stories (3 P1, 2 P2, 2 P3) - All P1/P2/P3 complete
+
+**Status**: Production Ready | **Next Phase**: 4 - Expansion (Imóveis, HubSpot/Agendor, Voice)
 
 ### Testing Progress (2026-01-20)
 
@@ -612,3 +615,55 @@ SETUP (Phase 1) → FOUNDATIONAL (Phase 2) → USER STORIES (Phase 3+) → POLIS
 **Parallelization**: 42% of tasks (42/100) are parallelizable within their phase.
 
 **Dependencies**: All user stories are now complete. The platform is ready for production deployment.
+
+---
+
+## Phase 11: Expansion (Fase 4) - PLANEJADO
+
+**Updated**: 2026-01-30
+**Status**: Planning
+**Reference**: [NEXT-STEPS-2026-01-30.md](../../docs/guides/NEXT-STEPS-2026-01-30.md)
+
+### 11.1 Segundo Vertical: Imóveis (P1)
+
+- [ ] T121 [P] Create vertical architecture in `src/lib/verticals/` with shared interfaces
+- [ ] T122 [P] Implement real estate flow template in `src/lib/verticals/real-estate/flow.json`
+- [ ] T123 [P] Create real estate AI prompts in `src/lib/verticals/real-estate/prompts.ts`
+- [ ] T124 Create real estate compliance rules in `src/lib/verticals/real-estate/compliance.ts`
+- [ ] T125 Add `vertical` column to leads table via migration
+- [ ] T126 Update lead service to support multi-vertical
+- [ ] T127 Update dashboard UI for vertical selection
+
+### 11.2 CRM Providers Expansion (P1)
+
+- [ ] T128 [P] Implement HubSpot provider in `src/lib/services/crm-providers/hubspot.ts`
+- [ ] T129 [P] Implement Agendor provider in `src/lib/services/crm-providers/agendor.ts`
+- [ ] T130 Add OAuth flow for HubSpot authentication
+- [ ] T131 Write integration tests for new CRM providers
+
+### 11.3 Voice Cloning (P2)
+
+- [ ] T132 [P] Integrate ElevenLabs API in `src/lib/services/voice-service.ts`
+- [ ] T133 Create voice sample upload flow in dashboard
+- [ ] T134 Implement audio message generation from AI text
+- [ ] T135 Add WhatsApp audio message support in Meta client
+
+### 11.4 Template Marketplace (P2)
+
+- [ ] T136 Create templates sharing schema (public/private)
+- [ ] T137 Implement marketplace UI in `src/app/dashboard/marketplace/`
+- [ ] T138 Add rating/review system for templates
+- [ ] T139 Implement flow import/export functionality
+
+### 11.5 Technical Improvements (P1)
+
+- [ ] T140 [P] Fix TypeScript errors in test files (~15 errors)
+- [ ] T141 [P] Archive deprecated files in `configs/docker/` and sprint docs
+- [ ] T142 [P] Add remaining integration tests (T078, T079, T092)
+- [ ] T143 Implement Storybook for UI components
+- [ ] T144 Create comprehensive API mock server
+
+---
+
+**Phase 4 Estimated Tasks**: 24 new tasks (T121-T144)
+**Priority Distribution**: P1 (12), P2 (8), P3 (4)

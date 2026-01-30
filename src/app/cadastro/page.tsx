@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function CadastroRedirect() {
-  redirect('/auth/signup');
+  redirect('/auth/register');
 }
