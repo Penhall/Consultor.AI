@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -1039,7 +1039,7 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 
 ## Maintainers
 
-**Last Updated**: 2026-01-30
+**Last Updated**: 2026-02-09
 **Project Version**: 0.3.0 (Fases 1-3 - **COMPLETO**)
 **Next.js Version**: 14.2.35
 **Node Version**: 20 LTS

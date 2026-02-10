@@ -11,7 +11,21 @@ import { mockLeads } from '@tests/fixtures/leads';
 // Create a flexible mock chain builder
 const createChainablePromise = (resolvedValue: any) => {
   const chain: any = {};
-  const methods = ['select', 'insert', 'update', 'delete', 'eq', 'or', 'order', 'range', 'single'];
+  const methods = [
+    'select',
+    'insert',
+    'update',
+    'delete',
+    'eq',
+    'or',
+    'order',
+    'range',
+    'single',
+    'gte',
+    'lte',
+    'in',
+    'ilike',
+  ];
 
   methods.forEach(method => {
     chain[method] = vi.fn(() => chain);

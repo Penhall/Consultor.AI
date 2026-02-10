@@ -8,6 +8,8 @@
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/database';
 import type { CreateLeadInput, UpdateLeadInput, ListLeadsParams } from '@/lib/validations/lead';
+import { PLAN_LEAD_LIMITS } from '@/lib/payment/plans';
+import type { SubscriptionPlan } from '@/types/billing';
 
 type Lead = Database['public']['Tables']['leads']['Row'];
 type LeadInsert = Database['public']['Tables']['leads']['Insert'];
@@ -42,6 +44,36 @@ export async function createLead(
 ): Promise<ServiceResult<Lead>> {
   try {
     const supabase = await createClient();
+
+    // Check lead limit based on subscription plan
+    const { data: consultantRaw } = await supabase
+      .from('consultants')
+      .select()
+      .eq('id', consultantId)
+      .single();
+
+    if (consultantRaw) {
+      const plan = (consultantRaw as any).subscription_plan as SubscriptionPlan | null;
+      const limit = PLAN_LEAD_LIMITS[plan || 'freemium'] || 20;
+
+      // Count leads created this month
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      const { count } = await supabase
+        .from('leads')
+        .select('*', { count: 'exact', head: true })
+        .eq('consultant_id', consultantId)
+        .gte('created_at', startOfMonth.toISOString());
+
+      if ((count ?? 0) >= limit) {
+        return {
+          success: false,
+          error: `Limite de ${limit} leads/mês atingido. Faça upgrade do seu plano para continuar.`,
+        };
+      }
+    }
 
     const leadData: LeadInsert = {
       consultant_id: consultantId,
