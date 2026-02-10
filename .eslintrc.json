@@ -70,7 +70,8 @@
 
     // Code quality
     "eqeqeq": ["error", "always"],
-    "curly": ["error", "all"],
+    "curly": ["error", "multi-line"],
+    "@typescript-eslint/consistent-type-imports": "warn",
     "no-throw-literal": "error",
     "prefer-promise-reject-errors": "error"
   },

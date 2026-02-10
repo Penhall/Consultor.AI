@@ -17,37 +17,7 @@ interface MetaEmbeddedSignupProps {
   onError?: (error: string) => void
 }
 
-// Extend Window interface to include FB SDK
-declare global {
-  interface Window {
-    FB?: {
-      init: (params: {
-        appId: string
-        cookie?: boolean
-        xfbml?: boolean
-        version: string
-      }) => void
-      login: (
-        callback: (response: {
-          authResponse?: {
-            code?: string
-            accessToken?: string
-            expiresIn?: number
-          }
-          status?: string
-        }) => void,
-        options?: {
-          config_id?: string
-          response_type?: string
-          override_default_response_type?: boolean
-          scope?: string
-          extras?: Record<string, unknown>
-        }
-      ) => void
-    }
-    fbAsyncInit?: () => void
-  }
-}
+// Facebook SDK types are defined in src/types/facebook-sdk.d.ts
 
 export function MetaEmbeddedSignup({
   consultantId,
@@ -68,12 +38,15 @@ export function MetaEmbeddedSignup({
 
     // Initialize FB SDK
     window.fbAsyncInit = function () {
-      window.FB?.init({
-        appId: process.env.NEXT_PUBLIC_META_APP_ID!,
-        cookie: true,
-        xfbml: true,
-        version: 'v18.0',
-      })
+      const appId = process.env.NEXT_PUBLIC_META_APP_ID
+      if (appId) {
+        window.FB?.init({
+          appId,
+          cookie: true,
+          xfbml: true,
+          version: 'v18.0',
+        })
+      }
       setSdkLoaded(true)
     }
 
@@ -173,7 +146,7 @@ export function MetaEmbeddedSignup({
           }
         },
         {
-          config_id: process.env.NEXT_PUBLIC_META_CONFIG_ID!,
+          config_id: process.env.NEXT_PUBLIC_META_CONFIG_ID ?? '',
           response_type: 'code',
           override_default_response_type: true,
           extras: {

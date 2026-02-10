@@ -2,10 +2,12 @@
 
 **Feature Branch**: `001-project-specs`
 **Created**: 2026-01-12
-**Status**: Draft
+**Updated**: 2026-01-30
+**Status**: Complete - Production Ready
+**Version**: 0.3.0
 **Input**: User description: "Analise a pasta .rules e a pasta docs para criar as especificações do projeto descrito nestas pastas"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Lead Qualification via WhatsApp (Priority: P1)
 
@@ -155,7 +157,7 @@ A consultant wants to export their lead data to CSV/Excel format and integrate w
 
 - **How does the system handle consultants exceeding rate limits (e.g., 10 requests per 10 seconds)?** API returns 429 status with "Rate limit exceeded" error. Dashboard shows warning. Webhook processing continues but delayed responses are queued.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -258,7 +260,7 @@ A consultant wants to export their lead data to CSV/Excel format and integrate w
 
 - **Analytics Metric**: Represents calculated performance metrics for consultants (not directly stored, computed from Leads and Conversations). Computed attributes: total_leads, leads_by_status (map of status to count), average_score, conversion_rate (percentage of leads in qualificado/fechado status), average_response_time (time from lead message to bot response), active_conversations_count.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
@@ -295,7 +297,7 @@ A consultant wants to export their lead data to CSV/Excel format and integrate w
 - **SC-017**: Test coverage maintains minimum 80% overall (90% for unit tests) measured on every commit
 - **SC-018**: Client-side JavaScript bundle sizes stay under 200KB gzipped for main bundle and under 100KB for route bundles
 
-## Assumptions *(included if needed)*
+## Assumptions _(included if needed)_
 
 1. **WhatsApp Business API Availability**: We assume Meta's WhatsApp Business API remains available, affordable, and maintains current pricing/rate limits. If API pricing increases significantly, we may need to pass costs to consultants or optimize message volume.
 
@@ -317,7 +319,7 @@ A consultant wants to export their lead data to CSV/Excel format and integrate w
 
 10. **Synchronous Webhook Processing**: We assume webhook processing completes within WhatsApp's expected response window (under 5 seconds). For heavy operations (AI generation, database writes), we use async processing with immediate 200 OK response.
 
-## Dependencies *(included if needed)*
+## Dependencies _(included if needed)_
 
 **External Services:**
 
@@ -359,7 +361,7 @@ A consultant wants to export their lead data to CSV/Excel format and integrate w
 
 3. **HTTPS Certificate**: Meta webhooks require HTTPS. Dependency on Vercel providing valid TLS certificates for deployed domains. Cannot test webhooks on localhost without ngrok or similar tunneling.
 
-## Out of Scope *(included if needed)*
+## Out of Scope _(included if needed)_
 
 **Explicitly Excluded from Current Specification:**
 
@@ -395,7 +397,7 @@ A consultant wants to export their lead data to CSV/Excel format and integrate w
 
 16. **Offline Mode**: No progressive web app (PWA) offline capabilities. Dashboard requires internet connection. WhatsApp messages queue on Meta's side if consultant is offline.
 
-## Notes *(optional, include if helpful)*
+## Notes _(optional, include if helpful)_
 
 **Technical Implementation Guidance:**
 

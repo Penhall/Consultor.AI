@@ -13,21 +13,23 @@ Sistema completo de automação de vendas via WhatsApp com Inteligência Artific
 
 ## 🎯 Status do Projeto
 
-**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** (100%)
-**Última Atualização:** 2025-12-20
-**Versão:** 0.1.0
+**Fase Atual:** Versão 0.3.0 – Flow Customization + Integrações CRM ✅  
+**Última Atualização:** 2026-01-27  
+**Versão:** 0.3.0
 
 ### O que está pronto:
-- ✅ CRUD Completo de Leads
-- ✅ Flow Engine Conversacional
-- ✅ Integração WhatsApp Business (Meta API)
-- ✅ Geração de Respostas com IA (Google Gemini)
-- ✅ Dashboard Analytics com Gráficos
-- ✅ Fluxo Padrão de Saúde
-- ✅ Sistema de Scores
-- ✅ 19 Páginas + 13 API Endpoints
 
-**Sistema 100% funcional e pronto para testes!** 🚀
+- ✅ CRUD completo de leads + pipeline e scoring
+- ✅ Flow Engine + **Flow Builder visual** (versões, duplicação, ativação)
+- ✅ Integração WhatsApp Business (Meta API) com webhooks e HMAC
+- ✅ Geração de respostas com IA (Google Gemini) com compliance ANS
+- ✅ Dashboard analytics com 6 métricas, gráficos e atividade
+- ✅ Exportação CSV, follow-ups automáticos, templates de mensagens e filtros avançados
+- ✅ **Integrações CRM** (RD Station, Pipedrive, HubSpot, Agendor) com sync manual/automático
+- ✅ Monitoramento (Sentry + logs), error boundary e página 404 aprimorada
+- ✅ 22 páginas + 25 API routes
+
+**Sistema operacional e pronto para pilotar/produção leve.** 🚀
 
 ---
 
@@ -47,6 +49,7 @@ Sistema completo de automação de vendas via WhatsApp com Inteligência Artific
 ## ✨ Funcionalidades
 
 ### 🤖 Automação WhatsApp
+
 - [x] **Integração Oficial Meta Business API**
 - [x] Mensagens interativas (botões e listas)
 - [x] Auto-criação de leads via WhatsApp
@@ -56,6 +59,7 @@ Sistema completo de automação de vendas via WhatsApp com Inteligência Artific
 - [x] Logs de eventos para auditoria
 
 ### 🧠 Inteligência Artificial
+
 - [x] **Google Gemini AI** (1.5 Flash)
 - [x] Prompts com **compliance ANS** integrado
 - [x] Respostas contextuais baseadas em estado
@@ -64,6 +68,7 @@ Sistema completo de automação de vendas via WhatsApp com Inteligência Artific
 - [x] Temperature e max tokens configuráveis
 
 ### 📊 Dashboard Analytics
+
 - [x] **6 Métricas em tempo real**:
   - Total de leads
   - Leads este mês
@@ -78,6 +83,7 @@ Sistema completo de automação de vendas via WhatsApp com Inteligência Artific
 - [x] Refetch automático (1-5min)
 
 ### 🔄 Flow Engine
+
 - [x] Fluxos conversacionais JSON
 - [x] **3 tipos de steps**:
   - 💬 Mensagem (com variáveis `{{nome}}`)
@@ -88,6 +94,7 @@ Sistema completo de automação de vendas via WhatsApp com Inteligência Artific
 - [x] Fluxo padrão de saúde (7 passos)
 
 ### 👥 Gestão de Leads
+
 - [x] CRUD completo
 - [x] Sistema de scores (0-100)
 - [x] Pipeline de vendas (5 status)
@@ -200,6 +207,7 @@ npm run flow:validate supabase/seed/default-health-flow.json
 ```
 
 **Estrutura mínima**:
+
 ```json
 {
   "versao": "1.0",
@@ -220,24 +228,28 @@ npm run flow:validate supabase/seed/default-health-flow.json
 ## 📖 Documentação
 
 ### 🚀 Guias de Setup
+
 - [📖 **WhatsApp Embedded Signup**](./docs/guides/WHATSAPP-EMBEDDED-SIGNUP.md) ⭐ **NOVO**
 - [📖 Setup Completo](./docs/guides/SETUP-COMPLETE.md)
 - [📖 Docker Setup](./docs/guides/DOCKER-SETUP.md)
 - [📖 Supabase Migration](./docs/guides/SUPABASE-MIGRATION.md)
 
 ### 📚 Documentação Técnica
+
 - [📖 SRS - Especificação de Requisitos](./docs/technical/SRS-Software-Requirements-Specification.md)
 - [📖 SAD - Arquitetura do Sistema](./docs/architecture/SAD-System-Architecture-Document.md)
 - [📖 Database Design](./docs/architecture/Database-Design-Document.md)
 - [📖 API Specification](./docs/api/API-Specification.md)
 
 ### 🛠️ Guias de Desenvolvimento
+
 - [📖 Development Standards](./.rules/development-standards.md)
 - [📖 Coding Guidelines](./.rules/coding-guidelines.md)
 - [📖 Architecture Rules](./.rules/architecture-rules.md)
 - [📖 Testing Standards](./.rules/testing-standards.md)
 
 ### 🤖 Claude Code
+
 - [📖 CLAUDE.md](./CLAUDE.md) - Instruções para Claude
 
 ---
@@ -245,23 +257,27 @@ npm run flow:validate supabase/seed/default-health-flow.json
 ## 🛠️ Stack Tecnológica
 
 ### Frontend
+
 - **Next.js 14** (App Router) + React 18
 - **TypeScript 5.3** (strict mode)
 - **Tailwind CSS** + shadcn/ui
 - **React Query** (TanStack Query v5)
 
 ### Backend
+
 - **Supabase** (PostgreSQL 14 + Auth + Realtime)
 - **Next.js API Routes**
 - **Zod** (Runtime validation)
 - **Row Level Security** (RLS)
 
 ### AI & Integrações
+
 - **Google AI** (Gemini 1.5 Flash)
 - **Meta WhatsApp Cloud API**
 - **HMAC SHA-256** validation
 
 ### DevOps
+
 - **Docker** + Docker Compose
 - **ESLint** + Prettier
 - **Vitest** + Playwright
@@ -309,12 +325,12 @@ const response = await fetch('/api/leads', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     whatsapp_number: '+5511999999999',
-    name: 'João Silva'
-  })
-})
+    name: 'João Silva',
+  }),
+});
 
-const { data } = await response.json()
-console.log('Lead criado:', data.id)
+const { data } = await response.json();
+console.log('Lead criado:', data.id);
 ```
 
 ### Exemplo: Iniciar Conversa
@@ -326,12 +342,12 @@ const response = await fetch('/api/conversations/start', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     leadId: 'uuid-do-lead',
-    flowId: 'uuid-do-flow'
-  })
-})
+    flowId: 'uuid-do-flow',
+  }),
+});
 
-const { data } = await response.json()
-console.log('Conversa iniciada:', data.conversationId)
+const { data } = await response.json();
+console.log('Conversa iniciada:', data.conversationId);
 ```
 
 ---
@@ -353,6 +369,7 @@ npm run flow:validate supabase/seed/default-health-flow.json
 ```
 
 ### Cobertura Atual
+
 - **Meta**: 80%+ overall
 - **Unit Tests**: 90%+
 - **Integration**: 70%+
@@ -375,66 +392,64 @@ vercel
 vercel --prod
 ```
 
-### Opção 2: Docker
+### Opção 2: Docker (prod)
 
 ```bash
-# Build
+# 1) Gere .env com SUPABASE/AI/META/REDIS
+cp .env.example .env
+# Preencha NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, GOOGLE_AI_API_KEY ou GROQ_API_KEY, META_APP_SECRET, ENCRYPTION_KEY, REDIS_PASSWORD.
+
+# 2) Build
 docker build -t consultor-ai .
 
-# Run
-docker run -p 3000:3000 consultor-ai
+# 3) Run
+docker run --env-file .env -p 3000:3000 consultor-ai
 ```
 
 ### Opção 3: Docker Compose
 
 ```bash
-docker-compose up -d
+# Produção (app + redis)
+docker-compose up -d --build
+
+# Desenvolvimento (hot-reload, usa Dockerfile.dev)
+docker-compose -f docker-compose.dev.yml up --build
 ```
+
+> Dicas: a aplicação usa Supabase Cloud por padrão; se quiser Postgres local, habilite o serviço `postgres` comentado em `docker-compose.yml` e atualize as variáveis do .env. O healthcheck usa `/api/health` (não depende do banco).
 
 ---
 
 ## 📊 Status do Build
 
 ```
-✅ Build: SUCESSO
+✅ Build: SUCESSO (0.3.0)
 ✅ TypeScript: 0 erros
-✅ Páginas: 19 páginas
-✅ API Routes: 13 endpoints
+✅ Páginas: 22 páginas
+✅ API Routes: 25 endpoints
 ✅ Componentes: 20+ componentes React
-✅ Tempo de Build: ~45s
+✅ Tempo de Build: ~67s
 ```
 
-### Rotas da API (13)
+### Rotas da API (25 – principais)
 
 ```
-Analytics (3):
-  GET /api/analytics/overview
-  GET /api/analytics/charts
-  GET /api/analytics/activity
-
-Leads (4):
-  GET    /api/leads
-  POST   /api/leads
-  GET/PATCH/DELETE /api/leads/[id]
-  GET    /api/leads/stats
-
-Conversations (2):
-  POST /api/conversations/start
-  POST /api/conversations/[id]/message
-
-WhatsApp (1):
-  GET/POST /api/webhook/meta/[consultantId]
-
-Outros (3):
-  GET /api/health
-  GET /api/consultants/meta-callback
+Analytics: /api/analytics/(overview|charts|activity)
+Leads: /api/leads, /api/leads/[id], /api/leads/stats, /api/leads/export
+Conversations: /api/conversations/start, /api/conversations/[id]/message
+WhatsApp: /api/webhook/meta/[consultantId], /api/webhook/mock
+Consultants: /api/consultants/meta-callback, /api/consultants/meta-signup
+Templates: /api/templates/*
+CRM: /api/integrations/crm/* (RD Station, Pipedrive, HubSpot, Agendor)
+Healthcheck: /api/health
 ```
 
 ---
 
 ## 🗺️ Roadmap
 
-### ✅ Fase 1 - MVP (COMPLETO!)
+### ✅ Fase 1 - MVP
+
 - [x] CRUD de Leads
 - [x] Flow Engine
 - [x] Integração WhatsApp
@@ -442,16 +457,24 @@ Outros (3):
 - [x] Dashboard Analytics
 - [x] Fluxo Padrão de Saúde
 
-### 📋 Fase 2 - Polimento
-- [ ] Exportação de Leads (CSV/Excel)
-- [ ] Follow-up Automático
-- [ ] Templates de Mensagens
-- [ ] Filtros Avançados
-- [ ] Testes E2E completos
+### ✅ Fase 2 - Polimento
 
-### 🎯 Fase 3 - Expansão
-- [ ] Segundo Vertical (Imóveis)
-- [ ] Integração CRM (RD Station)
+- [x] Exportação de Leads (CSV/Excel)
+- [x] Follow-up Automático
+- [x] Templates de Mensagens
+- [x] Filtros Avançados
+- [x] Testes E2E completos
+
+### ✅ Fase 3 - Personalização e CRM (0.3.0)
+
+- [x] Flow Builder visual + versionamento
+- [x] Integrações CRM (RD Station, Pipedrive, HubSpot, Agendor)
+- [x] Monitoramento/Sentry + error boundary
+- [x] Páginas extras (flows, integrações) e bundle analyzer
+
+### 🎯 Próximos (Fase 4)
+
+- [ ] Segundo vertical (Imóveis)
 - [ ] Voice Cloning (ElevenLabs)
 - [ ] Image Generation (Canva API)
 - [ ] Multi-tenant
@@ -461,18 +484,21 @@ Outros (3):
 ## 🔒 Compliance e Segurança
 
 ### WhatsApp
+
 - ✅ HMAC SHA-256 validation
 - ✅ Webhook verification
 - ✅ 24-hour message window
 - ✅ Audit logs
 
 ### AI (ANS Compliance)
+
 - ✅ Nunca menciona preços exatos
 - ✅ Nunca pede CPF/dados médicos
 - ✅ Nunca promete "zero carência"
 - ✅ Prompts validados
 
 ### Dados
+
 - ✅ RLS policies ativas
 - ✅ Tokens criptografados
 - ✅ LGPD compliant
@@ -485,6 +511,7 @@ Outros (3):
 Projeto proprietário. Leia `.rules/development-standards.md` antes de contribuir.
 
 ### Processo
+
 1. Fork o repositório
 2. Crie branch: `git checkout -b feature/nova-feature`
 3. Commit: `git commit -m 'feat: adiciona exportação CSV'`
@@ -499,15 +526,15 @@ Proprietary - Todos os direitos reservados © 2025 Consultor.AI
 
 ---
 
-## 👥 Time
+## 🧑‍💻 Time
 
-**Versão**: 0.1.0 (MVP Fase 1 Completo)
-**Última Atualização**: 2025-12-20
-**Status**: ✅ **Pronto para Testes**
+**Versão**: 0.3.0 (Flow Customization + CRM)
+**Última Atualização**: 2026-01-27
+**Status**: ✅ Pronto para produção/piloto
 
 ---
 
-## 🆘 Suporte
+## 🧠 Suporte
 
 - **Documentação**: [./docs/](./docs/)
 - **Guias**: [./docs/guides/](./docs/guides/)

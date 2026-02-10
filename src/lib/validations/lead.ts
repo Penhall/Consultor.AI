@@ -4,7 +4,7 @@
  * Zod schemas for validating lead-related operations
  */
 
-import { z } from 'zod'
+import { z } from 'zod';
 
 /**
  * Lead status enum
@@ -16,9 +16,9 @@ export const leadStatusSchema = z.enum([
   'agendado',
   'fechado',
   'perdido',
-])
+]);
 
-export type LeadStatus = z.infer<typeof leadStatusSchema>
+export type LeadStatus = z.infer<typeof leadStatusSchema>;
 
 /**
  * Schema for creating a new lead
@@ -36,9 +36,9 @@ export const createLeadSchema = z.object({
   utm_source: z.string().optional(),
   utm_medium: z.string().optional(),
   utm_campaign: z.string().optional(),
-})
+});
 
-export type CreateLeadInput = z.infer<typeof createLeadSchema>
+export type CreateLeadInput = z.infer<typeof createLeadSchema>;
 
 /**
  * Schema for updating a lead
@@ -49,9 +49,9 @@ export const updateLeadSchema = z.object({
   status: leadStatusSchema.optional(),
   score: z.number().min(0).max(100).optional(),
   metadata: z.record(z.unknown()).optional(),
-})
+});
 
-export type UpdateLeadInput = z.infer<typeof updateLeadSchema>
+export type UpdateLeadInput = z.infer<typeof updateLeadSchema>;
 
 /**
  * Schema for listing leads with filters
@@ -60,9 +60,18 @@ export const listLeadsSchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
   limit: z.coerce.number().min(1).max(100).optional().default(20),
   status: leadStatusSchema.optional(),
+  statuses: z.string().optional(), // Comma-separated statuses for multi-select
   search: z.string().optional(),
   orderBy: z.enum(['created_at', 'updated_at', 'score', 'name']).optional().default('created_at'),
   order: z.enum(['asc', 'desc']).optional().default('desc'),
-})
+  // Date range filters
+  dateFrom: z.string().optional(), // ISO date string
+  dateTo: z.string().optional(), // ISO date string
+  // Score range filters
+  scoreMin: z.coerce.number().min(0).max(100).optional(),
+  scoreMax: z.coerce.number().min(0).max(100).optional(),
+  // Source filter
+  source: z.string().optional(),
+});
 
-export type ListLeadsParams = z.infer<typeof listLeadsSchema>
+export type ListLeadsParams = z.infer<typeof listLeadsSchema>;

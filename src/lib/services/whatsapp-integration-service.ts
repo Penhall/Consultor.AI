@@ -11,8 +11,6 @@ import type { Database } from '@/types/database'
 
 type WhatsAppIntegration = Database['public']['Tables']['whatsapp_integrations']['Row']
 type WhatsAppIntegrationInsert = Database['public']['Tables']['whatsapp_integrations']['Insert']
-type WhatsAppIntegrationUpdate = Database['public']['Tables']['whatsapp_integrations']['Update']
-
 export type ServiceResult<T> =
   | { success: true; data: T }
   | { success: false; error: string }

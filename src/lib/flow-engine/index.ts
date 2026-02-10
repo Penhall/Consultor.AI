@@ -19,6 +19,7 @@ import {
   executeActionStep,
   processChoiceResponse,
 } from './executors'
+import { FlowEngine } from './engine'
 
 type FlowEngineResult<T> =
   | { success: true; data: T }
@@ -345,3 +346,4 @@ export * from './types'
 export * from './parser'
 export * from './state-manager'
 export * from './executors'
+export { FlowEngine }

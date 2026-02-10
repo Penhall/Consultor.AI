@@ -54,10 +54,13 @@ export function useAuth(): UseAuthReturn {
 
         // If found by email, update user_id to link them
         if (data && !error) {
-          await supabase
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const consultantData = data as any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any)
             .from('consultants')
             .update({ user_id: userId })
-            .eq('id', data.id)
+            .eq('id', consultantData.id)
         }
       }
 
