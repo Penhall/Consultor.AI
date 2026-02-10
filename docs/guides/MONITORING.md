@@ -219,3 +219,53 @@ Exemplo de log em producao:
 
 1. Certifique-se de usar as funcoes de tracking
 2. Chame `flushMetrics()` ao final de uma request se necessario
+
+---
+
+## Metricas de Billing e SaaS
+
+### Painel Admin
+
+O painel admin (`/admin`) exibe metricas SaaS em tempo real:
+
+- **Total de usuarios** - Cadastros acumulados
+- **Usuarios pagantes** - Assinantes Pro + Agencia
+- **Receita (MRR)** - Receita recorrente mensal estimada
+- **Deltas diarios** - Variacao de usuarios e receita
+
+Os dados vem da tabela `daily_stats`, populada automaticamente pelo pg_cron a cada hora.
+
+### Metricas de Creditos
+
+Monitorar o consumo de creditos por usuario:
+
+```sql
+-- Usuarios com creditos baixos
+SELECT email, subscription_plan, credits, purchased_credits, monthly_credits_allocation
+FROM consultants
+WHERE credits < 5 AND subscription_status = 'active'
+ORDER BY credits ASC;
+
+-- Consumo medio de creditos
+SELECT subscription_plan, AVG(monthly_credits_allocation - credits) as avg_usage
+FROM consultants
+WHERE subscription_status = 'active'
+GROUP BY subscription_plan;
+```
+
+### Metricas de Email
+
+Quando Resend esta configurado, monitore:
+
+- **Taxa de entrega** - Verifique no dashboard do Resend
+- **Bounces** - Emails invalidos retornados
+- **Templates enviados** - Welcome, password reset, cancelamento
+
+Em desenvolvimento, todos os emails sao logados no console com prefixo `[EMAIL]`.
+
+### Alertas Recomendados para Billing
+
+1. **Webhook failures** - Stripe nao consegue entregar eventos
+2. **Credit exhaustion** - Usuarios sem creditos tentando usar IA
+3. **Subscription churn** - Taxa de cancelamento > 5% ao mes
+4. **Payment failures** - Invoices com status `past_due`

@@ -1,109 +1,40 @@
-# Guias de Configuração e Setup
+# Guias - Consultor.AI
 
-Esta pasta contém todos os guias de configuração, setup, troubleshooting e documentação de correções do projeto Consultor.AI.
-
-## 📂 Conteúdo
-
-### Guias de Setup
-
-- **[DOCKER-SETUP.md](./DOCKER-SETUP.md)** - Guia completo de configuração do Docker
-- **[SETUP-COMPLETE.md](./SETUP-COMPLETE.md)** - Checklist de setup completo do ambiente
-- **[SUPABASE-MIGRATION.md](./SUPABASE-MIGRATION.md)** - Guia de migração e configuração do Supabase
-
-### Troubleshooting
-
-- **[DOCKER-BUILD-FIX.md](./DOCKER-BUILD-FIX.md)** - Soluções para problemas comuns de build do Docker
-
-### Próximos Passos
-
-- **[NEXT-STEPS.md](./NEXT-STEPS.md)** - Roadmap e próximos passos de desenvolvimento
-
-## 🎯 Propósito
-
-Esta pasta foi criada para manter a raiz do projeto limpa e organizada. Seguindo a regra definida em `.rules/development-standards.md` Section 0, **NUNCA** crie arquivos de documentação diretamente na raiz do projeto.
-
-## 📝 Quando Adicionar Arquivos Aqui
-
-Adicione documentos nesta pasta quando:
-
-- ✅ Criar guias de setup ou configuração
-- ✅ Documentar soluções para problemas encontrados
-- ✅ Escrever tutoriais de deploy ou migração
-- ✅ Criar checklists de processos
-- ✅ Documentar troubleshooting steps
-
-## ❌ O Que NÃO Colocar Aqui
-
-Não adicione:
-
-- ❌ Especificações técnicas → Use `docs/technical/`
-- ❌ Documentação de arquitetura → Use `docs/architecture/`
-- ❌ Documentação de API → Use `docs/api/`
-- ❌ Notas internas/TODOs → Use `docs/internal/`
-- ❌ Scripts executáveis → Use `scripts/`
-
-## 🔗 Documentação Relacionada
-
-- **[CLAUDE.md](../../CLAUDE.md)** - Guia completo do projeto para IA
-- **[README.md](../../README.md)** - Visão geral do projeto
-- **[.rules/development-standards.md](../../.rules/development-standards.md)** - Padrões de desenvolvimento (inclui regras de organização)
-
-## 📋 Template para Novos Guias
-
-Ao criar um novo guia, use este template:
-
-```markdown
-# Nome do Guia
-
-## Objetivo
-
-[Descreva brevemente o que este guia resolve ou ensina]
-
-## Pré-requisitos
-
-- [ ] Requisito 1
-- [ ] Requisito 2
-
-## Passos
-
-### 1. Primeiro Passo
-
-```bash
-# comandos exemplo
-```
-
-[Explicação]
-
-### 2. Segundo Passo
-
-[...]
-
-## Verificação
-
-Como verificar se funcionou:
-
-```bash
-# comando de verificação
-```
-
-## Troubleshooting
-
-### Problema: [descrição]
-
-**Solução**: [...]
-
-## Referências
-
-- [Link 1]
-- [Link 2]
+Documentacao pratica para configuracao, deploy e operacao do Consultor.AI.
 
 ---
 
-**Última Atualização**: YYYY-MM-DD
-**Versão**: X.Y.Z
-```
+## Guias Disponiveis
+
+| Guia                                                         | Descricao                                                                        |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| [getting-started.md](./getting-started.md)                   | Setup completo do ambiente de desenvolvimento (Node, Supabase, env vars, testes) |
+| [DEPLOYMENT.md](./DEPLOYMENT.md)                             | Deploy para producao (Vercel, Docker, Stripe, Supabase, Resend)                  |
+| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)                   | Resolucao de problemas comuns (auth, database, billing, WhatsApp)                |
+| [MONITORING.md](./MONITORING.md)                             | Logging, performance tracking, Sentry, metricas SaaS                             |
+| [LOCAL-DOCKER-TESTING.md](./LOCAL-DOCKER-TESTING.md)         | Desenvolvimento local com Docker (stack completa, dev, comandos uteis)           |
+| [WHATSAPP-EMBEDDED-SIGNUP.md](./WHATSAPP-EMBEDDED-SIGNUP.md) | Integracao WhatsApp Business via Meta Embedded Signup (OAuth, arquitetura)       |
+| [WHATSAPP-SIMULATOR.md](./WHATSAPP-SIMULATOR.md)             | Simulador de WhatsApp para testes locais (flow engine, IA, leads)                |
+| [ROADMAP.md](./ROADMAP.md)                                   | Status das fases, proximos passos, KPIs e cronograma                             |
 
 ---
 
-**Última Atualização**: 2025-12-17
-**Mantido por**: Equipe Consultor.AI
+## Por onde comecar
+
+1. **Novo no projeto?** Comece por [getting-started.md](./getting-started.md)
+2. **Precisa fazer deploy?** Veja [DEPLOYMENT.md](./DEPLOYMENT.md)
+3. **Algo nao funciona?** Consulte [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+4. **Quer testar com Docker?** Veja [LOCAL-DOCKER-TESTING.md](./LOCAL-DOCKER-TESTING.md)
+
+---
+
+## Documentacao Relacionada
+
+- **Regras de desenvolvimento**: [.rules/](../../.rules/) (leia antes de escrever codigo)
+- **Especificacoes tecnicas**: [docs/technical/](../technical/)
+- **Arquitetura**: [docs/architecture/](../architecture/)
+- **API**: [docs/api/](../api/)
+
+---
+
+**Ultima Atualizacao**: 2026-02-10

@@ -184,14 +184,15 @@ Consultor.AI/
 │
 ├── docs/                            # Technical documentation
 │   ├── guides/                      # Setup guides, tutorials, fixes
-│   │   ├── WHATSAPP-EMBEDDED-SIGNUP.md  # ⭐ WhatsApp Business setup (3-click)
-│   │   ├── DEPLOYMENT.md            # ⭐ Deploy guide (Docker, Vercel)
+│   │   ├── README.md                # ⭐ Guide index
+│   │   ├── getting-started.md       # ⭐ Dev environment setup
+│   │   ├── DEPLOYMENT.md            # ⭐ Deploy guide (Docker, Vercel, Stripe)
+│   │   ├── TROUBLESHOOTING.md       # ⭐ Common issues & solutions
 │   │   ├── MONITORING.md            # ⭐ Monitoring & observability
-│   │   ├── DOCKER-SETUP.md
-│   │   ├── DOCKER-BUILD-FIX.md
-│   │   ├── SUPABASE-MIGRATION.md
-│   │   ├── NEXT-STEPS.md
-│   │   └── SETUP-COMPLETE.md
+│   │   ├── LOCAL-DOCKER-TESTING.md  # ⭐ Docker local development
+│   │   ├── WHATSAPP-EMBEDDED-SIGNUP.md  # ⭐ WhatsApp Business setup
+│   │   ├── WHATSAPP-SIMULATOR.md    # WhatsApp test simulator
+│   │   └── ROADMAP.md               # Project roadmap & KPIs
 │   ├── technical/                   # Technical specifications
 │   │   ├── SRS-Software-Requirements-Specification.md
 │   │   └── Implementation-Plan.md
@@ -1047,7 +1048,7 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 
 ### Próximos Passos
 
-- Guia atualizado: [NEXT-STEPS-2026-01-30.md](./docs/guides/NEXT-STEPS-2026-01-30.md)
+- Guia atualizado: [ROADMAP.md](./docs/guides/ROADMAP.md)
 - Fase 4 (Expansão): Vertical Imóveis, HubSpot/Agendor, Voice Cloning
 
 ---

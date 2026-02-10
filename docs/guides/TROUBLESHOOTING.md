@@ -310,8 +310,72 @@ supabase db reset
 
 ---
 
+## Problema: Stripe Webhook falha (400/401)
+
+**Causa**: Webhook secret incorreto ou body parsing incorreto.
+
+### Solucao
+
+1. Verifique `STRIPE_WEBHOOK_SECRET` no `.env`
+2. Confirme que o webhook endpoint e `https://seu-dominio/api/billing/webhook`
+3. No Stripe Dashboard > Developers > Webhooks, verifique os eventos:
+   - `invoice.paid`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+4. Teste com Stripe CLI:
+
+```bash
+stripe listen --forward-to localhost:3000/api/billing/webhook
+```
+
+---
+
+## Problema: Creditos nao resetam no inicio do mes
+
+**Causa**: pg_cron nao esta configurado ou Supabase esta no plano Free.
+
+### Solucao
+
+1. Verifique se a migration `20260208000007_setup_pg_cron.sql` foi aplicada
+2. pg_cron requer Supabase **plano pago** (Pro+)
+3. Alternativa: crie um cron externo que chame a funcao:
+
+```sql
+SELECT reset_monthly_credits();
+```
+
+---
+
+## Problema: Painel admin nao acessivel (403)
+
+**Causa**: Email do usuario nao esta na lista `ADMIN_EMAILS` ou flag `is_admin` nao esta ativa.
+
+### Solucao
+
+1. Verifique `ADMIN_EMAILS` no `.env` (separado por virgula)
+2. Ou ative manualmente no banco:
+
+```sql
+UPDATE consultants SET is_admin = true WHERE email = 'seu-email@exemplo.com';
+```
+
+---
+
+## Problema: Emails nao enviados
+
+**Causa**: `RESEND_API_KEY` nao configurada ou dominio nao verificado.
+
+### Solucao
+
+1. Em desenvolvimento: emails sao logados no console (fallback automatico)
+2. Em producao: configure `RESEND_API_KEY` e verifique o dominio em [resend.com](https://resend.com)
+3. Verifique logs do servidor para erros de envio
+
+---
+
 ## Contatos e Recursos
 
 - [Supabase Docs](https://supabase.com/docs)
 - [Next.js Troubleshooting](https://nextjs.org/docs/messages)
-- [Projeto GitHub Issues](https://github.com/seu-usuario/consultor-ai/issues)
+- [Stripe Docs](https://stripe.com/docs)
+- [Projeto GitHub Issues](https://github.com/Penhall/Consultor.AI/issues)

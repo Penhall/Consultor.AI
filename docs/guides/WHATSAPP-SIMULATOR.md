@@ -9,6 +9,7 @@
 ## 🎯 O que é?
 
 Um simulador completo de WhatsApp que permite:
+
 - ✅ Testar o flow engine conversacional
 - ✅ Validar respostas com IA
 - ✅ Verificar auto-criação de leads
@@ -25,13 +26,14 @@ Um simulador completo de WhatsApp que permite:
 ### 1. Iniciar o servidor
 
 ```bash
-cd /mnt/e/PROJETOS/Consultor.AI
+cd Consultor.AI
 npm run dev
 ```
 
 ### 2. Acessar o simulador
 
 Abra no navegador:
+
 ```
 http://localhost:3000/dashboard/test/whatsapp-simulator
 ```
@@ -110,6 +112,7 @@ psql -h localhost -U postgres -d consultor_ai -f supabase/seed/seed.sql
 ## 🔍 O que Acontece nos Bastidores
 
 ### 1. Auto-criação de Lead
+
 ```
 Número simulado: 5511999999999
 ↓
@@ -121,6 +124,7 @@ Lead criado com status "novo"
 ```
 
 ### 2. Criação de Conversation
+
 ```
 Lead encontrado/criado
 ↓
@@ -132,6 +136,7 @@ Conversation ativa criada
 ```
 
 ### 3. Processamento de Mensagens
+
 ```
 Mensagem recebida
 ↓
@@ -145,6 +150,7 @@ Retorna resposta + próximo step
 ```
 
 ### 4. Geração de Resposta com IA
+
 ```
 Todos os dados coletados
 ↓
@@ -160,6 +166,7 @@ Score calculado (0-100)
 ```
 
 ### 5. Salvamento de Mensagens
+
 ```
 Cada mensagem (user + bot) salva no banco
 ↓
@@ -204,11 +211,13 @@ LIMIT 20;
 ### Ver analytics
 
 Acesse o dashboard:
+
 ```
 http://localhost:3000/dashboard/analytics
 ```
 
 Você verá:
+
 - Total de leads (incluindo os criados pelo simulador)
 - Taxa de conversão
 - Leads por status
@@ -244,6 +253,7 @@ Você verá:
 ### ❌ Erro: "Nenhum flow ativo encontrado"
 
 **Solução**: Execute o seed do banco de dados:
+
 ```bash
 psql -h localhost -U postgres -d consultor_ai -f supabase/seed/seed.sql
 ```
@@ -251,11 +261,13 @@ psql -h localhost -U postgres -d consultor_ai -f supabase/seed/seed.sql
 ### ❌ Erro: "Cannot read property 'id' of null"
 
 **Causas possíveis**:
+
 1. Supabase não está rodando
 2. Credenciais erradas no `.env`
 3. Migrations não foram aplicadas
 
 **Solução**:
+
 ```bash
 # Verificar Supabase
 docker-compose ps
@@ -270,6 +282,7 @@ npx supabase db push
 ### ❌ Bot não responde / Fica carregando infinitamente
 
 **Soluções**:
+
 1. Verifique o console do navegador (F12) para erros
 2. Verifique logs do servidor (`npm run dev`)
 3. Confirme que API do Gemini está configurada (`.env`):
@@ -280,6 +293,7 @@ npx supabase db push
 ### ❌ Resposta da IA está genérica/ruim
 
 **Isso é esperado!** O prompt pode ser melhorado. Edite:
+
 ```
 src/lib/services/ai-service.ts
 ```
@@ -320,6 +334,7 @@ const [messages, setMessages] = useState<Message[]>([
 ### Mudar cores do chat
 
 As cores seguem o tema do WhatsApp:
+
 - `bg-[#005c4b]` - Mensagens do usuário (verde)
 - `bg-[#1f2c33]` - Mensagens do bot (cinza)
 - `bg-[#0a1014]` - Fundo (preto)
@@ -340,6 +355,7 @@ Agora que você tem o simulador funcionando:
 6. ✅ **Valide analytics** com dados simulados
 
 Quando tudo estiver pronto:
+
 - Integre com a API real do WhatsApp (Meta ou Twilio)
 - Configure webhooks de produção
 - Deploy em servidor com domínio real
@@ -372,6 +388,18 @@ Quando tudo estiver pronto:
 
 ---
 
-**Última atualização**: 2026-01-08
-**Status**: ✅ Funcional e testado
+### Testes E2E Automatizados
+
+O fluxo de qualificacao de leads tambem e testado automaticamente:
+
+```bash
+npm run test:e2e
+```
+
+Veja `tests/e2e/` para os cenarios cobertos.
+
+---
+
+**Ultima atualizacao**: 2026-02-10
+**Status**: Funcional e testado
 **Modo**: Desenvolvimento local (sem API externa)
