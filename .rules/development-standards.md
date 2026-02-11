@@ -1,10 +1,11 @@
 # Development Standards - Consultor.AI
+
 ## AI-Powered WhatsApp Sales Assistant Platform
 
-**Version:** 1.0
-**Last Updated:** 2025-12-12
-**Stack:** Next.js 14 + TypeScript + Supabase + PostgreSQL
-**Target:** Health Plan Consultants & Real Estate Agents
+**Version:** 2.0
+**Last Updated:** 2026-02-11
+**Stack:** Next.js 14 + TypeScript + Supabase + PostgreSQL + Stripe + Resend
+**Target:** Health Plan Consultants & Real Estate Agents (SaaS Multi-tenant)
 
 ---
 
@@ -23,6 +24,9 @@
 - [10. Security](#10-security)
 - [11. Git Workflow](#11-git-workflow)
 - [12. Code Review Checklist](#12-code-review-checklist)
+- [13. SaaS & Billing Standards](#13-saas--billing-standards)
+- [14. File Upload & Storage](#14-file-upload--storage)
+- [15. Email & Notifications](#15-email--notifications)
 
 ---
 
@@ -35,6 +39,7 @@
 ### Allowed Files in Root Directory
 
 **Required Files** (MUST be in root):
+
 ```
 .env                    # Environment variables (gitignored)
 .env.example            # Environment template
@@ -45,43 +50,53 @@ CLAUDE.md               # AI assistant guide (English)
 package.json            # npm configuration
 package-lock.json       # npm lock file
 docker-compose.yml      # Production Docker setup
-Dockerfile              # Production container
+docker-compose.dev.yml  # Development Docker setup
+docker-compose.full.yml # Full stack Docker setup
+Dockerfile              # Production container (multi-stage)
+Dockerfile.dev          # Development container (hot-reload)
+Dockerfile.test         # Test container
 next.config.js          # Next.js configuration
 next-env.d.ts           # Next.js TypeScript declarations
 tsconfig.json           # TypeScript configuration
 ```
 
-**Configuration Proxies** (symlinks to configs/):
+**Configuration Files** (in root, required by tools):
+
 ```
-.eslintrc.json         → configs/eslint/.eslintrc.json
-.prettierrc            → configs/prettier/.prettierrc
-.prettierignore        → configs/prettier/.prettierignore
-playwright.config.ts   → configs/testing/playwright.config.ts
-vitest.config.ts       → configs/testing/vitest.config.ts
-postcss.config.js      → configs/build/postcss.config.js
-tailwind.config.ts     → configs/build/tailwind.config.ts
+.eslintrc.json          # ESLint configuration
+.prettierrc             # Prettier configuration
+.prettierignore         # Prettier ignore rules
+playwright.config.ts    # Playwright E2E tests
+vitest.config.ts        # Vitest unit tests
+postcss.config.js       # PostCSS configuration
+tailwind.config.ts      # Tailwind CSS configuration
 ```
+
+> **Note**: Docker files previously in `configs/docker/` are deprecated. Root Docker files are the source of truth.
 
 ### Forbidden in Root Directory
 
 **NEVER create these in root** (use proper directories instead):
 
 ❌ **Documentation files**:
+
 - `SETUP.md`, `DEPLOYMENT.md`, `TROUBLESHOOTING.md` → Move to `docs/guides/`
 - `CHANGELOG.md` → Move to `docs/`
 - `TODO.md`, `NOTES.md` → Move to `docs/internal/`
 
 ❌ **Script files**:
+
 - `setup.sh`, `deploy.sh`, `start-dev.sh` → Move to `scripts/`
 - `*.py`, `*.rb` scripts → Move to `scripts/`
 
 ❌ **Configuration files**:
+
 - `jest.config.js` → Move to `configs/testing/`
 - `babel.config.js` → Move to `configs/build/`
 - `.editorconfig` → Move to `configs/editor/`
-- `docker-compose.dev.yml` → Move to `configs/docker/`
 
 ❌ **Temporary/generated files**:
+
 - `.DS_Store`, `Thumbs.db` → Add to `.gitignore`
 - `debug.log`, `error.log` → Add to `.gitignore`
 - Build artifacts → Should be in `.gitignore`
@@ -152,6 +167,7 @@ Consultor.AI/
 ### Examples
 
 **✅ CORRECT**:
+
 ```bash
 # Create new test configuration
 touch configs/testing/jest.config.js
@@ -166,6 +182,7 @@ chmod +x scripts/deploy-production.sh
 ```
 
 **❌ WRONG**:
+
 ```bash
 # DON'T do this!
 touch SETUP-INSTRUCTIONS.md      # → Should be docs/guides/
@@ -194,7 +211,9 @@ When cleaning up an existing project:
 ## 1. Language and Documentation
 
 ### Code Language
+
 **English mandatory** for:
+
 - File names, folders, variables, functions, classes
 - Comments, JSDoc, technical documentation
 - Git commits, branches, pull requests
@@ -202,26 +221,22 @@ When cleaning up an existing project:
 
 ```typescript
 // ✅ CORRECT
-export async function analyzeConversation(
-  leadId: string,
-  flowId: string
-): Promise<AnalysisResult> {
+export async function analyzeConversation(leadId: string, flowId: string): Promise<AnalysisResult> {
   // Process conversation flow
   return result;
 }
 
 // ❌ WRONG
-export async function analisarConversa(
-  idLead: string,
-  idFluxo: string
-): Promise<ResultadoAnalise> {
+export async function analisarConversa(idLead: string, idFluxo: string): Promise<ResultadoAnalise> {
   // Processar fluxo de conversa
   return resultado;
 }
 ```
 
 ### Documentation Language
+
 **Brazilian Portuguese** for:
+
 - README.md, CHANGELOG.md
 - Business documentation (PRD, requirements)
 - User-facing content and UI messages
@@ -248,7 +263,9 @@ export function calculateEngagement(
 ```
 
 ### UI Messages
+
 **Brazilian Portuguese** for all user-facing text:
+
 - Button labels, form fields, error messages
 - Notifications, tooltips, help text
 - Dashboard headings, navigation labels
@@ -279,110 +296,105 @@ const messages = {
 Consultor.AI/
 ├── src/
 │   ├── app/                          # Next.js 14 App Router
-│   │   ├── (auth)/                   # Auth route group
-│   │   │   ├── login/
-│   │   │   └── register/
-│   │   ├── (dashboard)/              # Dashboard route group
-│   │   │   ├── dashboard/
-│   │   │   ├── leads/
-│   │   │   ├── analytics/
-│   │   │   └── settings/
-│   │   ├── (public)/                 # Public route group
-│   │   │   └── [slug]/               # Consultant public page
+│   │   ├── auth/                     # Auth pages (login, signup)
+│   │   ├── admin/                    # Admin panel pages
+│   │   │   ├── dashboard/            # Admin dashboard (stats, charts)
+│   │   │   └── users/                # User management
+│   │   ├── dashboard/                # Consultant dashboard
+│   │   │   ├── analytics/            # Analytics page
+│   │   │   ├── integracoes/          # CRM integrations
+│   │   │   ├── leads/                # Lead management
+│   │   │   ├── flows/                # Flow editor
+│   │   │   ├── templates/            # Message templates
+│   │   │   └── perfil/               # Profile & WhatsApp settings
 │   │   ├── api/                      # API routes
-│   │   │   ├── auth/
-│   │   │   ├── leads/
-│   │   │   ├── flows/
-│   │   │   ├── analytics/
-│   │   │   └── webhooks/
+│   │   │   ├── admin/                # Admin API (stats, users)
+│   │   │   ├── analytics/            # Analytics endpoints
+│   │   │   ├── billing/              # Billing (checkout, portal, webhooks)
+│   │   │   ├── contact/              # Contact form
+│   │   │   ├── conversations/        # Conversation management
+│   │   │   ├── files/                # File upload/download
+│   │   │   ├── integrations/         # CRM integrations
+│   │   │   ├── leads/                # Lead CRUD + stats + export
+│   │   │   └── webhook/meta/         # WhatsApp webhooks
 │   │   ├── layout.tsx
-│   │   └── page.tsx
+│   │   └── page.tsx                  # Landing page
 │   │
 │   ├── components/                    # React components
-│   │   ├── ui/                        # shadcn/ui components
-│   │   │   ├── button.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── card.tsx
-│   │   │   └── ...
-│   │   ├── leads/
-│   │   │   ├── lead-list.tsx
-│   │   │   ├── lead-detail.tsx
-│   │   │   └── lead-status-badge.tsx
-│   │   ├── analytics/
-│   │   │   ├── metrics-card.tsx
-│   │   │   └── funnel-chart.tsx
-│   │   ├── conversation/
-│   │   │   └── message-thread.tsx
-│   │   └── layout/
-│   │       ├── header.tsx
-│   │       ├── sidebar.tsx
-│   │       └── footer.tsx
+│   │   ├── ui/                        # shadcn/ui base components
+│   │   ├── admin/                     # Admin panel (guard, sidebar, charts, tables)
+│   │   ├── billing/                   # Pricing, checkout, credits display
+│   │   ├── cookie-consent/            # LGPD cookie banner
+│   │   ├── dashboard/                 # Dashboard widgets (metrics, charts)
+│   │   ├── integrations/              # CRM integration components
+│   │   ├── landing/                   # Landing page (hero, features, testimonials, FAQ, footer)
+│   │   ├── leads/                     # Lead management components
+│   │   ├── whatsapp/                  # WhatsApp integration components
+│   │   └── providers.tsx              # React Query provider
 │   │
-│   ├── lib/                           # Utility libraries
-│   │   ├── supabase/
-│   │   │   ├── client.ts              # Supabase client
-│   │   │   ├── server.ts              # Supabase server client
-│   │   │   └── middleware.ts          # Supabase middleware
-│   │   ├── api/
-│   │   │   ├── groq.ts                # Groq API client
-│   │   │   ├── whatsapp.ts            # WhatsApp API client
-│   │   │   └── canva.ts               # Canva API client
-│   │   ├── flow-engine/
-│   │   │   ├── parser.ts              # Flow JSON parser
-│   │   │   ├── executor.ts            # Flow executor
-│   │   │   └── state-manager.ts       # Conversation state
-│   │   ├── validators/
-│   │   │   └── schemas.ts             # Zod validation schemas
-│   │   └── utils.ts                   # Generic utilities
+│   ├── lib/                           # Core libraries & utilities
+│   │   ├── ai/                        # AI integration (Gemini)
+│   │   ├── api/                       # External API wrappers
+│   │   ├── email/                     # Email provider (Resend) & templates
+│   │   ├── encryption/                # AES-256-GCM encryption
+│   │   ├── flow-engine/               # Conversation flow engine
+│   │   │   ├── types.ts
+│   │   │   ├── parser.ts
+│   │   │   ├── state-manager.ts
+│   │   │   ├── executors.ts
+│   │   │   └── engine.ts
+│   │   ├── monitoring/                # Logger, performance, Sentry
+│   │   ├── payment/                   # Payment processing (Stripe)
+│   │   │   ├── processor.ts           # PaymentProcessor interface + Stripe impl
+│   │   │   └── plans.ts              # Plan definitions & credit allocations
+│   │   ├── services/                  # Business logic services
+│   │   │   ├── analytics-service.ts
+│   │   │   ├── ai-service.ts
+│   │   │   ├── billing-service.ts     # Subscription & credit management
+│   │   │   ├── crm-service.ts
+│   │   │   ├── crm-providers/         # CRM provider implementations
+│   │   │   ├── lead-service.ts
+│   │   │   ├── lead-auto-create.ts
+│   │   │   └── stats-service.ts       # Daily stats calculation
+│   │   ├── supabase/                  # Client, server, middleware
+│   │   ├── validations/               # Zod schemas
+│   │   ├── whatsapp/                  # Meta API client & webhook validation
+│   │   └── utils.ts
 │   │
-│   ├── types/                         # TypeScript type definitions
-│   │   ├── database.ts                # Generated from Supabase
-│   │   ├── api.ts                     # API types
-│   │   ├── flow.ts                    # Flow definition types
-│   │   └── index.ts                   # Barrel exports
-│   │
+│   ├── types/                         # TypeScript definitions
 │   ├── hooks/                         # Custom React hooks
-│   │   ├── use-leads.ts
-│   │   ├── use-auth.ts
-│   │   ├── use-analytics.ts
-│   │   └── use-toast.ts
-│   │
-│   ├── stores/                        # Zustand stores (if needed)
-│   │   └── auth-store.ts
-│   │
-│   └── styles/                        # Global styles
+│   ├── middleware.ts                  # Next.js auth middleware
+│   └── styles/
 │       └── globals.css
 │
-├── supabase/                          # Supabase configuration
-│   ├── functions/                     # Edge Functions
-│   │   ├── whatsapp-webhook/
-│   │   ├── process-message/
-│   │   ├── generate-ai-response/
-│   │   └── generate-image/
-│   └── migrations/                    # Database migrations
-│       ├── 20251201000000_initial_schema.sql
-│       └── 20251202000000_add_flows.sql
+├── supabase/
+│   ├── migrations/                    # Database migrations (ordered)
+│   └── seed/                          # Seed data (flows, SQL)
 │
-├── tests/                             # Test files
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
+├── tests/
+│   ├── unit/                          # Unit tests (.test.ts)
+│   ├── integration/                   # Integration tests (.test.ts)
+│   ├── e2e/                           # E2E tests (.spec.ts)
+│   ├── fixtures/                      # Reusable test data
+│   └── mocks/                         # Mock clients (Supabase, APIs)
 │
 ├── docs/                              # Documentation
+├── specs/                             # Feature specifications
+├── scripts/                           # Utility scripts
 ├── .rules/                            # Development rules
 └── public/                            # Static assets
 ```
 
 ### File Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Components | kebab-case | `lead-list.tsx`, `metrics-card.tsx` |
-| Utilities | kebab-case | `date-utils.ts`, `format-number.ts` |
-| Types | kebab-case | `database.ts`, `api-types.ts` |
-| API Routes | kebab-case | `route.ts` in `api/leads/[id]/` |
-| Constants | UPPER_SNAKE_CASE | `MAX_LEADS_PER_PAGE` |
-| Environment Variables | UPPER_SNAKE_CASE | `NEXT_PUBLIC_SUPABASE_URL` |
+| Type                  | Convention       | Example                             |
+| --------------------- | ---------------- | ----------------------------------- |
+| Components            | kebab-case       | `lead-list.tsx`, `metrics-card.tsx` |
+| Utilities             | kebab-case       | `date-utils.ts`, `format-number.ts` |
+| Types                 | kebab-case       | `database.ts`, `api-types.ts`       |
+| API Routes            | kebab-case       | `route.ts` in `api/leads/[id]/`     |
+| Constants             | UPPER_SNAKE_CASE | `MAX_LEADS_PER_PAGE`                |
+| Environment Variables | UPPER_SNAKE_CASE | `NEXT_PUBLIC_SUPABASE_URL`          |
 
 ---
 
@@ -413,16 +425,15 @@ Consultor.AI/
 ### Type Definitions
 
 **✅ DO:** Use explicit types for function parameters and return values
+
 ```typescript
-function calculateConversionRate(
-  totalLeads: number,
-  convertedLeads: number
-): number {
+function calculateConversionRate(totalLeads: number, convertedLeads: number): number {
   return convertedLeads / totalLeads;
 }
 ```
 
 **❌ DON'T:** Rely on type inference for public APIs
+
 ```typescript
 function calculateConversionRate(totalLeads, convertedLeads) {
   return convertedLeads / totalLeads;
@@ -432,6 +443,7 @@ function calculateConversionRate(totalLeads, convertedLeads) {
 ### Interface vs Type
 
 **✅ Use `interface` for:** Object shapes that may be extended
+
 ```typescript
 interface Lead {
   id: string;
@@ -448,6 +460,7 @@ interface QualifiedLead extends Lead {
 ```
 
 **✅ Use `type` for:** Unions, intersections, primitives
+
 ```typescript
 type LeadStatus = 'novo' | 'em_contato' | 'agendado' | 'fechado' | 'perdido';
 type APIResponse<T> = { success: true; data: T } | { success: false; error: string };
@@ -456,12 +469,14 @@ type APIResponse<T> = { success: true; data: T } | { success: false; error: stri
 ### Null Safety
 
 **✅ DO:** Use optional chaining and nullish coalescing
+
 ```typescript
 const leadName = lead?.name ?? 'Unknown';
 const phoneNumber = lead.metadata?.whatsapp ?? lead.whatsapp_number;
 ```
 
 **❌ DON'T:** Use ! (non-null assertion) without justification
+
 ```typescript
 const leadName = lead!.name; // Dangerous if lead can be null
 ```
@@ -469,6 +484,7 @@ const leadName = lead!.name; // Dangerous if lead can be null
 ### Generic Types
 
 **✅ DO:** Use generics for reusable functions
+
 ```typescript
 async function fetchData<T>(url: string): Promise<T> {
   const response = await fetch(url);
@@ -519,6 +535,7 @@ export function LeadList({ consultantId, initialLeads = [] }: LeadListProps) {
 ### Server vs Client Components
 
 **✅ Default to Server Components:**
+
 - Faster initial load
 - Better SEO
 - Reduced client bundle size
@@ -542,6 +559,7 @@ export default async function LeadsPage() {
 ```
 
 **✅ Use 'use client' only when needed:**
+
 - User interactions (onClick, onChange)
 - Browser APIs (localStorage, navigator)
 - React hooks (useState, useEffect, useContext)
@@ -550,6 +568,7 @@ export default async function LeadsPage() {
 ### Data Fetching
 
 **✅ DO:** Use React Server Components for initial data
+
 ```typescript
 // Server Component
 async function getLeads(consultantId: string) {
@@ -560,6 +579,7 @@ async function getLeads(consultantId: string) {
 ```
 
 **✅ DO:** Use React Query for client-side mutations
+
 ```typescript
 'use client';
 
@@ -586,6 +606,7 @@ export function useUpdateLeadStatus() {
 ### Form Handling
 
 **✅ DO:** Use React Hook Form + Zod for validation
+
 ```typescript
 'use client';
 
@@ -650,6 +671,7 @@ export const createServerClient = () => {
 ### Query Patterns
 
 **✅ DO:** Use type-safe queries with generated types
+
 ```typescript
 const { data, error } = await supabase
   .from('leads')
@@ -662,6 +684,7 @@ const { data, error } = await supabase
 ```
 
 **✅ DO:** Handle errors explicitly
+
 ```typescript
 const { data, error } = await supabase.from('leads').select('*');
 
@@ -674,6 +697,7 @@ return data;
 ```
 
 **❌ DON'T:** Ignore errors
+
 ```typescript
 const { data } = await supabase.from('leads').select('*');
 return data; // What if there was an error?
@@ -682,6 +706,7 @@ return data; // What if there was an error?
 ### Row-Level Security (RLS)
 
 **✅ ALWAYS enable RLS on all tables:**
+
 ```sql
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 
@@ -717,9 +742,9 @@ export function useLeadUpdates(consultantId: string) {
           table: 'leads',
           filter: `consultant_id=eq.${consultantId}`,
         },
-        (payload) => {
+        payload => {
           // Handle real-time update
-          setLeads((prev) => updateLeadsArray(prev, payload));
+          setLeads(prev => updateLeadsArray(prev, payload));
         }
       )
       .subscribe();
@@ -751,25 +776,15 @@ const updateLeadSchema = z.object({
   status: z.enum(['novo', 'em_contato', 'agendado', 'fechado']).optional(),
 });
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
 
-    const { data, error } = await supabase
-      .from('leads')
-      .select('*')
-      .eq('id', params.id)
-      .single();
+    const { data, error } = await supabase.from('leads').select('*').eq('id', params.id).single();
 
     if (error) throw error;
     if (!data) {
-      return NextResponse.json(
-        { success: false, error: 'Lead not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, error: 'Lead not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -778,17 +793,11 @@ export async function GET(
     });
   } catch (error) {
     console.error('API Error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
     const body = await request.json();
@@ -823,10 +832,7 @@ export async function PATCH(
     }
 
     console.error('API Error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 ```
@@ -834,6 +840,7 @@ export async function PATCH(
 ### Error Response Format
 
 **✅ Standard error response:**
+
 ```typescript
 type ErrorResponse = {
   success: false;
@@ -870,10 +877,7 @@ export async function POST(request: NextRequest) {
   const { success } = await rateLimit.limit(ip);
 
   if (!success) {
-    return NextResponse.json(
-      { success: false, error: 'Rate limit exceeded' },
-      { status: 429 }
-    );
+    return NextResponse.json({ success: false, error: 'Rate limit exceeded' }, { status: 429 });
   }
 
   // Process request...
@@ -900,7 +904,10 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  constructor(message: string, public details?: unknown) {
+  constructor(
+    message: string,
+    public details?: unknown
+  ) {
     super(message, 400, 'VALIDATION_ERROR');
     this.name = 'ValidationError';
   }
@@ -1079,6 +1086,7 @@ test.describe('Lead Management', () => {
 ```
 
 ### Test Coverage Goals
+
 - **Unit tests:** > 80% coverage
 - **Integration tests:** All API endpoints
 - **E2E tests:** Critical user journeys
@@ -1090,6 +1098,7 @@ test.describe('Lead Management', () => {
 ### Next.js Optimization
 
 **✅ DO:** Use Image optimization
+
 ```typescript
 import Image from 'next/image';
 
@@ -1103,6 +1112,7 @@ import Image from 'next/image';
 ```
 
 **✅ DO:** Use dynamic imports for heavy components
+
 ```typescript
 import dynamic from 'next/dynamic';
 
@@ -1113,6 +1123,7 @@ const AnalyticsChart = dynamic(() => import('@/components/analytics-chart'), {
 ```
 
 **✅ DO:** Implement pagination
+
 ```typescript
 const LEADS_PER_PAGE = 20;
 
@@ -1132,20 +1143,20 @@ async function getLeads(page: number = 1) {
 ### Database Optimization
 
 **✅ DO:** Use indexes for frequent queries
+
 ```sql
 CREATE INDEX idx_leads_consultant_status ON leads(consultant_id, status);
 CREATE INDEX idx_leads_created_at ON leads(created_at DESC);
 ```
 
 **✅ DO:** Use `select()` to limit returned columns
+
 ```typescript
 // ❌ BAD: Fetches all columns
 const { data } = await supabase.from('leads').select('*');
 
 // ✅ GOOD: Only fetches needed columns
-const { data } = await supabase
-  .from('leads')
-  .select('id, name, status, created_at');
+const { data } = await supabase.from('leads').select('id, name, status, created_at');
 ```
 
 ---
@@ -1155,23 +1166,43 @@ const { data } = await supabase
 ### Environment Variables
 
 **✅ DO:** Never commit secrets
+
 ```env
 # .env.local (gitignored)
 SUPABASE_SERVICE_ROLE_KEY=your-service-key
 GROQ_API_KEY=your-api-key
+GOOGLE_AI_API_KEY=your-gemini-key
 CANVA_API_KEY=your-api-key
 WHATSAPP_WEBHOOK_SECRET=your-webhook-secret
+
+# Stripe (Payment)
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+
+# Email (Resend)
+RESEND_API_KEY=re_...
+
+# OAuth (optional)
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
 ```
 
 **✅ DO:** Use `NEXT_PUBLIC_` prefix for client-side vars
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ### Input Validation
 
-**✅ ALWAYS validate user input with Zod
+\*\*✅ ALWAYS validate user input with Zod
+
 ```typescript
 import { z } from 'zod';
 
@@ -1188,22 +1219,21 @@ const validatedData = leadUpdateSchema.parse(await request.json());
 ### SQL Injection Prevention
 
 **✅ ALWAYS use parameterized queries** (Supabase does this automatically)
+
 ```typescript
 // ✅ SAFE: Supabase parameterizes automatically
-const { data } = await supabase
-  .from('leads')
-  .select('*')
-  .eq('whatsapp_number', userInput);
+const { data } = await supabase.from('leads').select('*').eq('whatsapp_number', userInput);
 
 // ❌ NEVER do raw SQL with user input
 const result = await supabase.rpc('raw_query', {
-  query: `SELECT * FROM leads WHERE whatsapp_number = '${userInput}'`
+  query: `SELECT * FROM leads WHERE whatsapp_number = '${userInput}'`,
 });
 ```
 
 ### XSS Prevention
 
 **✅ React escapes by default**, but be careful with `dangerouslySetInnerHTML`
+
 ```typescript
 // ✅ SAFE: React escapes automatically
 <div>{userInput}</div>
@@ -1218,12 +1248,12 @@ const result = await supabase.rpc('raw_query', {
 
 ### Branch Naming
 
-| Type | Format | Example |
-|------|--------|---------|
-| Feature | `feature/description` | `feature/add-lead-export` |
-| Bug fix | `fix/description` | `fix/dashboard-loading-error` |
-| Hotfix | `hotfix/description` | `hotfix/critical-auth-bug` |
-| Documentation | `docs/description` | `docs/update-api-spec` |
+| Type          | Format                | Example                       |
+| ------------- | --------------------- | ----------------------------- |
+| Feature       | `feature/description` | `feature/add-lead-export`     |
+| Bug fix       | `fix/description`     | `fix/dashboard-loading-error` |
+| Hotfix        | `hotfix/description`  | `hotfix/critical-auth-bug`    |
+| Documentation | `docs/description`    | `docs/update-api-spec`        |
 
 ### Commit Messages
 
@@ -1241,6 +1271,7 @@ chore(deps): update Next.js to 14.1.0
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation only
@@ -1253,21 +1284,25 @@ chore(deps): update Next.js to 14.1.0
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Unit tests passing
 - [ ] Integration tests passing
 - [ ] E2E tests passing
 - [ ] Manual testing completed
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Comments added for complex logic
@@ -1281,12 +1316,14 @@ Brief description of changes
 ## 12. Code Review Checklist
 
 ### Functionality
+
 - [ ] Code solves the intended problem
 - [ ] Edge cases handled
 - [ ] Error handling implemented
 - [ ] Input validation present
 
 ### Code Quality
+
 - [ ] Follows TypeScript best practices
 - [ ] No `any` types (unless justified)
 - [ ] Proper error handling
@@ -1294,26 +1331,164 @@ Brief description of changes
 - [ ] No commented-out code
 
 ### Performance
+
 - [ ] No unnecessary re-renders
 - [ ] Database queries optimized
 - [ ] Proper use of caching
 - [ ] Images optimized
 
 ### Security
+
 - [ ] Input validation with Zod
 - [ ] No hardcoded secrets
 - [ ] RLS policies enforced
 - [ ] No SQL injection risks
 
 ### Testing
+
 - [ ] Unit tests added/updated
 - [ ] Tests passing
 - [ ] Coverage maintained > 80%
 
 ### Documentation
+
 - [ ] JSDoc comments for public APIs
 - [ ] README updated if needed
 - [ ] CHANGELOG.md updated
+
+---
+
+## 13. SaaS & Billing Standards
+
+### Subscription Plans
+
+The platform uses a credit-based SaaS model with three tiers:
+
+| Plan         | Price | Credits/month | Key Features                       |
+| ------------ | ----- | ------------- | ---------------------------------- |
+| **Freemium** | R$0   | 20            | Basic flow, text-only              |
+| **Pro**      | R$47  | 200           | Images, auto follow-up, CSV export |
+| **Agência**  | R$147 | 1000          | Custom flows, CRM, full dashboard  |
+
+### Credit Operations
+
+**✅ ALWAYS use atomic operations for credits:**
+
+```sql
+-- Use RPC for atomic credit deduction
+SELECT decrement_credits(user_id, amount);
+-- Never do: UPDATE consultants SET credits = credits - 1
+```
+
+```typescript
+// ✅ CORRECT: Atomic credit deduction via RPC
+const { error } = await (supabase.rpc as any)('decrement_credits', {
+  user_id: consultantId,
+  amount: 1,
+});
+
+// ❌ WRONG: Race condition possible
+const { data } = await supabase.from('consultants').select('credits');
+await supabase.from('consultants').update({ credits: data.credits - 1 });
+```
+
+### Subscription Status Lifecycle
+
+```
+active → cancel_at_period_end → deleted
+active → past_due → deleted
+```
+
+- **active**: Full access, credits available
+- **cancel_at_period_end**: Access until period ends, no renewal
+- **past_due**: Payment failed, grace period
+- **deleted**: Subscription ended, revert to Freemium
+
+### Payment Webhook Security
+
+```typescript
+// ✅ ALWAYS verify Stripe webhook signatures
+const event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
+```
+
+### Lead Limit Enforcement
+
+Credits are checked in `createLead` service. When credits reach 0:
+
+- Block new lead creation
+- Show upgrade prompt in UI
+- Allow viewing existing leads (read-only)
+
+---
+
+## 14. File Upload & Storage
+
+### Allowed File Types
+
+| Type      | Extensions                       | Max Size |
+| --------- | -------------------------------- | -------- |
+| Documents | `.pdf`                           | 10 MB    |
+| Images    | `.png`, `.jpg`, `.jpeg`, `.webp` | 10 MB    |
+
+**✅ ALWAYS reject:** `.exe`, `.bat`, `.sh`, `.cmd`, and any executable
+
+### Upload Pattern
+
+```typescript
+// 1. Validate file type and size on client AND server
+// 2. Generate presigned upload URL via API
+// 3. Upload directly to Supabase Storage
+// 4. Save metadata to files table with consultant_id
+// 5. Serve via time-limited download URLs (1 hour expiry)
+```
+
+### Storage RLS
+
+Files are isolated per consultant via `consultant_id` column with RLS policies.
+
+### Storage Key Convention
+
+```typescript
+// Format: {consultant_id}/{timestamp}-{filename}
+const storageKey = `${consultantId}/${Date.now()}-${sanitizedFilename}`;
+```
+
+> **Pitfall**: The DB column is `storage_key` (not `key`).
+
+---
+
+## 15. Email & Notifications
+
+### Email Provider Pattern
+
+Uses Strategy pattern with dev fallback:
+
+- **Production**: Resend API
+- **Development**: `console.log` fallback (no API key needed)
+
+### Email Templates
+
+| Template               | Trigger                 |
+| ---------------------- | ----------------------- |
+| Welcome                | New signup              |
+| Password Reset         | Password reset request  |
+| Subscription Confirmed | Successful payment      |
+| Subscription Canceled  | Cancellation            |
+| Credit Low Warning     | Credits < 10% remaining |
+
+### Email Standards
+
+```typescript
+// ✅ CORRECT: Always handle missing API key gracefully
+if (!process.env.RESEND_API_KEY) {
+  console.log(`[EMAIL] To: ${to}, Subject: ${subject}`);
+  return { success: true, data: { id: 'dev-fallback' } };
+}
+```
+
+- All emails must include unsubscribe link (LGPD)
+- Use React Email for template rendering
+- Log all sent emails for audit trail
 
 ---
 
@@ -1331,7 +1506,9 @@ Brief description of changes
     "zustand": "^4.4.0",
     "zod": "^3.22.0",
     "react-hook-form": "^7.48.0",
-    "@hookform/resolvers": "^3.3.2"
+    "@hookform/resolvers": "^3.3.2",
+    "stripe": "^14.0.0",
+    "resend": "^2.0.0"
   },
   "devDependencies": {
     "typescript": "^5.3.0",
@@ -1344,14 +1521,17 @@ Brief description of changes
 ```
 
 ### Documentation Links
+
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Supabase Documentation](https://supabase.com/docs)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [React Documentation](https://react.dev/)
+- [Stripe Documentation](https://docs.stripe.com/)
+- [Resend Documentation](https://resend.com/docs)
 
 ---
 
-**Last Updated:** 2025-12-12
-**Version:** 1.0
+**Last Updated:** 2026-02-11
+**Version:** 2.0
 **Maintainer:** Consultor.AI Development Team
-**Next Review:** 2026-03-12
+**Next Review:** 2026-05-11

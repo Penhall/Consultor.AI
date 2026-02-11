@@ -1,7 +1,7 @@
 # Testing Standards - Consultor.AI
 
-**Version:** 1.0
-**Last Updated:** 2025-12-12
+**Version:** 2.0
+**Last Updated:** 2026-02-11
 
 ---
 
@@ -58,12 +58,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'tests/',
-        '**/*.config.ts',
-        '**/*.d.ts',
-      ],
+      exclude: ['node_modules/', 'tests/', '**/*.config.ts', '**/*.d.ts'],
       lines: 80,
       functions: 80,
       branches: 75,
@@ -83,37 +78,43 @@ export default defineConfig({
 ```
 tests/
 ├── unit/
+│   ├── app/api/                # API route tests (14+ files)
+│   │   ├── leads/
+│   │   ├── analytics/
+│   │   ├── billing/            # Billing API tests
+│   │   ├── admin/              # Admin API tests
+│   │   ├── files/              # File upload tests
+│   │   └── webhook/
 │   ├── lib/
-│   │   ├── flow-engine/
-│   │   │   ├── executor.test.ts
-│   │   │   └── state-manager.test.ts
-│   │   ├── validators/
-│   │   │   └── schemas.test.ts
-│   │   └── utils/
-│   │       └── formatters.test.ts
-│   └── hooks/
-│       ├── use-leads.test.ts
-│       └── use-conversations.test.ts
+│   │   ├── flow-engine/        # Flow engine tests (4 files)
+│   │   ├── services/           # Service tests (billing, credits, email)
+│   │   ├── payment/            # Payment processor tests
+│   │   └── email/              # Email provider tests
+│   └── components/
+│       ├── billing/            # Pricing, checkout component tests
+│       └── admin/              # Admin component tests
 ├── integration/
 │   ├── api/
-│   │   ├── leads.test.ts
-│   │   └── conversations.test.ts
 │   └── services/
-│       └── lead-service.test.ts
-├── e2e/
+├── e2e/                        # E2E tests (.spec.ts extension)
 │   ├── auth.spec.ts
 │   ├── lead-qualification.spec.ts
+│   ├── billing-flow.spec.ts    # Subscription & checkout flow
 │   └── dashboard.spec.ts
 ├── fixtures/
 │   ├── leads.ts
 │   ├── flows.ts
-│   └── consultants.ts
+│   ├── consultants.ts
+│   └── billing.ts              # Stripe event fixtures
 ├── mocks/
 │   ├── supabase.ts
-│   ├── groq.ts
+│   ├── stripe.ts               # Stripe mock client
+│   ├── resend.ts               # Email mock
 │   └── whatsapp.ts
 └── setup.ts
 ```
+
+> **Convention**: Unit/integration tests use `.test.ts`, E2E tests use `.spec.ts`.
 
 ### Unit Test Patterns
 
@@ -543,29 +544,22 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { getLeadById } from '@/lib/services/lead-service';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const lead = await getLeadById(params.id);
 
     return NextResponse.json({ success: true, data: lead });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -670,10 +664,7 @@ import { createLead } from '@/lib/services/lead-service';
 import { createClient } from '@supabase/supabase-js';
 
 // Use test database
-const supabase = createClient(
-  process.env.SUPABASE_TEST_URL!,
-  process.env.SUPABASE_TEST_ANON_KEY!
-);
+const supabase = createClient(process.env.SUPABASE_TEST_URL!, process.env.SUPABASE_TEST_ANON_KEY!);
 
 describe('Lead Service Integration', () => {
   let testConsultantId: string;
@@ -720,9 +711,7 @@ describe('Lead Service Integration', () => {
   it('throws error on duplicate whatsapp number', async () => {
     await createLead(testConsultantId, '+5511988776655');
 
-    await expect(
-      createLead(testConsultantId, '+5511988776655')
-    ).rejects.toThrow();
+    await expect(createLead(testConsultantId, '+5511988776655')).rejects.toThrow();
   });
 });
 ```
@@ -798,9 +787,7 @@ test.describe('Authentication', () => {
     await page.fill('input[name="password"]', 'wrongpassword');
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('[role="alert"]')).toContainText(
-      'Credenciais inválidas'
-    );
+    await expect(page.locator('[role="alert"]')).toContainText('Credenciais inválidas');
   });
 
   test('should logout successfully', async ({ page }) => {
@@ -848,24 +835,18 @@ test.describe('Lead Qualification', () => {
     await page.fill('textarea[name="message"]', 'familia');
     await page.click('button:has-text("Enviar")');
 
-    await expect(page.locator('.message-bot').last()).toContainText(
-      'Qual sua faixa etária'
-    );
+    await expect(page.locator('.message-bot').last()).toContainText('Qual sua faixa etária');
 
     await page.fill('textarea[name="message"]', '35');
     await page.click('button:has-text("Enviar")');
 
-    await expect(page.locator('.message-bot').last()).toContainText(
-      'coparticipação'
-    );
+    await expect(page.locator('.message-bot').last()).toContainText('coparticipação');
 
     await page.fill('textarea[name="message"]', 'sim');
     await page.click('button:has-text("Enviar")');
 
     // Verify AI response is generated
-    await expect(page.locator('.message-bot').last()).toContainText(
-      'plano ideal'
-    );
+    await expect(page.locator('.message-bot').last()).toContainText('plano ideal');
 
     // Verify lead status updated
     await page.goto('/leads');
@@ -880,9 +861,7 @@ test.describe('Lead Qualification', () => {
     // Try to send empty message
     await page.click('button:has-text("Enviar")');
 
-    await expect(page.locator('[role="alert"]')).toContainText(
-      'Digite uma mensagem'
-    );
+    await expect(page.locator('[role="alert"]')).toContainText('Digite uma mensagem');
   });
 });
 ```
@@ -915,8 +894,8 @@ test.describe('Dashboard', () => {
     await expect(page.locator('button:has-text("Últimos 30 dias")')).toBeVisible();
 
     // Verify data updates
-    await page.waitForResponse(response =>
-      response.url().includes('/api/analytics') && response.status() === 200
+    await page.waitForResponse(
+      response => response.url().includes('/api/analytics') && response.status() === 200
     );
   });
 
@@ -936,18 +915,21 @@ test.describe('Dashboard', () => {
 
 ## Mock Strategies
 
-### Mocking Supabase
+### Mocking Supabase (Chain Builder Pattern)
+
+The Supabase mock must include **all chainable methods** used in the codebase. When adding a new query method (like `.gte()`, `.in()`, `.ilike()`), you **must** add it to the mock chain:
 
 ```typescript
 // tests/mocks/supabase.ts
 import { vi } from 'vitest';
 
 export function createMockSupabaseClient() {
-  return {
+  const chainMethods = {
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
+    upsert: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
     neq: vi.fn().mockReturnThis(),
@@ -958,10 +940,19 @@ export function createMockSupabaseClient() {
     like: vi.fn().mockReturnThis(),
     ilike: vi.fn().mockReturnThis(),
     in: vi.fn().mockReturnThis(),
+    is: vi.fn().mockReturnThis(),
+    not: vi.fn().mockReturnThis(),
+    or: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
+    range: vi.fn().mockReturnThis(),
     single: vi.fn().mockResolvedValue({ data: null, error: null }),
     maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+  };
+
+  return {
+    ...chainMethods,
+    rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     auth: {
       getUser: vi.fn().mockResolvedValue({
         data: { user: { id: 'user-123', email: 'test@example.com' } },
@@ -971,44 +962,78 @@ export function createMockSupabaseClient() {
       signOut: vi.fn(),
     },
     storage: {
-      from: vi.fn().mockReturnThis(),
-      upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
-      download: vi.fn(),
-      remove: vi.fn(),
+      from: vi.fn().mockReturnValue({
+        upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
+        createSignedUrl: vi
+          .fn()
+          .mockResolvedValue({ data: { signedUrl: 'https://...' }, error: null }),
+        remove: vi.fn().mockResolvedValue({ error: null }),
+      }),
     },
   };
 }
 ```
 
-### Mocking Groq API
+> **Important**: When you add a new chainable method call in production code, add it to this mock builder or tests will fail with "not a function" errors.
+
+### Mocking Stripe
 
 ```typescript
-// tests/mocks/groq.ts
+// tests/mocks/stripe.ts
 import { vi } from 'vitest';
 
-export function createMockGroqClient() {
+export function createMockStripe() {
   return {
-    chat: {
-      completions: {
+    checkout: {
+      sessions: {
         create: vi.fn().mockResolvedValue({
-          choices: [
-            {
-              message: {
-                role: 'assistant',
-                content: 'Mocked AI response',
-              },
-            },
-          ],
+          id: 'cs_test_123',
+          url: 'https://checkout.stripe.com/test',
         }),
       },
+    },
+    billingPortal: {
+      sessions: {
+        create: vi.fn().mockResolvedValue({
+          url: 'https://billing.stripe.com/test',
+        }),
+      },
+    },
+    webhooks: {
+      constructEvent: vi.fn().mockReturnValue({
+        type: 'checkout.session.completed',
+        data: { object: { metadata: { consultant_id: 'user-123' } } },
+      }),
+    },
+    customers: {
+      create: vi.fn().mockResolvedValue({ id: 'cus_test_123' }),
+    },
+    subscriptions: {
+      retrieve: vi.fn(),
+      update: vi.fn(),
     },
   };
 }
 
-// Usage in tests
-vi.mock('groq-sdk', () => ({
-  default: vi.fn(() => createMockGroqClient()),
-}));
+// Usage: vi.mock('stripe', () => ({ default: vi.fn(() => createMockStripe()) }));
+```
+
+### Mocking Email Service
+
+```typescript
+// tests/mocks/resend.ts
+import { vi } from 'vitest';
+
+export function createMockEmailProvider() {
+  return {
+    sendEmail: vi.fn().mockResolvedValue({ success: true, data: { id: 'email-123' } }),
+    sendTemplate: vi.fn().mockResolvedValue({ success: true, data: { id: 'email-456' } }),
+  };
+}
+
+// For testing dev fallback: verify console.log is called when no API key
+// vi.spyOn(console, 'log');
+// expect(console.log).toHaveBeenCalledWith(expect.stringContaining('[EMAIL]'));
 ```
 
 ### Mocking WhatsApp API
@@ -1019,20 +1044,25 @@ import { vi } from 'vitest';
 
 export function createMockWhatsAppClient() {
   return {
-    sendMessage: vi.fn().mockResolvedValue({
-      success: true,
-      messageId: 'msg-123',
-    }),
-    sendImage: vi.fn().mockResolvedValue({
-      success: true,
-      messageId: 'msg-456',
-    }),
+    sendMessage: vi.fn().mockResolvedValue({ success: true, messageId: 'msg-123' }),
+    sendImage: vi.fn().mockResolvedValue({ success: true, messageId: 'msg-456' }),
     getMessageStatus: vi.fn().mockResolvedValue({
       status: 'delivered',
       timestamp: new Date().toISOString(),
     }),
   };
 }
+```
+
+### NextRequest Mock Pattern
+
+```typescript
+// For API route tests, use NextRequest constructor:
+const request = new NextRequest(new URL('http://localhost:3000/api/leads'), {
+  method: 'POST',
+  body: JSON.stringify({ name: 'Test' }),
+  headers: { 'Content-Type': 'application/json' },
+});
 ```
 
 ---
@@ -1337,6 +1367,169 @@ vi.mock('@/lib/services/lead-service', () => ({
 
 ---
 
+## SaaS-Specific Test Patterns
+
+### Testing Billing & Credits
+
+```typescript
+describe('BillingService', () => {
+  it('should deduct credits on lead creation', async () => {
+    // Arrange: set up consultant with 20 credits
+    mockSupabase.rpc.mockResolvedValueOnce({ data: null, error: null });
+
+    // Act: create lead
+    const result = await createLead({ consultantId: 'user-123', ... });
+
+    // Assert: credits were deducted
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('decrement_credits', {
+      user_id: 'user-123',
+      amount: 1,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should block lead creation when credits exhausted', async () => {
+    // Arrange: consultant with 0 credits
+    mockSupabase.from.mockReturnValue({
+      ...chainMethods,
+      single: vi.fn().mockResolvedValue({
+        data: { credits: 0, purchased_credits: 0 },
+        error: null,
+      }),
+    });
+
+    // Act & Assert
+    const result = await createLead({ consultantId: 'user-123', ... });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('créditos');
+  });
+});
+```
+
+### Testing Stripe Webhooks
+
+```typescript
+describe('POST /api/billing/webhook', () => {
+  it('should handle checkout.session.completed', async () => {
+    const mockEvent = {
+      type: 'checkout.session.completed',
+      data: {
+        object: {
+          metadata: { consultant_id: 'user-123' },
+          customer: 'cus_123',
+          subscription: 'sub_123',
+        },
+      },
+    };
+
+    mockStripe.webhooks.constructEvent.mockReturnValue(mockEvent);
+
+    const request = new NextRequest(new URL('http://localhost:3000/api/billing/webhook'), {
+      method: 'POST',
+      body: JSON.stringify(mockEvent),
+    });
+    // Add stripe-signature header
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    // Verify consultant was updated with subscription info
+  });
+
+  it('should reject invalid signatures', async () => {
+    mockStripe.webhooks.constructEvent.mockImplementation(() => {
+      throw new Error('Invalid signature');
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+  });
+});
+```
+
+### Testing Admin API
+
+```typescript
+describe('Admin API', () => {
+  it('should return 403 for non-admin users', async () => {
+    // Mock user without is_admin flag
+    mockSupabase.from.mockReturnValue({
+      ...chainMethods,
+      single: vi.fn().mockResolvedValue({
+        data: { is_admin: false },
+        error: null,
+      }),
+    });
+
+    const response = await GET(request);
+    expect(response.status).toBe(403);
+  });
+
+  it('should return stats for admin users', async () => {
+    // Mock admin user
+    mockSupabase.from.mockReturnValue({
+      ...chainMethods,
+      single: vi.fn().mockResolvedValue({
+        data: { is_admin: true },
+        error: null,
+      }),
+    });
+
+    const response = await GET(request);
+    expect(response.status).toBe(200);
+  });
+});
+```
+
+### Testing Email Service
+
+```typescript
+describe('EmailProvider', () => {
+  it('should send email via Resend when API key exists', async () => {
+    process.env.RESEND_API_KEY = 're_test_123';
+    const result = await sendEmail({ to: 'user@example.com', ... });
+    expect(result.success).toBe(true);
+  });
+
+  it('should fall back to console.log when no API key', async () => {
+    delete process.env.RESEND_API_KEY;
+    const consoleSpy = vi.spyOn(console, 'log');
+
+    const result = await sendEmail({ to: 'user@example.com', ... });
+
+    expect(result.success).toBe(true);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[EMAIL]')
+    );
+  });
+});
+```
+
+### Testing File Upload
+
+```typescript
+describe('POST /api/files', () => {
+  it('should reject files exceeding 10MB', async () => {
+    // Create FormData with large file
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+  });
+
+  it('should reject executable file types', async () => {
+    // Create FormData with .exe file
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+  });
+
+  it('should save file metadata with storage_key', async () => {
+    const response = await POST(request);
+    const data = await response.json();
+    expect(data.data.storage_key).toMatch(/^user-123\/\d+-/);
+  });
+});
+```
+
+---
+
 ## Best Practices Summary
 
 1. **Write Tests First** (TDD) - Write failing test, implement feature, refactor
@@ -1352,6 +1545,14 @@ vi.mock('@/lib/services/lead-service', () => ({
 
 ---
 
-**Last Updated:** 2025-12-12
-**Version:** 1.0
-**Next Review:** 2026-03-12
+## Current Test Coverage
+
+- **34 test files**, **319 tests** (all passing)
+- **0 TypeScript errors** in production code
+- Covers: unit (services, components), integration (API routes), E2E (billing, lead qualification)
+
+---
+
+**Last Updated:** 2026-02-11
+**Version:** 2.0
+**Next Review:** 2026-05-11

@@ -1,7 +1,7 @@
 # Coding Guidelines - Consultor.AI
 
-**Version:** 1.0
-**Last Updated:** 2025-12-12
+**Version:** 2.0
+**Last Updated:** 2026-02-11
 
 ---
 
@@ -144,12 +144,7 @@ interface LeadCardProps {
   className?: string;
 }
 
-export function LeadCard({
-  lead,
-  onUpdate,
-  showActions = true,
-  className = '',
-}: LeadCardProps) {
+export function LeadCard({ lead, onUpdate, showActions = true, className = '' }: LeadCardProps) {
   // Component implementation
 }
 
@@ -235,10 +230,7 @@ export function useLeads(consultantId: string) {
 
 ```typescript
 // ✅ GOOD: Organized in dedicated functions
-export async function getLeadsByStatus(
-  consultantId: string,
-  status: LeadStatus
-): Promise<Lead[]> {
+export async function getLeadsByStatus(consultantId: string, status: LeadStatus): Promise<Lead[]> {
   const { data, error } = await supabase
     .from('leads')
     .select('id, name, whatsapp_number, status, created_at')
@@ -251,10 +243,7 @@ export async function getLeadsByStatus(
 }
 
 // ❌ BAD: Inline queries everywhere
-const { data } = await supabase
-  .from('leads')
-  .select('*')
-  .eq('consultant_id', consultantId);
+const { data } = await supabase.from('leads').select('*').eq('consultant_id', consultantId);
 ```
 
 ### Transaction Patterns
@@ -274,6 +263,98 @@ const { data, error } = await supabase.rpc('create_lead_with_conversation', {
 //   -- Transaction logic
 // END;
 // $$ LANGUAGE plpgsql;
+```
+
+---
+
+## Service Return Pattern
+
+### ServiceResult Type
+
+All services return `ServiceResult<T>` for consistent error handling across the codebase:
+
+```typescript
+// ✅ GOOD: Consistent return type
+type ServiceResult<T> = { success: true; data: T } | { success: false; error: string };
+
+export async function createLead(params: CreateLeadParams): Promise<ServiceResult<Lead>> {
+  try {
+    // Check credit limit before creating
+    const credits = await getCredits(params.consultantId);
+    if (credits <= 0) {
+      return { success: false, error: 'Créditos insuficientes' };
+    }
+
+    const lead = await insertLead(params);
+    await decrementCredits(params.consultantId, 1);
+    return { success: true, data: lead };
+  } catch (error) {
+    return { success: false, error: 'Falha ao criar lead' };
+  }
+}
+```
+
+```typescript
+// ✅ GOOD: Caller handles result cleanly
+const result = await createLead(params);
+if (!result.success) {
+  return NextResponse.json({ error: result.error }, { status: 400 });
+}
+return NextResponse.json({ data: result.data });
+```
+
+### Strategy Pattern
+
+Use for services with multiple provider implementations:
+
+```typescript
+// ✅ GOOD: Interface + implementation
+interface PaymentProcessor {
+  createCheckoutSession(params: CheckoutParams): Promise<{ url: string }>;
+  getCustomerPortal(customerId: string): Promise<{ url: string }>;
+  handleWebhook(body: string, signature: string): Promise<WebhookResult>;
+}
+
+// Implementation selected at runtime
+const processor: PaymentProcessor = new StripeProcessor();
+```
+
+```typescript
+// ✅ GOOD: Email with dev fallback
+interface EmailProvider {
+  sendEmail(params: EmailParams): Promise<ServiceResult<{ id: string }>>;
+}
+
+// Production: Resend, Development: Console fallback
+const provider: EmailProvider = process.env.RESEND_API_KEY
+  ? new ResendProvider()
+  : new ConsoleProvider();
+```
+
+---
+
+## Supabase Type Workarounds
+
+When TypeScript inference conflicts with Supabase's generated types, use these patterns:
+
+```typescript
+// ✅ .select() (no args) + type cast for reads
+const { data } = await supabase.from('consultants').select().eq('id', userId).single();
+const consultant = data as Consultant;
+
+// ✅ .from() as any for update chains
+const { error } = await (supabase.from('consultants') as any)
+  .update({ credits: newCredits })
+  .eq('id', userId);
+
+// ✅ supabase.rpc as any for RPC calls
+const { error } = await (supabase.rpc as any)('decrement_credits', {
+  user_id: userId,
+  amount: 1,
+});
+
+// ✅ .slice(0, 10) instead of .split('T')[0] for date strings
+const dateStr = isoString.slice(0, 10); // Avoids string | undefined issue
 ```
 
 ---
@@ -320,11 +401,14 @@ export const logger = {
   error: (message: string, error?: unknown, context?: Record<string, unknown>) => {
     console.error('[ERROR]', {
       message,
-      error: error instanceof Error ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      } : error,
+      error:
+        error instanceof Error
+          ? {
+              name: error.name,
+              message: error.message,
+              stack: error.stack,
+            }
+          : error,
       context,
       timestamp: new Date().toISOString(),
     });
@@ -368,10 +452,7 @@ export const whatsappNumberSchema = z
   .string()
   .regex(/^\+55\d{11}$/, 'Formato inválido: use +55XXXXXXXXXXX');
 
-export const emailSchema = z
-  .string()
-  .email('Email inválido')
-  .optional();
+export const emailSchema = z.string().email('Email inválido').optional();
 
 // Entity schemas
 export const leadCreateSchema = z.object({
@@ -411,7 +492,7 @@ const filteredLeads = useMemo(() => {
 
 // ✅ GOOD: useCallback for stable function references
 const handleLeadUpdate = useCallback((updatedLead: Lead) => {
-  setLeads(prev => prev.map(l => l.id === updatedLead.id ? updatedLead : l));
+  setLeads(prev => prev.map(l => (l.id === updatedLead.id ? updatedLead : l)));
 }, []);
 ```
 
@@ -494,7 +575,7 @@ const HeavyModal = dynamic(
 
 ### JSDoc Comments
 
-```typescript
+````typescript
 /**
  * Executa um fluxo de conversação para um lead específico.
  *
@@ -532,7 +613,7 @@ export async function executeFlowStep(
 ): Promise<FlowStepResult> {
   // Implementation
 }
-```
+````
 
 ---
 
@@ -592,8 +673,52 @@ async function updateLead(id: string, data: Partial<Lead>) {
 }
 ```
 
+### 5. Database Column Names
+
+```typescript
+// ❌ BAD: Wrong column name
+const { data } = await supabase.from('files').select('key'); // Column doesn't exist
+
+// ✅ GOOD: Correct column name
+const { data } = await supabase.from('files').select('storage_key');
+```
+
+### 6. Admin API Query Params
+
+```typescript
+// ❌ BAD: Wrong field name
+const status = searchParams.get('subscriptionStatus');
+
+// ✅ GOOD: Correct query param
+const status = searchParams.get('status');
+```
+
+### 7. FileList Handling
+
+```typescript
+// ❌ BAD: Assuming file exists
+const file = files[0];
+await uploadFile(file); // files[0] can be undefined!
+
+// ✅ GOOD: Null check
+const file = files[0];
+if (!file) return;
+await uploadFile(file);
+```
+
+### 8. Non-Atomic Credit Operations
+
+```typescript
+// ❌ BAD: Race condition with concurrent requests
+const { data } = await supabase.from('consultants').select('credits');
+await supabase.from('consultants').update({ credits: data.credits - 1 });
+
+// ✅ GOOD: Atomic via RPC
+await (supabase.rpc as any)('decrement_credits', { user_id: id, amount: 1 });
+```
+
 ---
 
-**Last Updated:** 2025-12-12
-**Version:** 1.0
-**Next Review:** 2026-03-12
+**Last Updated:** 2026-02-11
+**Version:** 2.0
+**Next Review:** 2026-05-11

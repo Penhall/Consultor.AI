@@ -1,24 +1,27 @@
 # Architecture Rules - Consultor.AI
 
-**Version:** 1.0
-**Last Updated:** 2025-12-12
+**Version:** 2.0
+**Last Updated:** 2026-02-11
 
 ---
 
 ## Architectural Principles
 
 ### 1. Separation of Concerns
+
 - **Components** handle UI rendering only
 - **Hooks** handle data fetching and state management
 - **Services/Libs** handle business logic
 - **API Routes** handle server-side operations
 
 ### 2. Unidirectional Data Flow
+
 ```
 User Action → Component → Hook → API → Database → Hook → Component → UI Update
 ```
 
 ### 3. Server-First Architecture
+
 - Default to Server Components
 - Use Client Components only when necessary
 - Keep business logic on the server
@@ -30,6 +33,7 @@ User Action → Component → Hook → API → Database → Hook → Component �
 ### Server vs Client Components
 
 **Server Components (default):**
+
 ```typescript
 // app/leads/page.tsx - NO 'use client'
 import { LeadList } from '@/components/leads/lead-list';
@@ -41,6 +45,7 @@ export default async function LeadsPage() {
 ```
 
 **Client Components (when needed):**
+
 ```typescript
 // components/leads/lead-list.tsx - WITH 'use client'
 'use client';
@@ -54,6 +59,7 @@ export function LeadList({ initialData }: Props) {
 ```
 
 **When to use Client Components:**
+
 - Event handlers (onClick, onChange)
 - Hooks (useState, useEffect, useContext)
 - Browser APIs (localStorage, geolocation)
@@ -93,6 +99,9 @@ export function LeadList({ initialData }: Props) {
 │ - Flow execution                                 │
 │ - AI orchestration                               │
 │ - Business rules                                 │
+│ - Billing & credits                              │
+│ - Payment processing                             │
+│ - Email notifications                            │
 └─────────────────────────────────────────────────┘
                     ▼
 ┌─────────────────────────────────────────────────┐
@@ -124,19 +133,15 @@ const updateLeadSchema = z.object({
 });
 
 // 2. GET Handler
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     // 2a. Authentication
     const supabase = createRouteHandlerClient({ cookies });
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     // 2b. Business Logic (via service)
@@ -144,10 +149,7 @@ export async function GET(
 
     // 2c. Authorization (check ownership)
     if (lead.consultant_id !== user.id) {
-      return NextResponse.json(
-        { success: false, error: 'Forbidden' },
-        { status: 403 }
-      );
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 
     // 2d. Response
@@ -155,27 +157,20 @@ export async function GET(
   } catch (error) {
     // 2e. Error Handling
     console.error('API Error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
 // 3. PATCH Handler
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     // 3a. Authentication
     const supabase = createRouteHandlerClient({ cookies });
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     // 3b. Input Validation
@@ -201,10 +196,7 @@ export async function PATCH(
     }
 
     console.error('API Error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 ```
@@ -212,6 +204,16 @@ export async function PATCH(
 ---
 
 ## Service Layer Pattern
+
+### ServiceResult Convention
+
+All services return a discriminated union for consistent error handling:
+
+```typescript
+type ServiceResult<T> = { success: true; data: T } | { success: false; error: string };
+```
+
+Services in `src/lib/services/` handle business logic. Payment services in `src/lib/payment/`.
 
 ### Dedicated Service Files
 
@@ -225,17 +227,10 @@ import type { Lead, LeadUpdateInput } from '@/types';
  * Busca um lead por ID.
  * Valida que o lead pertence ao consultant_id fornecido.
  */
-export async function getLeadById(
-  leadId: string,
-  consultantId?: string
-): Promise<Lead> {
+export async function getLeadById(leadId: string, consultantId?: string): Promise<Lead> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from('leads')
-    .select('*')
-    .eq('id', leadId)
-    .single();
+  const { data, error } = await supabase.from('leads').select('*').eq('id', leadId).single();
 
   if (error || !data) {
     throw new NotFoundError('Lead');
@@ -300,17 +295,12 @@ export class FlowExecutor {
   /**
    * Executa um passo do fluxo baseado no input do usuário.
    */
-  async executeStep(
-    conversationId: string,
-    userInput: string
-  ): Promise<FlowStepResult> {
+  async executeStep(conversationId: string, userInput: string): Promise<FlowStepResult> {
     // 1. Load current state
     const state = await this.stateManager.getState(conversationId);
 
     // 2. Get current step definition
-    const currentStep = this.flowDefinition.steps.find(
-      s => s.id === state.currentStepId
-    );
+    const currentStep = this.flowDefinition.steps.find(s => s.id === state.currentStepId);
 
     if (!currentStep) {
       throw new Error(`Step ${state.currentStepId} not found`);
@@ -357,10 +347,7 @@ export class FlowExecutor {
     return input;
   }
 
-  private determineNextStep(
-    currentStep: FlowStep,
-    input: string
-  ): FlowStep {
+  private determineNextStep(currentStep: FlowStep, input: string): FlowStep {
     // Logic to determine next step based on current step and input
     const nextStepId = currentStep.proxima;
     const nextStep = this.flowDefinition.steps.find(s => s.id === nextStepId);
@@ -374,9 +361,11 @@ export class FlowExecutor {
 
   private formatStepMessage(step: FlowStep, state: ConversationState): string {
     // Replace template variables in message
-    return step.conteudo?.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-      return state.context[key] || match;
-    }) || '';
+    return (
+      step.conteudo?.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+        return state.context[key] || match;
+      }) || ''
+    );
   }
 }
 ```
@@ -419,94 +408,136 @@ const { data } = await supabase.from('leads').select('*');
 // User can only see their own leads
 
 // ❌ BAD: Manual filtering (RLS still applies, but redundant)
-const { data } = await supabase
-  .from('leads')
-  .select('*')
-  .eq('consultant_id', user.id);
+const { data } = await supabase.from('leads').select('*').eq('consultant_id', user.id);
 ```
 
 ---
 
 ## Integration Architecture
 
+### Strategy Pattern for External Services
+
+Use the Strategy pattern for services that may have multiple providers:
+
+```typescript
+// ✅ GOOD: Define interface, implement per provider
+interface PaymentProcessor {
+  createCheckoutSession(params: CheckoutParams): Promise<{ url: string }>;
+  getCustomerPortal(customerId: string): Promise<{ url: string }>;
+  handleWebhook(body: string, signature: string): Promise<WebhookResult>;
+}
+
+class StripeProcessor implements PaymentProcessor {
+  // Stripe-specific implementation
+}
+```
+
+```typescript
+// ✅ GOOD: Email provider with dev fallback
+interface EmailProvider {
+  sendEmail(params: EmailParams): Promise<ServiceResult<{ id: string }>>;
+  sendTemplate(
+    template: string,
+    to: string,
+    data: Record<string, unknown>
+  ): Promise<ServiceResult<{ id: string }>>;
+}
+
+class ResendProvider implements EmailProvider {
+  /* ... */
+}
+class ConsoleProvider implements EmailProvider {
+  /* dev fallback */
+}
+```
+
 ### External Service Wrappers
 
 ```typescript
-// lib/api/groq.ts
-import Groq from 'groq-sdk';
+// lib/ai/gemini.ts - AI Service
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export class GroqClient {
-  private client: Groq;
+export async function generateAIResponse(
+  prompt: string,
+  context: Record<string, string>
+): Promise<string> {
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const result = await model.generateContent(prompt);
+  return result.response.text();
+}
+```
 
-  constructor() {
-    this.client = new Groq({
-      apiKey: process.env.GROQ_API_KEY!,
+```typescript
+// lib/payment/processor.ts - Payment Service
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+export class StripeProcessor implements PaymentProcessor {
+  async createCheckoutSession(params: CheckoutParams) {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [{ price: params.priceId, quantity: 1 }],
+      success_url: `${params.appUrl}/dashboard?checkout=success`,
+      cancel_url: `${params.appUrl}/pricing`,
+      customer_email: params.email,
+      metadata: { consultant_id: params.consultantId },
     });
-  }
-
-  async generateResponse(
-    prompt: string,
-    options?: GenerateOptions
-  ): Promise<string> {
-    try {
-      const completion = await this.client.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.1-70b-versatile',
-        temperature: options?.temperature ?? 0.4,
-        max_tokens: options?.maxTokens ?? 200,
-      });
-
-      return completion.choices[0]?.message?.content || '';
-    } catch (error) {
-      console.error('Groq API error:', error);
-      throw new AIServiceError('Failed to generate response');
-    }
+    return { url: session.url! };
   }
 }
+```
 
-// Singleton instance
-export const groqClient = new GroqClient();
+### Webhook Handler Pattern
+
+Webhooks must respond fast (< 200ms) and verify signatures:
+
+```typescript
+// Pattern for all webhook handlers:
+// 1. Verify signature (HMAC/Stripe)
+// 2. Parse payload
+// 3. Acknowledge immediately (200 OK)
+// 4. Process asynchronously if needed
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.text();
+    const signature = request.headers.get('stripe-signature')!;
+
+    // 1. Verify (throws on invalid)
+    const event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
+
+    // 2. Process by event type
+    switch (event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutCompleted(event.data.object);
+        break;
+      case 'customer.subscription.updated':
+        await handleSubscriptionUpdated(event.data.object);
+        break;
+    }
+
+    // 3. Acknowledge
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Webhook error' }, { status: 400 });
+  }
+}
 ```
 
 ### WhatsApp Webhook Handler
 
 ```typescript
-// app/api/webhooks/whatsapp/message/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyWebhookSignature } from '@/lib/webhooks/verify';
-import { processIncomingMessage } from '@/lib/services/message-service';
-
-export async function POST(request: NextRequest) {
-  try {
-    // 1. Verify webhook signature
-    const signature = request.headers.get('x-webhook-signature');
-    const body = await request.text();
-
-    if (!verifyWebhookSignature(body, signature)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid signature' },
-        { status: 401 }
-      );
-    }
-
-    // 2. Parse payload
-    const payload = JSON.parse(body);
-
-    // 3. Process message (async, non-blocking)
-    processIncomingMessage(payload).catch(error => {
-      console.error('Failed to process message:', error);
-    });
-
-    // 4. Respond immediately (webhook expects fast response)
-    return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error) {
-    console.error('Webhook error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+// Validates HMAC SHA-256 signature from Meta
+// Handles message types: text, interactive (buttons/lists), media
+// Uses whatsapp_message_id for idempotency (dedup retries)
+// Responds with 200 immediately, processes async
 ```
 
 ---
@@ -516,6 +547,7 @@ export async function POST(request: NextRequest) {
 ### Client-Side State
 
 **1. Server State (React Query):**
+
 ```typescript
 // For data from API
 import { useQuery } from '@tanstack/react-query';
@@ -530,6 +562,7 @@ export function useLeads(consultantId: string) {
 ```
 
 **2. UI State (useState/useReducer):**
+
 ```typescript
 // For temporary UI state
 const [isModalOpen, setIsModalOpen] = useState(false);
@@ -537,13 +570,14 @@ const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 ```
 
 **3. Global State (Zustand) - Use sparingly:**
+
 ```typescript
 // Only for truly global state (auth, theme, etc.)
 import { create } from 'zustand';
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>(set => ({
   user: null,
-  setUser: (user) => set({ user }),
+  setUser: user => set({ user }),
   clearUser: () => set({ user: null }),
 }));
 ```
@@ -551,9 +585,119 @@ export const useAuthStore = create<AuthState>((set) => ({
 ### Server-Side State
 
 **Database as source of truth:**
+
 - Don't duplicate database state in memory
 - Use database queries with proper indexes
 - Leverage Supabase real-time for live updates
+
+---
+
+## Admin Panel Architecture
+
+### Role-Based Access Control
+
+Admin access is controlled by the `is_admin` boolean flag on the `consultants` table:
+
+```typescript
+// Admin guard pattern - used in admin layouts and API routes
+export async function isAdmin(supabase: SupabaseClient): Promise<boolean> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  const { data } = await supabase.from('consultants').select('is_admin').eq('id', user.id).single();
+
+  return data?.is_admin === true;
+}
+```
+
+**Admin API routes** check `is_admin` in the handler (not via RLS, since admin tables use `service_role`).
+
+### Admin Dashboard Metrics
+
+```
+┌────────────────────────────────────────────────┐
+│ Daily Stats (pg_cron → daily_stats table)      │
+│ - total_revenue, total_users, active_subs      │
+│ - total_leads, page_views                      │
+│ - Day-over-day deltas (percentage change)      │
+└────────────────────────────────────────────────┘
+```
+
+---
+
+## Scheduled Jobs Architecture
+
+### pg_cron Pattern
+
+Background jobs run via PostgreSQL `pg_cron` extension:
+
+| Job                   | Schedule     | Function                                         |
+| --------------------- | ------------ | ------------------------------------------------ |
+| Calculate daily stats | Hourly       | Aggregates revenue, users, leads, views          |
+| Reset monthly credits | 1st of month | Resets `credits` to `monthly_credits_allocation` |
+
+```sql
+-- Example: hourly stats calculation
+SELECT cron.schedule(
+  'calculate-daily-stats',
+  '0 * * * *',  -- Every hour
+  $$SELECT calculate_daily_stats()$$
+);
+
+-- Example: monthly credit reset
+SELECT cron.schedule(
+  'reset-monthly-credits',
+  '0 0 1 * *',  -- 1st of every month at midnight
+  $$SELECT reset_monthly_credits()$$
+);
+```
+
+**Error Handling**: Jobs log errors to the `logs` table with `level: 'error'` and `source: 'pg_cron'`.
+
+---
+
+## File Storage Architecture
+
+### Upload Flow
+
+```
+Client → API (validate) → Supabase Storage (upload) → DB (save metadata)
+                                                            ↓
+Client ← API (signed URL) ← Supabase Storage (createSignedUrl) ←
+```
+
+### Key Decisions
+
+- **Direct upload**: Client uploads to Supabase Storage via presigned URL
+- **Time-limited downloads**: Signed URLs expire after 1 hour
+- **User isolation**: RLS on `files` table via `consultant_id`
+- **Validation**: File type + size checked on both client and server
+- **Storage key**: `{consultant_id}/{timestamp}-{filename}`
+
+---
+
+## LGPD Compliance Architecture
+
+### Cookie Consent
+
+```
+┌─────────────────────────────────────────────────┐
+│ Cookie Banner (bottom of page)                  │
+│ - Shows on first visit                          │
+│ - Persisted in localStorage                     │
+│ - Blocks analytics scripts until accepted       │
+└─────────────────────────────────────────────────┘
+```
+
+### Data Protection Measures
+
+- **Encryption at rest**: Sensitive tokens encrypted with AES-256-GCM
+- **Data isolation**: RLS policies ensure tenant separation
+- **Audit trail**: All email sends logged
+- **Right to deletion**: Admin can delete user data
+- **Cookie consent**: Required before loading analytics
 
 ---
 
@@ -567,11 +711,11 @@ export const useAuthStore = create<AuthState>((set) => ({
 └─────────────────────────────────────────────────┘
                     ▼
 ┌─────────────────────────────────────────────────┐
-│ Layer 2: Authentication (Supabase Auth)        │
+│ Layer 2: Authentication (Supabase Auth + OAuth) │
 └─────────────────────────────────────────────────┘
                     ▼
 ┌─────────────────────────────────────────────────┐
-│ Layer 3: Authorization (RLS Policies)          │
+│ Layer 3: Authorization (RLS + Admin Guard)      │
 └─────────────────────────────────────────────────┘
                     ▼
 ┌─────────────────────────────────────────────────┐
@@ -579,20 +723,32 @@ export const useAuthStore = create<AuthState>((set) => ({
 └─────────────────────────────────────────────────┘
                     ▼
 ┌─────────────────────────────────────────────────┐
-│ Layer 5: Business Logic Validation             │
+│ Layer 5: Webhook Signatures (HMAC / Stripe)    │
+└─────────────────────────────────────────────────┘
+                    ▼
+┌─────────────────────────────────────────────────┐
+│ Layer 6: Business Logic Validation             │
 └─────────────────────────────────────────────────┘
 ```
 
 ### Authentication Flow
 
 ```
-1. User logs in via Supabase Auth
+1. User logs in via Supabase Auth (email/password or OAuth)
 2. Supabase returns JWT token
 3. Token stored in httpOnly cookie
 4. All requests include cookie
 5. Supabase validates token
 6. RLS policies check auth.uid()
+7. Admin routes additionally check is_admin flag
 ```
+
+### Webhook Security
+
+| Provider        | Verification Method                                               |
+| --------------- | ----------------------------------------------------------------- |
+| Meta (WhatsApp) | HMAC SHA-256 with `x-hub-signature-256` header                    |
+| Stripe          | `stripe.webhooks.constructEvent()` with `stripe-signature` header |
 
 ---
 
@@ -631,12 +787,13 @@ export const logger = {
 ### Metrics to Track
 
 - **Performance:** API response times, database query times
-- **Business:** Lead conversion rates, flow completion rates
-- **Errors:** Error rates by type, failed API calls
-- **Usage:** Active users, messages sent, API usage
+- **Business:** Lead conversion rates, flow completion rates, revenue (MRR)
+- **SaaS:** Active subscriptions, churn rate, credit usage, plan distribution
+- **Errors:** Error rates by type, failed API calls, webhook failures
+- **Usage:** Active users, messages sent, API usage, file storage
 
 ---
 
-**Last Updated:** 2025-12-12
-**Version:** 1.0
-**Next Review:** 2026-03-12
+**Last Updated:** 2026-02-11
+**Version:** 2.0
+**Next Review:** 2026-05-11
