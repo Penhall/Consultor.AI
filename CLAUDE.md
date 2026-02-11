@@ -15,13 +15,13 @@ The system combines conversational AI with personalized content generation to cr
 
 ## Current Status
 
-**Fase Atual:** MVP Fase 1 - ✅ **COMPLETO** | Fase 1.5 (Testes) - ✅ **COMPLETO** | Fase 2 (Polish) - ✅ **COMPLETO** | Fase 3 (CRM) - ✅ **COMPLETO**
-**Última Atualização:** 2026-01-30
-**Versão:** 0.3.0
-**Branch Atual:** `001-project-specs`
-**Status:** Production Ready - Pronto para Deploy
+**Fase Atual:** MVP (Fases 1-3) ✅ | SaaS Billing & Admin ✅ | **Tudo mergeado em `main`**
+**Última Atualização:** 2026-02-11
+**Versão:** 0.4.0
+**Branch Atual:** `main`
+**Status:** Production Ready - SaaS Platform Completa
 
-### MVP Completo ✅
+### Core Platform (Branch `001-project-specs`) ✅
 
 **Core Features**:
 
@@ -35,96 +35,52 @@ The system combines conversational AI with personalized content generation to cr
 - ✅ **Auto-criação de Leads**: Leads criados automaticamente via WhatsApp
 - ✅ **Sistema de Follow-ups**: Agendamento automático e manual de follow-ups
 - ✅ **Exportação CSV**: Export de leads com filtros e BOM UTF-8
+- ✅ **CRM Integrations**: RD Station, Pipedrive (HubSpot/Agendor planned)
 
-**Infrastructure**:
+### SaaS Billing & Admin (Branch `002-saas-billing-admin`) ✅
+
+- ✅ **Stripe Billing**: Checkout, customer portal, webhook handling
+- ✅ **Credit System**: Atomic credit operations, monthly reset via pg_cron
+- ✅ **Subscription Plans**: Freemium (20) / Pro (200) / Agência (1000) credits
+- ✅ **Admin Dashboard**: SaaS metrics, user management, daily stats
+- ✅ **File Upload**: Supabase Storage with presigned URLs, 10MB limit
+- ✅ **Email System**: Resend provider + console fallback for dev
+- ✅ **Landing Page**: Hero, features, testimonials, FAQ, footer sections
+- ✅ **LGPD Cookie Consent**: Banner with localStorage persistence
+- ✅ **OAuth**: Google & GitHub social login
+
+### Infrastructure
 
 - ✅ **Build Pipeline**: Next.js builds successfully (0 erros TypeScript)
 - ✅ **Supabase Integration**: Client SSR + Server + Middleware configurados
 - ✅ **Database Schema**: RLS policies ativas, migrations aplicadas
 - ✅ **Encryption**: Tokens criptografados com AES-256-GCM
-- ✅ **Webhook Validation**: HMAC SHA-256 para segurança
-- ✅ **API Routes**: 25 endpoints REST completos
-- ✅ **Pages**: 22 páginas renderizadas
+- ✅ **Webhook Validation**: HMAC SHA-256 (Meta) + Stripe signatures
 - ✅ **Monitoring**: Logger, Performance Tracking, Sentry Integration
 - ✅ **Performance**: Skeleton loading, React Query caching, optimized hooks
-- ✅ **CRM Integrations**: RD Station, Pipedrive (HubSpot/Agendor planned)
 - ✅ **Bundle Analyzer**: Otimização de bundle configurada
+- ✅ **CI/CD**: GitHub Actions + Husky pre-commit/pre-push hooks
 
-**Build Status**: ✅ 22 páginas, 25 API routes, ~67s build time
+### Test Status
 
-### Fase 1.5 - Testes ✅ (100% Completo)
+- ✅ **34 test files** | **319 tests** (all passing)
+- ✅ **30 test suites** | **298 unit tests** passing
+- ✅ **0 TypeScript errors** in production code
+- ✅ Covers: services, components, API routes, billing, admin, E2E flows
 
-**Status dos Testes** (2026-01-20):
+### Próxima Fase 📋
 
-- ✅ **Cobertura**: 22 suites de teste | 240 testes no total
-- ✅ **Testes Passando**: 240/240 (100%)
-- ✅ **14/14 rotas** com cobertura de teste (100% das rotas)
-- ✅ **CI/CD**: GitHub Actions configurado e funcionando
-- ✅ **Husky**: Pre-commit hooks configurados
-- ⚠️ **TypeScript**: ~15 erros em arquivos de teste (produção OK)
-
-**Progresso por Sprint**:
-
-- ✅ **Sprint 1**: Infraestrutura de testes (COMPLETO)
-- ✅ **Sprint 2**: Testes unitários críticos (COMPLETO)
-- ✅ **Sprint 3**: Testes de integração (COMPLETO)
-- ✅ **Sprint 4**: CI/CD + E2E (COMPLETO)
-
-**Arquivos de Teste Criados**:
-
-- `tests/unit/app/api/**` - Testes de API routes (14 arquivos)
-- `tests/unit/lib/flow-engine/**` - Testes do Flow Engine (4 arquivos)
-- `tests/unit/lib/services/**` - Testes de serviços (3 arquivos)
-- `tests/fixtures/` - Fixtures reutilizáveis
-- `tests/mocks/` - Mocks globais (Supabase, Next.js)
-- `tests/setup.ts` - Configuração global
-
-### Próximas Fases 📋
-
-**Fase 1.5 - Testes** ✅ (100% Completo):
-
-- [x] Estrutura de testes configurada
-- [x] Fixtures e mocks criados
-- [x] Testes de API routes (14/14 rotas)
-- [x] Testes unitários críticos (Flow Engine, AI, Lead, Analytics)
-- [x] GitHub Actions CI/CD configurado
-- [x] Pre-commit hooks (Husky)
-- [x] Teste E2E (lead qualification flow)
-- [ ] Corrigir erros TypeScript em arquivos de teste
-
-**Fase 2 - Polimento** ✅ (100% Completo):
-
-- [x] Lead detail page completo (`/dashboard/leads/[id]`) - Timeline de conversas, edição inline
-- [x] Exportação de Leads (CSV/Excel) - `/api/leads/export` com filtros
-- [x] Follow-up Automático - Migration, service, API, UI completos
-- [x] Monitoring Infrastructure - Sentry, Performance, Logging (`src/lib/monitoring/`)
-- [x] Docker Networking Fix - Supabase interno via Kong
-- [x] Templates de Mensagens - CRUD completo, picker UI, página de gerenciamento
-- [x] Filtros Avançados - Busca, status multi-select, date range, score range, source
-- [x] Otimização de Performance - Skeletons, React Query caching, useLeads hook
-
-**Fase 3 - CRM & Polish** ✅ (100% Completo):
-
-- [x] Integração CRM (RD Station, Pipedrive) - `/dashboard/integracoes`
-- [x] CRM Service Layer - Sync automático e manual
-- [x] Histórico de Sincronizações - Logs detalhados
-- [x] Bundle Analyzer - `npm run analyze`
-- [x] Error Boundary - Dashboard específico
-- [x] Enhanced 404 Page - Quick links
-- [x] Release Verification Script - `scripts/verify-release.ts`
-- [x] Documentation - DEPLOYMENT.md, MONITORING.md, CHANGELOG.md
-
-**Fase 4 - Expansão** (Futuro):
+**Fase 5 - Expansão** (Futuro):
 
 - [ ] Segundo Vertical (Imóveis)
 - [ ] HubSpot & Agendor Providers
 - [ ] Voice Cloning (ElevenLabs)
 - [ ] Image Generation (Canva API)
-- [ ] Multi-tenant
+- [ ] Mobile App
 
 ### Especificações do Projeto 📋
 
-**Localização**: `specs/001-project-specs/`
+**Spec 001** - `specs/001-project-specs/` (Core Platform):
 
 | Arquivo                      | Descrição                                       | Status      |
 | ---------------------------- | ----------------------------------------------- | ----------- |
@@ -132,6 +88,14 @@ The system combines conversational AI with personalized content generation to cr
 | `plan.md`                    | Plano de implementação técnico                  | ✅ Completo |
 | `tasks.md`                   | 100 tasks organizadas por user story            | ✅ Completo |
 | `checklists/requirements.md` | Checklist de qualidade                          | ✅ Aprovado |
+
+**Spec 002** - `specs/002-saas-billing-admin/` (SaaS Billing & Admin):
+
+| Arquivo         | Descrição                                         | Status      |
+| --------------- | ------------------------------------------------- | ----------- |
+| `spec.md`       | Especificação (10 user stories, 42 FRs)           | ✅ Completo |
+| `plan.md`       | Plano técnico (Stripe, Resend, pg_cron)           | ✅ Completo |
+| `data-model.md` | Schema (5 novas tabelas, 9 campos em consultants) | ✅ Completo |
 
 ---
 
@@ -141,16 +105,18 @@ The system combines conversational AI with personalized content generation to cr
 
 - **Frontend**: Next.js 14 (App Router) + React 18 + TypeScript 5.3
 - **Styling**: Tailwind CSS + shadcn/ui components
-- **Backend**: Supabase (PostgreSQL + Edge Functions + Realtime)
+- **Backend**: Supabase (PostgreSQL + Realtime + Storage)
 - **State Management**: React Query + Zustand (minimal)
 - **Forms**: React Hook Form + Zod validation
-- **AI**: Google AI (Gemini) / Groq (Llama 3.1 70B)
+- **AI**: Google AI (Gemini 1.5 Flash)
+- **Payments**: Stripe (checkout, subscriptions, webhooks)
+- **Email**: Resend (transactional) + React Email (templates)
 - **WhatsApp**: Meta Business API (360dialog via Weni Cloud)
-- **Image Generation**: Canva API
 - **Caching**: Redis (Upstash)
+- **Scheduled Jobs**: pg_cron (daily stats, monthly credit reset)
 - **Testing**: Vitest + Testing Library + Playwright
 - **Deployment**: Docker + Vercel (frontend) + Supabase (backend)
-- **Monitoring**: Sentry / Better Stack (planned)
+- **Monitoring**: Sentry + structured logging
 
 ---
 
@@ -160,239 +126,103 @@ The system combines conversational AI with personalized content generation to cr
 
 ```
 Consultor.AI/
-├── .rules/                          # Development guidelines (READ THESE!)
-│   ├── development-standards.md     # Code standards, language rules, ROOT ORGANIZATION
-│   ├── coding-guidelines.md         # TypeScript, React patterns
-│   ├── architecture-rules.md        # System architecture patterns
-│   └── testing-standards.md         # Testing philosophy and patterns
+├── .rules/                          # Development guidelines v2.0 (READ THESE!)
+│   ├── development-standards.md     # Code standards, SaaS billing, file upload, email
+│   ├── coding-guidelines.md         # TypeScript, React, ServiceResult, Strategy patterns
+│   ├── architecture-rules.md        # Architecture, admin panel, pg_cron, LGPD
+│   └── testing-standards.md         # Testing, SaaS test patterns, mock strategies
 │
-├── configs/                         # Additional configuration files
-│   ├── docker/                      # Docker configurations (legacy, use root files)
-│   │   ├── docker-compose.dev.yml   # ⚠️ Deprecated - use root docker-compose.dev.yml
-│   │   └── Dockerfile.dev           # ⚠️ Deprecated - use root Dockerfile.dev
-│   ├── eslint/                      # ESLint configuration
-│   │   └── .eslintrc.json
-│   ├── prettier/                    # Prettier configuration
-│   │   ├── .prettierrc
-│   │   └── .prettierignore
-│   ├── testing/                     # Test configurations
-│   │   ├── playwright.config.ts
-│   │   └── vitest.config.ts
-│   └── build/                       # Build tool configs
-│       ├── postcss.config.js
-│       └── tailwind.config.ts
+├── specs/                           # Feature specifications
+│   ├── 001-project-specs/           # Core platform spec (7 stories, 55 FRs)
+│   └── 002-saas-billing-admin/      # SaaS billing spec (10 stories, 42 FRs)
 │
 ├── docs/                            # Technical documentation
 │   ├── guides/                      # Setup guides, tutorials, fixes
-│   │   ├── README.md                # ⭐ Guide index
-│   │   ├── getting-started.md       # ⭐ Dev environment setup
-│   │   ├── DEPLOYMENT.md            # ⭐ Deploy guide (Docker, Vercel, Stripe)
-│   │   ├── TROUBLESHOOTING.md       # ⭐ Common issues & solutions
-│   │   ├── MONITORING.md            # ⭐ Monitoring & observability
-│   │   ├── LOCAL-DOCKER-TESTING.md  # ⭐ Docker local development
-│   │   ├── WHATSAPP-EMBEDDED-SIGNUP.md  # ⭐ WhatsApp Business setup
-│   │   ├── WHATSAPP-SIMULATOR.md    # WhatsApp test simulator
-│   │   └── ROADMAP.md               # Project roadmap & KPIs
-│   ├── technical/                   # Technical specifications
-│   │   ├── SRS-Software-Requirements-Specification.md
-│   │   └── Implementation-Plan.md
-│   ├── architecture/                # Architecture docs
-│   │   ├── SAD-System-Architecture-Document.md
-│   │   └── Database-Design-Document.md
-│   ├── api/                         # API documentation
-│   │   └── API-Specification.md
-│   └── motivação/                   # Conceptual planning & prototypes
+│   ├── technical/                   # SRS, Implementation Plan
+│   ├── architecture/                # SAD, Database Design
+│   └── api/                         # API Specification
 │
 ├── scripts/                         # Utility scripts
-│   ├── dev-setup.sh                 # Development environment setup
-│   ├── validate-flow.ts             # ⭐ Flow JSON validator
-│   └── verify-release.ts            # ⭐ Release verification script
 │
 ├── src/
 │   ├── app/                         # Next.js 14 App Router
-│   │   ├── api/                     # API routes (13 endpoints)
-│   │   │   ├── analytics/           # ⭐ Analytics endpoints
-│   │   │   │   ├── overview/        # GET - Overview metrics
-│   │   │   │   ├── charts/          # GET - Chart data
-│   │   │   │   └── activity/        # GET - Recent activity
-│   │   │   ├── consultants/
-│   │   │   │   └── meta-callback/   # Meta OAuth callback
-│   │   │   ├── conversations/       # ⭐ Conversation management
-│   │   │   │   ├── start/           # POST - Start conversation
-│   │   │   │   └── [id]/message/    # POST - Send message
-│   │   │   ├── health/              # GET - Health check
-│   │   │   ├── integrations/        # ⭐ CRM Integrations
-│   │   │   │   └── crm/             # CRM API routes
-│   │   │   │       ├── route.ts     # GET/POST - List/Create integrations
-│   │   │   │       ├── logs/        # GET - Sync logs
-│   │   │   │       └── [id]/        # Integration by ID
-│   │   │   │           ├── route.ts # GET/PATCH/DELETE
-│   │   │   │           ├── sync/    # POST - Sync leads
-│   │   │   │           └── test/    # POST - Test connection
-│   │   │   ├── leads/               # ⭐ Lead management
-│   │   │   │   ├── route.ts         # GET/POST - List/Create leads
-│   │   │   │   ├── [id]/route.ts    # GET/PATCH/DELETE - Lead by ID
-│   │   │   │   └── stats/           # GET - Lead statistics
-│   │   │   └── webhook/
-│   │   │       └── meta/[consultantId]/  # ⭐ WhatsApp webhook handler
-│   │   ├── auth/                    # ⭐ Authentication pages
-│   │   │   ├── login/
-│   │   │   └── signup/
-│   │   ├── dashboard/               # ⭐ Dashboard pages
-│   │   │   ├── analytics/           # Analytics page
-│   │   │   ├── integracoes/         # ⭐ CRM Integrations page
-│   │   │   ├── leads/               # Leads management
-│   │   │   ├── flows/               # ⭐ Flow editor
-│   │   │   ├── templates/           # Message templates
-│   │   │   ├── perfil/
-│   │   │   │   └── whatsapp/        # WhatsApp integration UI
-│   │   │   ├── layout.tsx           # Dashboard layout
-│   │   │   ├── error.tsx            # ⭐ Dashboard error boundary
-│   │   │   └── page.tsx             # Dashboard home
+│   │   ├── api/                     # API routes
+│   │   │   ├── admin/               # ⭐ Admin API (stats, users)
+│   │   │   ├── analytics/           # Analytics endpoints
+│   │   │   ├── billing/             # ⭐ Stripe (checkout, portal, webhook)
+│   │   │   ├── contact/             # ⭐ Contact form
+│   │   │   ├── consultants/         # Meta OAuth callback
+│   │   │   ├── conversations/       # Conversation management
+│   │   │   ├── files/               # ⭐ File upload/download
+│   │   │   ├── health/              # Health check
+│   │   │   ├── integrations/crm/    # CRM integration routes
+│   │   │   ├── leads/               # Lead CRUD + stats + export
+│   │   │   └── webhook/meta/        # WhatsApp webhook handler
+│   │   ├── admin/                   # ⭐ Admin panel pages
+│   │   ├── auth/                    # Authentication pages
+│   │   ├── dashboard/               # Consultant dashboard pages
 │   │   ├── layout.tsx               # Root layout
-│   │   ├── page.tsx                 # Landing page
-│   │   ├── error.tsx                # Error boundary
-│   │   ├── loading.tsx              # Loading state
-│   │   └── not-found.tsx            # 404 page
+│   │   └── page.tsx                 # Landing page
 │   │
 │   ├── components/                  # React components
-│   │   ├── auth/                    # ⭐ Auth components
-│   │   │   ├── login-form.tsx
-│   │   │   └── signup-form.tsx
-│   │   ├── dashboard/               # ⭐ Dashboard components
-│   │   │   ├── metric-card.tsx      # Metric display card
-│   │   │   ├── bar-chart.tsx        # Bar chart (SVG)
-│   │   │   ├── pie-chart.tsx        # Pie chart (SVG)
-│   │   │   └── recent-leads-table.tsx  # Recent leads table
-│   │   ├── integrations/            # ⭐ CRM Integration components
-│   │   │   ├── crm-integration-card.tsx
-│   │   │   ├── crm-connect-dialog.tsx
-│   │   │   └── crm-sync-history.tsx
-│   │   ├── ui/                      # shadcn/ui components
-│   │   │   ├── alert.tsx
-│   │   │   ├── button.tsx
-│   │   │   └── card.tsx
-│   │   ├── whatsapp/
-│   │   │   └── MetaConnectButton.tsx
+│   │   ├── admin/                   # ⭐ Admin (guard, sidebar, charts, tables)
+│   │   ├── auth/                    # Login/signup forms
+│   │   ├── billing/                 # ⭐ Pricing, checkout, credits display
+│   │   ├── cookie-consent/          # ⭐ LGPD cookie banner
+│   │   ├── dashboard/               # Dashboard widgets
+│   │   ├── integrations/            # CRM integration components
+│   │   ├── landing/                 # ⭐ Hero, features, testimonials, FAQ, footer
+│   │   ├── ui/                      # shadcn/ui base components
+│   │   ├── whatsapp/                # WhatsApp components
 │   │   └── providers.tsx            # React Query provider
 │   │
-│   ├── hooks/                       # Custom React hooks
-│   │   ├── useAnalytics.ts          # ⭐ Analytics data hooks
-│   │   ├── useAuth.ts               # ⭐ Authentication hook
-│   │   ├── useCRM.ts                # ⭐ CRM integration hooks
-│   │   ├── useLeads.ts              # ⭐ Lead management hooks
-│   │   └── useMetaSignup.ts
-│   │
 │   ├── lib/                         # Core libraries & utilities
-│   │   ├── ai/
-│   │   │   └── gemini.ts            # Google AI integration
-│   │   ├── api/
-│   │   │   └── google-ai.ts         # AI API wrapper
-│   │   ├── encryption/
-│   │   │   ├── index.ts             # Encryption utilities
-│   │   │   └── encryption.test.ts
-│   │   ├── flow-engine/             # ⭐ Flow Engine (NEW)
-│   │   │   ├── types.ts             # Flow type definitions
-│   │   │   ├── parser.ts            # Flow JSON parser/validator
-│   │   │   ├── state-manager.ts     # Conversation state management
-│   │   │   ├── executors.ts         # Step executors (message/choice/action)
-│   │   │   ├── engine.ts            # Main flow engine
-│   │   │   └── index.ts             # Barrel exports
-│   │   ├── services/                # ⭐ Service Layer
-│   │   │   ├── analytics-service.ts # Analytics metrics & charts
-│   │   │   ├── ai-service.ts        # AI response generation
-│   │   │   ├── crm-service.ts       # ⭐ CRM integration service
-│   │   │   ├── crm-providers/       # ⭐ CRM provider implementations
-│   │   │   │   ├── rd-station.ts    # RD Station provider
-│   │   │   │   ├── pipedrive.ts     # Pipedrive provider
-│   │   │   │   └── index.ts         # Provider exports
-│   │   │   ├── lead-auto-create.ts  # Auto-create leads from WhatsApp
-│   │   │   └── lead-service.ts      # Lead CRUD operations
-│   │   ├── supabase/
-│   │   │   ├── client.ts            # Client-side Supabase (SSR)
-│   │   │   ├── server.ts            # Server-side Supabase
-│   │   │   ├── middleware.ts        # Auth middleware
-│   │   │   ├── config.ts            # Configuration
-│   │   │   └── index.ts             # Barrel exports
-│   │   ├── validations/             # ⭐ Zod Schemas
-│   │   │   ├── lead.ts              # Lead validation schemas
-│   │   │   └── crm.ts               # ⭐ CRM validation schemas
-│   │   ├── whatsapp/
-│   │   │   ├── meta-client.ts       # ⭐ Enhanced Meta API client
-│   │   │   └── webhook-validation.ts # ⭐ Enhanced HMAC + interactive messages
-│   │   └── utils.ts                 # Generic utilities
+│   │   ├── ai/                      # Google AI (Gemini) integration
+│   │   ├── email/                   # ⭐ Email provider (Resend) & templates
+│   │   ├── encryption/              # AES-256-GCM encryption
+│   │   ├── flow-engine/             # Conversation flow engine
+│   │   ├── monitoring/              # Logger, performance, Sentry
+│   │   ├── payment/                 # ⭐ Stripe processor & plan definitions
+│   │   ├── services/                # Business logic services
+│   │   │   ├── analytics-service.ts
+│   │   │   ├── ai-service.ts
+│   │   │   ├── billing-service.ts   # ⭐ Subscription & credit management
+│   │   │   ├── crm-service.ts
+│   │   │   ├── lead-service.ts
+│   │   │   ├── stats-service.ts     # ⭐ Daily stats calculation
+│   │   │   └── crm-providers/       # RD Station, Pipedrive
+│   │   ├── supabase/                # Client, server, middleware
+│   │   ├── validations/             # Zod schemas
+│   │   └── whatsapp/                # Meta API client & webhook validation
 │   │
 │   ├── types/                       # TypeScript definitions
-│   │   ├── database.ts              # Generated from Supabase
-│   │   └── api.ts                   # API types
-│   │
-│   ├── middleware.ts                # ⭐ Next.js middleware (auth)
-│   │
-│   └── styles/
-│       └── globals.css              # Global styles
+│   ├── hooks/                       # Custom React hooks
+│   ├── middleware.ts                # Next.js auth middleware
+│   └── styles/globals.css
 │
-├── supabase/                        # Supabase configuration
-│   ├── functions/                   # Edge Functions (TBD)
-│   ├── migrations/                  # ⭐ Database migrations
-│   │   ├── 20251217000001_initial_schema.sql
-│   │   ├── 20251217000002_rls_policies.sql
-│   │   └── 20260127000001_add_crm_integrations.sql  # ⭐ CRM tables
-│   ├── seed/                        # ⭐ Seed data
-│   │   ├── default-health-flow.json # Default health qualification flow
-│   │   └── seed.sql                 # Seed SQL scripts
-│   └── config.toml                  # Supabase local config
+├── supabase/
+│   ├── migrations/                  # Database migrations (10+ files)
+│   └── seed/                        # Seed data (flows, SQL)
 │
-├── tests/                           # Test files
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
+├── tests/                           # 34 test files, 319 tests
+│   ├── unit/                        # Unit tests (.test.ts)
+│   ├── integration/                 # Integration tests (.test.ts)
+│   ├── e2e/                         # E2E tests (.spec.ts)
+│   ├── fixtures/                    # Reusable test data
+│   └── mocks/                       # Mock clients (Supabase, Stripe, Resend)
 │
-├── public/                          # Static assets
-│   └── .gitkeep
-│
-├── docker-compose.yml               # Docker production orchestration
-├── docker-compose.dev.yml           # Docker development (hot-reload)
-├── docker-compose.full.yml          # Docker full stack
-├── Dockerfile                       # Production container (multi-stage)
-├── Dockerfile.dev                   # Development container
-├── Dockerfile.test                  # Test container
-├── next.config.js                   # Next.js configuration
-├── tailwind.config.ts               # Tailwind CSS config
-├── tsconfig.json                    # TypeScript config
-├── vitest.config.ts                 # Vitest test config
-├── playwright.config.ts             # Playwright E2E config
-└── package.json                     # Dependencies
+└── [Root config files]              # Docker, Next.js, TS, Vitest, Playwright, etc.
 ```
 
 ### 🧹 Root Directory Organization
 
-**CRITICAL**: The root directory is kept intentionally clean. See `.rules/development-standards.md` Section 0 for complete rules.
+**CRITICAL**: Keep the root directory clean. See `.rules/development-standards.md` Section 0 for complete rules.
 
-**Configuration Files in Root**:
-
-- `.eslintrc.json` - ESLint configuration
-- `.prettierrc`, `.prettierignore` - Prettier configuration
-- `playwright.config.ts` - Playwright E2E tests
-- `vitest.config.ts` - Vitest unit tests
-- `tailwind.config.ts` - Tailwind CSS
-- `postcss.config.js` - PostCSS
-- `docker-compose.yml`, `docker-compose.dev.yml` - Docker orchestration
-- `Dockerfile`, `Dockerfile.dev`, `Dockerfile.test` - Docker containers
-
-**Note**: Docker files in `configs/docker/` are deprecated. Use root files as source of truth.
-
-**Where Things Go**:
-
-- Configuration files → Root directory (required by tools)
-- Setup guides/tutorials → `docs/guides/`
-- Utility scripts → `scripts/`
-- Internal notes → `docs/internal/`
-
-**Never Create in Root**:
-
-- ❌ `SETUP.md`, `NOTES.md` → Use `docs/guides/`
-- ❌ `deploy.sh`, `start.sh` → Use `scripts/`
-- ❌ Temporary files → Use `.gitignore`
+- Configuration files (ESLint, Prettier, Vitest, Playwright, Tailwind) → Root (required by tools)
+- Docker files (compose, Dockerfile) → Root (source of truth)
+- Setup guides → `docs/guides/`
+- Scripts → `scripts/`
+- ❌ Never create `SETUP.md`, `NOTES.md`, `deploy.sh` in root
 
 ---
 
@@ -402,55 +232,49 @@ Consultor.AI/
 
 Before writing any code, familiarize yourself with the guidelines in `.rules/`:
 
-1. **`.rules/development-standards.md`**
+1. **`.rules/development-standards.md`** (v2.0)
    - **Language Rules**: English for code, Portuguese for docs/UI
    - **Code Organization**: Project structure, naming conventions
    - **TypeScript Standards**: Strict mode, type safety
    - **React/Next.js Patterns**: Server vs Client components
    - **Supabase Patterns**: Queries, RLS, real-time
    - **API Development**: Route structure, error handling
-   - **Testing Requirements**: 80% coverage minimum
-   - **Performance**: Optimization strategies
    - **Security**: Input validation, XSS/SQL injection prevention
    - **Git Workflow**: Branches, commits, PR templates
+   - **SaaS & Billing Standards**: Credit operations, subscription lifecycle, lead limits
+   - **File Upload & Storage**: Allowed types, presigned URLs, storage keys
+   - **Email & Notifications**: Provider pattern, templates, dev fallback
 
-2. **`.rules/coding-guidelines.md`**
+2. **`.rules/coding-guidelines.md`** (v2.0)
    - **Naming Conventions**: camelCase, PascalCase, UPPER_SNAKE_CASE
    - **Function Signatures**: Clear types, JSDoc comments
-   - **Async/Await**: Proper error handling
-   - **Array/Object Operations**: Functional, immutable patterns
    - **React Patterns**: Props, hooks, conditional rendering
    - **Supabase Queries**: Organized in service functions
-   - **Error Handling**: Custom error classes
-   - **Validation**: Zod schemas
-   - **Performance**: Memoization, code splitting
-   - **Accessibility**: Semantic HTML, ARIA attributes
-   - **Documentation**: JSDoc standards
+   - **ServiceResult Pattern**: Discriminated union for all services
+   - **Strategy Pattern**: PaymentProcessor, EmailProvider interfaces
+   - **Supabase Type Workarounds**: `.select()` cast, `.from() as any`, `.rpc as any`
+   - **Error Handling**: Custom error classes, logging
+   - **Common Pitfalls**: `storage_key`, admin `status` field, FileList null checks, atomic credits
 
-3. **`.rules/architecture-rules.md`**
-   - **Architectural Principles**: Separation of concerns
-   - **Component Architecture**: Server vs Client components
-   - **Data Flow**: Layer responsibilities
-   - **API Route Structure**: Standard patterns
-   - **Service Layer Pattern**: Business logic organization
+3. **`.rules/architecture-rules.md`** (v2.0)
+   - **Service Layer Pattern**: ServiceResult convention
    - **Flow Engine Architecture**: Conversation execution
-   - **Database Access**: Direct queries vs services
-   - **Integration Architecture**: External service wrappers
-   - **State Management**: React Query, Zustand
-   - **Security Architecture**: Defense in depth
-   - **Monitoring**: Logging and metrics
+   - **Strategy Pattern**: External services (Stripe, Resend)
+   - **Webhook Handler Pattern**: Signature verification, fast ack
+   - **Admin Panel Architecture**: Role-based access (`is_admin`), admin guard
+   - **Scheduled Jobs**: pg_cron for daily stats & monthly credit reset
+   - **File Storage Architecture**: Presigned URLs, user isolation
+   - **LGPD Compliance**: Cookie consent, data protection
+   - **Security Architecture**: 6-layer defense in depth (incl. webhook signatures)
+   - **Monitoring**: Logging, SaaS metrics
 
-4. **`.rules/testing-standards.md`**
-   - **Testing Philosophy**: Behavior over implementation
+4. **`.rules/testing-standards.md`** (v2.0)
    - **Testing Pyramid**: 60% unit, 30% integration, 10% E2E
-   - **Unit Testing**: Vitest patterns
-   - **Component Testing**: React Testing Library
-   - **Integration Testing**: API routes, services
-   - **E2E Testing**: Playwright critical flows
-   - **Mock Strategies**: Supabase, AI, WhatsApp
-   - **Test Fixtures**: Reusable test data
-   - **Coverage Requirements**: 80% overall, 90% unit tests
-   - **CI/CD Integration**: GitHub Actions
+   - **Mock Strategies**: Supabase chain builder, Stripe mock, Email mock, NextRequest mock
+   - **SaaS Test Patterns**: Credit operations, Stripe webhooks, admin API, email fallback
+   - **File Upload Tests**: Type/size validation, `storage_key`
+   - **Test Conventions**: `.test.ts` for unit/integration, `.spec.ts` for E2E
+   - **Coverage**: 34 files, 319 tests, 80% minimum
 
 ### Key Conventions
 
@@ -686,177 +510,108 @@ Prompt template enforces:
 ### 4. WhatsApp Integration
 
 - **Meta Business API**: Official WhatsApp Business integration
-- **Webhook Handler**: Receives incoming messages
+- **Webhook Handler**: Receives incoming messages (text, interactive, media)
 - **Message Validation**: HMAC SHA256 signature verification
-- **Status Updates**: Delivery receipts and read confirmations
+- **Idempotency**: `whatsapp_message_id` deduplication for webhook retries
+
+### 5. SaaS Billing (Stripe)
+
+- **Checkout Flow**: Stripe Checkout Sessions for subscription signup
+- **Customer Portal**: Self-service billing management
+- **Webhook Handling**: `checkout.session.completed`, `customer.subscription.updated/deleted`
+- **Credit System**: Atomic deduction, monthly reset, one-time credit packs
+
+### 6. Admin Dashboard
+
+- **Daily Stats**: Revenue, active users, leads, page views (pg_cron)
+- **User Management**: List, search, filter consultants with subscription info
+- **Role Guard**: `is_admin` flag on consultants table
+
+### 7. Email System
+
+- **Provider**: Resend (production) / console.log (development)
+- **Templates**: Welcome, password reset, subscription confirmed/canceled, credit warning
 
 ---
 
 ## Implementation Roadmap
 
-### Phase 1: MVP Foundation (Days 1-30) ✅
+### Phase 1: MVP Foundation ✅ (Complete)
 
-**Status**: **COMPLETO** - 2025-12-20
+- [x] Next.js + TypeScript + Supabase + Docker setup
+- [x] Authentication, database schema, RLS policies
+- [x] Lead CRUD, conversation flow engine, WhatsApp webhook
+- [x] AI response generation (Gemini), analytics dashboard
+- [x] Default health plan qualification flow, score system
 
-- [x] Project setup (Next.js, TypeScript, Tailwind)
-- [x] Docker environment
-- [x] Supabase integration
-- [x] Landing page
-- [x] Health check endpoint
-- [x] **User authentication** (Supabase Auth)
-- [x] **Database schema** implementation (migrations + RLS)
-- [x] **Dashboard** interface (analytics, leads, settings)
-- [x] **Lead management CRUD** (create, read, update, delete, stats)
-- [x] **Conversation flow engine** (parser, state manager, executors)
-- [x] **WhatsApp webhook** integration (HMAC validation, interactive messages)
-- [x] **AI response generation** (Gemini 1.5 Flash, compliance ANS)
-- [x] **Analytics dashboard** (6 metrics, 2 charts, 2 tables)
-- [x] **Default health flow** (7-step qualification flow)
-- [x] **Auto-create leads** from WhatsApp
-- [x] **Score calculation** system
+### Phase 2: Polish ✅ (Complete)
 
-**Deliverables**:
+- [x] Lead export (CSV), follow-up automation, message templates
+- [x] Advanced filters, performance optimization (skeletons, React Query)
+- [x] Monitoring infrastructure (Sentry, logging)
 
-- ✅ 19 páginas renderizadas
-- ✅ 13 API endpoints
-- ✅ 20+ componentes React
-- ✅ 0 erros TypeScript
-- ✅ Build time: ~45s
+### Phase 3: CRM & Integrations ✅ (Complete)
 
-**Goal**: ✅ Sistema 100% funcional e pronto para testes com consultores beta
+- [x] CRM integrations (RD Station, Pipedrive)
+- [x] Sync history, bundle analyzer, error boundaries
 
-### Phase 2: Polimento (Days 31-60)
+### Phase 4: SaaS Platform ✅ (Complete)
 
-**Status**: Planejado
+- [x] Stripe billing (checkout, subscriptions, webhooks)
+- [x] Credit system (atomic ops, monthly reset via pg_cron)
+- [x] Admin dashboard (stats, user management)
+- [x] File upload (Supabase Storage, presigned URLs)
+- [x] Email system (Resend + dev console fallback)
+- [x] Landing page, LGPD cookie consent, OAuth
 
-- [ ] **Exportação de Leads** (CSV/Excel com filtros)
-- [ ] **Follow-up Automático** (message templates após 24h)
-- [ ] **Templates de Mensagens** (biblioteca reutilizável)
-- [ ] **Filtros Avançados** (busca, data range, score)
-- [ ] **Testes E2E** completos (Playwright)
-- [ ] **Monitoramento** (Sentry, logs estruturados)
-
-**Goal**: 20 consultores ativos, 500+ leads processados, 90% satisfação
-
-### Phase 3: Scale (Days 61-90)
+### Phase 5: Expansion (Future)
 
 - [ ] Second vertical (real estate)
-- [ ] Calendar integration
-- [ ] CRM integration (RD Station, Pipedrive)
-- [ ] Performance optimizations
-- [ ] Real-time dashboard updates
-- [ ] Advanced security features
-
-**Goal**: 100 active consultants, 5,000+ leads, 99.5% uptime
-
-### Phase 4: Iterate (Days 90+)
-
+- [ ] HubSpot & Agendor CRM providers
 - [ ] Voice cloning (ElevenLabs)
-- [ ] Template marketplace
-- [ ] White-label options
 - [ ] Mobile app
-- [ ] Additional integrations
+- [ ] White-label options
 
 ---
 
 ## Database Schema
 
-### Core Tables
+### Core Tables (Spec 001)
 
 ```sql
--- Consultants (sales professionals using the platform)
-consultants (
-  id uuid primary key,
-  email text unique,
-  name text,
-  whatsapp_number text,
-  vertical text,  -- 'saude' | 'imoveis'
-  slug text unique,
-  meta_access_token text (encrypted),
-  whatsapp_business_account_id text,
-  created_at timestamptz,
-  updated_at timestamptz
-)
-
--- Leads (potential customers)
-leads (
-  id uuid primary key,
-  consultant_id uuid references consultants,
-  whatsapp_number text,
-  name text,
-  status text,  -- 'novo' | 'em_contato' | 'qualificado' | 'fechado' | 'perdido'
-  score integer,
-  metadata jsonb,
-  created_at timestamptz,
-  updated_at timestamptz
-)
-
--- Conversations (active chat sessions)
-conversations (
-  id uuid primary key,
-  lead_id uuid references leads,
-  flow_id uuid references flows,
-  state jsonb,  -- Current state of conversation
-  status text,  -- 'active' | 'completed' | 'abandoned'
-  created_at timestamptz,
-  updated_at timestamptz
-)
-
--- Messages (individual messages)
-messages (
-  id uuid primary key,
-  conversation_id uuid references conversations,
-  direction text,  -- 'inbound' | 'outbound'
-  content text,
-  whatsapp_message_id text,
-  status text,  -- 'sent' | 'delivered' | 'read' | 'failed'
-  created_at timestamptz
-)
-
--- Flows (conversation flow definitions)
-flows (
-  id uuid primary key,
-  consultant_id uuid references consultants,
-  name text,
-  vertical text,
-  definition jsonb,  -- JSON flow structure
-  is_active boolean,
-  created_at timestamptz
-)
-
--- CRM Integrations (external CRM connections)
-crm_integrations (
-  id uuid primary key,
-  consultant_id uuid references consultants,
-  provider text,  -- 'rd-station' | 'pipedrive' | 'hubspot' | 'agendor'
-  name text,
-  status text,  -- 'active' | 'inactive' | 'error' | 'pending_auth'
-  api_key text (encrypted),
-  field_mappings jsonb,
-  auto_sync_enabled boolean,
-  sync_on_qualification boolean,
-  sync_stats jsonb,
-  created_at timestamptz,
-  updated_at timestamptz
-)
-
--- CRM Sync Logs (synchronization history)
-crm_sync_logs (
-  id uuid primary key,
-  integration_id uuid references crm_integrations,
-  lead_id uuid references leads,
-  status text,  -- 'pending' | 'in_progress' | 'success' | 'failed' | 'partial'
-  operation text,  -- 'create' | 'update'
-  crm_record_id text,
-  crm_record_url text,
-  error_message text,
-  duration_ms integer,
-  started_at timestamptz,
-  completed_at timestamptz
-)
+consultants      -- Sales professionals (+ billing fields from spec 002)
+leads            -- Potential customers (status, score, metadata)
+conversations    -- Active chat sessions (state JSONB)
+messages         -- Individual messages (direction, whatsapp_message_id)
+flows            -- Conversation flow definitions (JSON structure)
+crm_integrations -- External CRM connections (RD Station, Pipedrive)
+crm_sync_logs    -- Synchronization history
 ```
 
-See `docs/architecture/Database-Design-Document.md` for complete schema with indexes and RLS policies.
+### SaaS Tables (Spec 002)
+
+```sql
+-- Billing fields added to consultants:
+-- stripe_customer_id, subscription_status, subscription_plan,
+-- credits, purchased_credits, monthly_credits_allocation,
+-- credits_reset_at, date_paid, is_admin
+
+daily_stats          -- Platform metrics (revenue, users, views, deltas)
+page_view_sources    -- Traffic source breakdown
+files                -- User-uploaded documents (storage_key, consultant_id)
+logs                 -- System event logs (level, source, message)
+contact_form_messages -- Contact form submissions
+```
+
+### Database Functions (RPC)
+
+```sql
+decrement_credits(user_id, amount)  -- Atomic credit deduction
+reset_monthly_credits()             -- Monthly credit reset (pg_cron)
+calculate_daily_stats()             -- Hourly stats aggregation (pg_cron)
+```
+
+See `docs/architecture/Database-Design-Document.md` and `specs/002-saas-billing-admin/data-model.md` for complete schema.
 
 ---
 
@@ -864,21 +619,24 @@ See `docs/architecture/Database-Design-Document.md` for complete schema with ind
 
 ### Security Measures
 
-- **Authentication**: Supabase Auth with JWT
-- **Authorization**: Row-Level Security (RLS) policies
+- **Authentication**: Supabase Auth with JWT + OAuth (Google/GitHub)
+- **Authorization**: Row-Level Security (RLS) + Admin guard (`is_admin`)
 - **Input Validation**: Zod schemas for all inputs
 - **SQL Injection Prevention**: Parameterized queries (Supabase)
 - **XSS Prevention**: React auto-escaping
 - **Secrets Management**: Environment variables (never committed)
+- **Encryption**: AES-256-GCM for sensitive tokens
 - **HTTPS**: Required for all connections
 - **Rate Limiting**: Redis-based (Upstash)
-- **Webhook Validation**: HMAC SHA256 signatures
+- **Webhook Validation**: HMAC SHA256 (Meta) + Stripe signature verification
+- **File Upload Security**: Type validation, 10MB limit, reject executables
 
 ### Compliance
 
-- **LGPD** (Brazilian GDPR): Audit logs, data retention policies
+- **LGPD** (Brazilian GDPR): Cookie consent banner, audit logs, data retention
 - **ANS Regulations**: No pricing promises, no illegal claims
 - **WhatsApp Business Policy**: 24-hour message window, opt-in required
+- **PCI Compliance**: Stripe handles all payment data (no card info stored)
 
 ---
 
@@ -918,19 +676,20 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 
 ## Business Model
 
-### Pricing Tiers
+### Pricing Tiers (Implemented via Stripe)
 
-| Tier         | Price     | Features                                     |
-| ------------ | --------- | -------------------------------------------- |
-| **Freemium** | R$0/mês   | 20 leads/month, basic flow, text-only        |
-| **Pro**      | R$47/mês  | 200 leads/month, images, auto follow-up, CSV |
-| **Agência**  | R$147/mês | 1000 leads, custom flows, dashboard, CRM     |
+| Tier         | Price     | Credits/month | Features                           |
+| ------------ | --------- | ------------- | ---------------------------------- |
+| **Freemium** | R$0/mês   | 20            | Basic flow, text-only              |
+| **Pro**      | R$47/mês  | 200           | Images, auto follow-up, CSV export |
+| **Agência**  | R$147/mês | 1000          | Custom flows, CRM, full dashboard  |
 
-### Upsell Opportunities
+### Credit System
 
-- Voice cloning: +R$15/month
-- Interactive quizzes: +R$20/month
-- Real-time plan pricing: +R$50/month
+- 1 credit = 1 lead creation (atomic deduction via `decrement_credits` RPC)
+- Monthly reset via pg_cron on 1st of month
+- One-time credit packs available (non-expiring, stored in `purchased_credits`)
+- When credits = 0: block new leads, show upgrade prompt
 
 ---
 
@@ -938,12 +697,14 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 
 1. **Consultant's Identity First**: Bot is an "assistant", not a replacement
 2. **Compliance by Design**: AI prompts prevent illegal promises/data collection
-3. **Local Development**: All components testable locally
-4. **Free Tier Optimization**: MVP runs on free tiers (Vercel, Supabase, Groq)
-5. **Modular Flows**: JSON-based for easy customization
+3. **Local Development**: All components testable locally (console fallback for email)
+4. **Strategy Pattern**: Swappable providers for payments (Stripe) and email (Resend)
+5. **ServiceResult Convention**: All services return `{ success, data/error }` discriminated union
 6. **Server-First**: Default to Server Components for performance
 7. **Type Safety**: Strict TypeScript for all code
-8. **Test-Driven**: 80% coverage minimum
+8. **Test-Driven**: 80% coverage minimum (currently 319 tests passing)
+9. **Atomic Operations**: Credit deductions via database RPC to prevent race conditions
+10. **LGPD by Default**: Cookie consent, data isolation, audit trails
 
 ---
 
@@ -979,20 +740,23 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [shadcn/ui Components](https://ui.shadcn.com/)
 - [Meta WhatsApp API](https://developers.facebook.com/docs/whatsapp)
+- [Stripe Docs](https://docs.stripe.com/)
+- [Resend Docs](https://resend.com/docs)
 
 ### Internal Docs
 
-- **Complete Specs**: `/docs/` directory
-- **Development Rules**: `/.rules/` directory
+- **Feature Specs**: `/specs/` directory (001 + 002)
+- **Development Rules**: `/.rules/` directory (v2.0)
+- **Guides**: `/docs/guides/` (deployment, monitoring, troubleshooting)
 - **API Reference**: `/docs/api/API-Specification.md`
-- **Implementation Plan**: `/docs/technical/Implementation-Plan.md`
 
 ### Tools & Services
 
-- **AI**: [Google AI Studio](https://ai.google.dev/) | [Groq Console](https://console.groq.com/)
-- **WhatsApp**: [Weni Cloud](https://weni.ai/cloud) | [360dialog](https://www.360dialog.com/)
-- **Image Generation**: [Canva API](https://www.canva.com/developers)
-- **Monitoring**: [Sentry](https://sentry.io/) | [Better Stack](https://betterstack.com/)
+- **AI**: [Google AI Studio](https://ai.google.dev/)
+- **Payments**: [Stripe Dashboard](https://dashboard.stripe.com/)
+- **Email**: [Resend Dashboard](https://resend.com/)
+- **WhatsApp**: [Meta Business](https://business.facebook.com/)
+- **Monitoring**: [Sentry](https://sentry.io/)
 
 ---
 
@@ -1040,16 +804,17 @@ See `.rules/testing-standards.md` for detailed testing patterns and best practic
 
 ## Maintainers
 
-**Last Updated**: 2026-02-09
-**Project Version**: 0.3.0 (Fases 1-3 - **COMPLETO**)
+**Last Updated**: 2026-02-11
+**Project Version**: 0.4.0 (MVP + SaaS Platform - **COMPLETO**)
 **Next.js Version**: 14.2.35
 **Node Version**: 20 LTS
-**Status**: ✅ **Production Ready - Pronto para Deploy**
+**Rules Version**: 2.0 (`.rules/` updated 2026-02-11)
+**Status**: ✅ **Production Ready - SaaS Platform Completa**
 
 ### Próximos Passos
 
 - Guia atualizado: [ROADMAP.md](./docs/guides/ROADMAP.md)
-- Fase 4 (Expansão): Vertical Imóveis, HubSpot/Agendor, Voice Cloning
+- Fase 5 (Expansão): Vertical Imóveis, HubSpot/Agendor, Voice Cloning, Mobile App
 
 ---
 

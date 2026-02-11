@@ -20,14 +20,14 @@
 ```
            /\
           /  \
-         / E2E \ ←── 10% (Critical user flows)
+         / E2E\ ←── 10% (Critical user flows)
         /--------\
        /          \
       / Integration\ ←── 30% (API routes, services)
      /--------------\
     /                \
-   /      Unit       \ ←── 60% (Functions, utilities)
-  /------------------\
+   /      Unit        \ ←── 60% (Functions, utilities)
+  /--------------------\
 ```
 
 ### Coverage Requirements
