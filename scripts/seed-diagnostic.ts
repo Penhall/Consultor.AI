@@ -242,6 +242,28 @@ function randomDate(daysAgo: number): Date {
 }
 
 // ============================================================================
+// Retry Helper (for transient Docker/GoTrue errors like ECONNRESET)
+// ============================================================================
+
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  label: string,
+  maxAttempts = 3,
+  delayMs = 2000
+): Promise<T> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (attempt === maxAttempts) throw err;
+      console.warn(`  ⟳ ${label}: retry ${attempt}/${maxAttempts - 1} in ${delayMs / 1000}s...`);
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+  }
+  throw new Error('unreachable');
+}
+
+// ============================================================================
 // Safety Guard
 // ============================================================================
 
@@ -313,19 +335,23 @@ async function seedAuthUsers(supabase: SupabaseClient): Promise<Map<string, stri
   const emailToUserId = new Map<string, string>();
 
   for (const config of CONSULTANT_CONFIGS) {
-    const deterministicId = generateDeterministicId(config.email);
-
     try {
-      const { data, error } = await supabase.auth.admin.createUser({
-        email: config.email,
-        password: config.password,
-        email_confirm: true,
-        user_metadata: { name: config.name },
-      });
+      const { data, error } = await withRetry(
+        () => supabase.auth.admin.createUser({
+          email: config.email,
+          password: config.password,
+          email_confirm: true,
+          user_metadata: { name: config.name },
+        }),
+        config.email
+      );
 
       if (error) {
         // User may already exist — try to find them regardless of error type
-        const { data: existingUsers } = await supabase.auth.admin.listUsers();
+        const { data: existingUsers } = await withRetry(
+          () => supabase.auth.admin.listUsers(),
+          `listUsers for ${config.email}`
+        );
         const existing = existingUsers?.users?.find((u) => u.email === config.email);
         if (existing) {
           emailToUserId.set(config.email, existing.id);
@@ -341,7 +367,19 @@ async function seedAuthUsers(supabase: SupabaseClient): Promise<Map<string, stri
         console.log(`  ✓ ${config.email}${config.isAdmin ? ' (admin)' : ''}`);
       }
     } catch (err) {
-      console.error(`  ✗ ${config.email}: ${err}`);
+      // Network error even after retries — still try to find existing user
+      try {
+        const { data: existingUsers } = await supabase.auth.admin.listUsers();
+        const existing = existingUsers?.users?.find((u) => u.email === config.email);
+        if (existing) {
+          emailToUserId.set(config.email, existing.id);
+          console.log(`  ✓ ${config.email} (recovered)${config.isAdmin ? ' (admin)' : ''}`);
+          continue;
+        }
+      } catch {
+        // listUsers also failed
+      }
+      console.error(`  ✗ ${config.email}: ${err instanceof Error ? err.message : err}`);
     }
   }
 
