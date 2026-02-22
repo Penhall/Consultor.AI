@@ -68,7 +68,24 @@
       "Bash(npx playwright test:*)",
       "Bash(dir /b \"E:\\\\PROJETOS\\\\Consultor.AI\\\\configs\\\\docker\"\" 2>nul || echo \"Directory not found or empty \")",
       "Bash(docker stop:*)",
-      "Bash(docker rm:*)"
+      "Bash(docker rm:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsx:*)",
+      "Bash(ping:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(gh repo view:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:makerkit.dev)",
+      "Bash(git clone:*)",
+      "Bash(test:*)",
+      "WebSearch",
+      "Bash(powershell:*)",
+      "Bash(npx node -e \"const s = require\\(''stripe''\\); console.log\\(s.Stripe.LATEST_API_VERSION || ''check package''\\)\")",
+      "Bash(npx vitest:*)",
+      "Bash(git merge:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(git check-ignore:*)"
     ]
   }
 }
