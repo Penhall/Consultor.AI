@@ -38,7 +38,7 @@
     "db:types": "npx supabase gen types typescript --local > src/types/database.ts",
     "db:setup": "npm run db:start && npm run db:migrate && npm run db:types",
     "flow:validate": "npx tsx scripts/validate-flow.ts",
-    "seed:diagnostic": "tsx scripts/seed-diagnostic.ts",
+    "seed:diagnostic": "npx tsx scripts/seed-diagnostic.ts",
     "supabase:login": "npx supabase login",
     "supabase:link": "npx supabase link",
     "docker:up": "docker-compose -f docker-compose.dev.yml up -d",

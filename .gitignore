@@ -104,5 +104,11 @@ docs/guides/WHATSAPP-SETUP-2025.md
 docs/guides/meta-app-setup.md
 docs/guides/WHATSAPP-EMBEDDED-SIGNUP.md
 
-# Docker volumes (persistent data)
-docker/volumes/
+# Docker volumes (persistent data, but keep init scripts)
+docker/volumes/*
+!docker/volumes/db/
+docker/volumes/db/*
+!docker/volumes/db/00-init-supabase-roles.sql
+!docker/volumes/kong/
+docker/volumes/kong/*
+!docker/volumes/kong/kong.yml

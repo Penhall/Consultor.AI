@@ -10,12 +10,12 @@ INSERT INTO flows (
   vertical,
   definition,
   is_active,
-  is_public,
+  is_default,
   created_at,
   updated_at
 ) VALUES (
   gen_random_uuid(),
-  NULL, -- NULL means it's a public template
+  NULL, -- NULL consultant_id means it's a shared/default template
   'Qualificação de Planos de Saúde',
   'Fluxo padrão para qualificação de leads interessados em planos de saúde. Coleta perfil, faixa etária e preferência de coparticipação.',
   'saude',
@@ -131,7 +131,7 @@ INSERT INTO flows (
     ]
   }'::jsonb,
   true, -- is_active
-  true, -- is_public
+  true, -- is_default
   now(),
   now()
 ) ON CONFLICT DO NOTHING;

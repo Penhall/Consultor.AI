@@ -84,7 +84,10 @@ const nextConfig = {
     ];
   },
 
-  // Webpack configuration
+  // Turbopack configuration (Next.js 16 default bundler)
+  turbopack: {},
+
+  // Webpack configuration (fallback for bundle analyzer)
   webpack: (config, { isServer }) => {
     // Fixes for modules
     if (!isServer) {
@@ -100,7 +103,6 @@ const nextConfig = {
   },
 
   // Performance optimizations
-  swcMinify: true,
   compress: true,
 
   // Output
