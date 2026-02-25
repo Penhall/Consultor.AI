@@ -130,7 +130,7 @@ export async function listFlows(
     let query = (supabase as any)
       .from('flows')
       .select('*')
-      .eq('consultant_id', consultantId)
+      .or(`consultant_id.eq.${consultantId},consultant_id.is.null`)
       .order('updated_at', { ascending: false });
 
     if (options?.vertical) {
