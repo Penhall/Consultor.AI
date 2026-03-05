@@ -16,7 +16,7 @@ export function useAdminStats(days: number = 7) {
   return useQuery({
     queryKey: ['admin-stats', days],
     queryFn: async (): Promise<AdminStatsResponse> => {
-      const response = await fetch(`/api/admin/stats?days=${days}`);
+      const response = await fetch(`/api/admin/stats?days=${days}`, { credentials: 'include' });
       const data: ApiResponse<AdminStatsResponse> = await response.json();
 
       if (!data.success) {
@@ -62,7 +62,7 @@ export function useAdminUsers() {
       if (debouncedEmail) params.set('email', debouncedEmail);
       if (statusFilter) params.set('status', statusFilter);
 
-      const response = await fetch(`/api/admin/users?${params}`);
+      const response = await fetch(`/api/admin/users?${params}`, { credentials: 'include' });
       const data: ApiResponse<AdminUsersResponse> = await response.json();
 
       if (!data.success) {
@@ -76,6 +76,7 @@ export function useAdminUsers() {
   const toggleAdmin = useMutation({
     mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => {
       const response = await fetch('/api/admin/users', {
+        credentials: 'include',
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, isAdmin }),

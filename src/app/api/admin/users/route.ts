@@ -14,13 +14,9 @@ import type { Database } from '@/types/database';
 
 type Consultant = Database['public']['Tables']['consultants']['Row'];
 
-async function getAdminConsultant(session: { user: { id: string } }) {
+async function getAdminConsultant(userId: string) {
   const supabase = await createClient();
-  const consultantQuery = supabase
-    .from('consultants')
-    .select()
-    .eq('user_id', session.user.id)
-    .single();
+  const consultantQuery = supabase.from('consultants').select().eq('user_id', userId).single();
   const { data: rawData } = await consultantQuery;
   return rawData as Consultant | null;
 }
@@ -29,17 +25,17 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Não autenticado' },
         { status: 401 }
       );
     }
 
-    const admin = await getAdminConsultant(session);
+    const admin = await getAdminConsultant(user.id);
     if (!admin?.is_admin) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Acesso negado' },
@@ -122,17 +118,17 @@ export async function PATCH(request: NextRequest) {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Não autenticado' },
         { status: 401 }
       );
     }
 
-    const admin = await getAdminConsultant(session);
+    const admin = await getAdminConsultant(user.id);
     if (!admin?.is_admin) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Acesso negado' },

@@ -13,12 +13,12 @@ import type { Database } from '@/types/database';
 
 type Consultant = Database['public']['Tables']['consultants']['Row'];
 
-async function getConsultant(session: { user: { id: string } }) {
+async function getConsultant(userId: string) {
   const supabase = await createClient();
   const { data: rawData } = await supabase
     .from('consultants')
     .select()
-    .eq('user_id', session.user.id)
+    .eq('user_id', userId)
     .single();
   return rawData as Consultant | null;
 }
@@ -27,17 +27,17 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Não autenticado' },
         { status: 401 }
       );
     }
 
-    const consultant = await getConsultant(session);
+    const consultant = await getConsultant(user.id);
     if (!consultant) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Consultor não encontrado' },
@@ -71,17 +71,17 @@ export async function DELETE(_request: NextRequest, { params }: { params: { id: 
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Não autenticado' },
         { status: 401 }
       );
     }
 
-    const consultant = await getConsultant(session);
+    const consultant = await getConsultant(user.id);
     if (!consultant) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Consultor não encontrado' },

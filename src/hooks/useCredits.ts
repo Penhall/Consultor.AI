@@ -19,7 +19,7 @@ export function useCreditsBalance() {
   return useQuery({
     queryKey: CREDITS_QUERY_KEY,
     queryFn: async (): Promise<CreditBalance> => {
-      const response = await fetch('/api/billing/credits');
+      const response = await fetch('/api/billing/credits', { credentials: 'include' });
       const data: ApiResponse<CreditBalance> = await response.json();
 
       if (!data.success) {

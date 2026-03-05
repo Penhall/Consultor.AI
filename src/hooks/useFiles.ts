@@ -12,7 +12,7 @@ export function useFileList() {
   return useQuery({
     queryKey: ['files'],
     queryFn: async (): Promise<FileRecord[]> => {
-      const response = await fetch('/api/files');
+      const response = await fetch('/api/files', { credentials: 'include' });
       const data: ApiResponse<FileRecord[]> = await response.json();
 
       if (!data.success) {
@@ -31,6 +31,7 @@ export function useUploadFile() {
     mutationFn: async (file: File) => {
       // Step 1: Get presigned URL
       const response = await fetch('/api/files', {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -71,6 +72,7 @@ export function useDeleteFile() {
   return useMutation({
     mutationFn: async (fileId: string) => {
       const response = await fetch(`/api/files/${fileId}`, {
+        credentials: 'include',
         method: 'DELETE',
       });
 

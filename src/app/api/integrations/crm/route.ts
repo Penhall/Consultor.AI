@@ -36,10 +36,10 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Nao autenticado' },
         { status: 401 }
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     const { data: consultant, error: consultantError } = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     const consultantId = (consultant as { id: string } | null)?.id;
@@ -128,10 +128,10 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Nao autenticado' },
         { status: 401 }
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
     const { data: consultant, error: consultantError } = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     const consultantIdPost = (consultant as { id: string } | null)?.id;

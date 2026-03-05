@@ -16,6 +16,7 @@ export function useCheckout() {
   return useMutation({
     mutationFn: async (planId: PaymentPlanId) => {
       const response = await fetch('/api/billing/checkout', {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ planId }),
@@ -43,7 +44,7 @@ export function useCheckout() {
 export function usePortal() {
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/billing/portal');
+      const response = await fetch('/api/billing/portal', { credentials: 'include' });
       const data: ApiResponse<PortalResponse> = await response.json();
 
       if (!data.success) {

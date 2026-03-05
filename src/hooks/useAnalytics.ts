@@ -87,7 +87,7 @@ export function useOverviewMetrics() {
   return useQuery<OverviewMetrics>({
     queryKey: ['analytics', 'overview'],
     queryFn: async () => {
-      const response = await fetch('/api/analytics/overview');
+      const response = await fetch('/api/analytics/overview', { credentials: 'include' });
       if (!response.ok) {
         throw new Error('Failed to fetch overview metrics');
       }
@@ -108,7 +108,9 @@ export function useChartData(days: number = 30) {
   return useQuery<ChartData>({
     queryKey: ['analytics', 'charts', days],
     queryFn: async () => {
-      const response = await fetch(`/api/analytics/charts?days=${days}`);
+      const response = await fetch(`/api/analytics/charts?days=${days}`, {
+        credentials: 'include',
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch chart data');
       }
@@ -129,7 +131,7 @@ export function useActivityData() {
   return useQuery<ActivityData>({
     queryKey: ['analytics', 'activity'],
     queryFn: async () => {
-      const response = await fetch('/api/analytics/activity');
+      const response = await fetch('/api/analytics/activity', { credentials: 'include' });
       if (!response.ok) {
         throw new Error('Failed to fetch activity data');
       }

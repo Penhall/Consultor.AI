@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
     // Get authenticated user
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         {
           success: false,
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     const { data: consultant, error: consultantError } = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (consultantError || !consultant) {
@@ -118,10 +118,10 @@ export async function POST(request: NextRequest) {
     // Get authenticated user
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         {
           success: false,
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
     const { data: consultant, error: consultantError } = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (consultantError || !consultant) {

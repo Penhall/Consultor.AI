@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
@@ -7,6 +7,11 @@ import type { Database } from '@/types/database';
 
 type Consultant = Database['public']['Tables']['consultants']['Row'];
 
+// Safety timeout: if Supabase is unreachable, don't hang forever.
+// 20000 was too aggressive for Docker on Windows (WSL2 networking adds ~20s latency
+// for browser-to-PostgREST calls via localhost:54321). 45s gives fetchConsultant
+// time to complete in Docker while still protecting against truly unreachable Supabase.
+const AUTH_INIT_TIMEOUT_MS = 45000;
 interface AuthState {
   user: User | null;
   consultant: Consultant | null;
@@ -87,7 +92,7 @@ export function useAuth(): UseAuthReturn {
     setState(prev => ({ ...prev, consultant }));
   };
 
-  // Sign out — clear local React state instantly, then do a full-page navigation to the
+  // Sign out â€” clear local React state instantly, then do a full-page navigation to the
   // server-side signout route which clears the auth cookie via Set-Cookie headers.
   // Must use window.location (not router.push) so the browser applies the cookie headers.
   const signOut = () => {
@@ -100,16 +105,17 @@ export function useAuth(): UseAuthReturn {
 
     // Get initial session
     const initializeAuth = async () => {
-      // Safety timeout: if Supabase is unreachable, don't hang forever
+      // Safety timeout: if Supabase is unreachable, don't hang forever.
+      // 7s was too aggressive for Docker cold starts and could trigger false redirects.
       const timeout = setTimeout(() => {
-        console.warn('Auth initialization timed out — Supabase may be unreachable');
+        console.warn('Auth initialization timed out - Supabase may be unreachable');
         setState({
           user: null,
           consultant: null,
           isLoading: false,
           isAuthenticated: false,
         });
-      }, 7000);
+      }, AUTH_INIT_TIMEOUT_MS);
 
       try {
         const {

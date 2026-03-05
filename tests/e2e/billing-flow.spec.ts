@@ -16,24 +16,35 @@ test.describe('Pricing Page', () => {
   test('should display all 3 plan cards with correct pricing', async ({ page }) => {
     await page.goto('/pricing');
 
-    // Page title
-    await expect(page.locator('h1')).toContainText('Planos e Preços');
+    // Wait for the server-rendered HTML and client hydration (CheckoutButton
+    // is a 'use client' component that uses useAuth — hydration can be slow
+    // on first load in Docker/dev mode).
+    await page.waitForLoadState('domcontentloaded');
 
-    // Freemium plan
-    await expect(page.getByText('Grátis')).toBeVisible();
-    await expect(page.getByText('Começar grátis')).toBeVisible();
+    // Page title (server-rendered — available immediately)
+    await expect(page.locator('h1')).toContainText('Planos e Preços', { timeout: 15000 });
 
-    // Pro plan
-    await expect(page.getByText('R$47')).toBeVisible();
-    await expect(page.getByText('Assinar Pro')).toBeVisible();
+    // Freemium plan (server-rendered via PricingCard)
+    // exact:true avoids strict-mode violation: "Grátis" is inside a <span> AND
+    // "Começar grátis" also contains the substring, so without exact we get 2 matches.
+    await expect(page.getByText('Grátis', { exact: true })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('link', { name: 'Começar grátis' })).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Pro plan — CheckoutButton is a client component; wait for hydration
+    await expect(page.getByText('R$47')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('button', { name: 'Assinar Pro' })).toBeVisible({ timeout: 15000 });
 
     // Agência plan
-    await expect(page.getByText('R$147')).toBeVisible();
-    await expect(page.getByText('Assinar Agência')).toBeVisible();
+    await expect(page.getByText('R$147')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('button', { name: 'Assinar Agência' })).toBeVisible({
+      timeout: 15000,
+    });
 
-    // Credits section
-    await expect(page.getByText('Precisa de mais créditos?')).toBeVisible();
-    await expect(page.getByText('R$19,90')).toBeVisible();
+    // Credits section (server-rendered)
+    await expect(page.getByText('Precisa de mais créditos?')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('R$19,90')).toBeVisible({ timeout: 10000 });
   });
 
   test('should mark Pro plan as recommended', async ({ page }) => {

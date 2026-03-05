@@ -4,17 +4,17 @@
  * GET /api/leads/stats - Get lead statistics for the authenticated consultant
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { getLeadStats } from '@/lib/services/lead-service'
-import type { ApiResponse } from '@/types/api'
+import { type NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { getLeadStats } from '@/lib/services/lead-service';
+import type { ApiResponse } from '@/types/api';
 
 type LeadStats = {
-  total: number
-  byStatus: Record<string, number>
-  thisMonth: number
-  averageScore: number | null
-}
+  total: number;
+  byStatus: Record<string, number>;
+  thisMonth: number;
+  averageScore: number | null;
+};
 
 /**
  * GET /api/leads/stats
@@ -24,27 +24,27 @@ type LeadStats = {
 export async function GET(_request: NextRequest) {
   try {
     // Get authenticated user
-    const supabase = await createClient()
+    const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         {
           success: false,
           error: 'Não autenticado',
         },
         { status: 401 }
-      )
+      );
     }
 
     // Get consultant profile
     const consultantResult = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
-      .single()
+      .eq('user_id', user.id)
+      .single();
 
     if (consultantResult.error || !consultantResult.data) {
       return NextResponse.json<ApiResponse<never>>(
@@ -53,11 +53,11 @@ export async function GET(_request: NextRequest) {
           error: 'Perfil de consultor não encontrado',
         },
         { status: 404 }
-      )
+      );
     }
 
     // Get stats
-    const result = await getLeadStats((consultantResult as any).data.id as string)
+    const result = await getLeadStats((consultantResult as any).data.id as string);
 
     if (!result.success) {
       return NextResponse.json<ApiResponse<never>>(
@@ -66,7 +66,7 @@ export async function GET(_request: NextRequest) {
           error: result.error,
         },
         { status: 500 }
-      )
+      );
     }
 
     return NextResponse.json<ApiResponse<LeadStats>>(
@@ -75,15 +75,15 @@ export async function GET(_request: NextRequest) {
         data: result.data,
       },
       { status: 200 }
-    )
+    );
   } catch (error) {
-    console.error('Error in GET /api/leads/stats:', error)
+    console.error('Error in GET /api/leads/stats:', error);
     return NextResponse.json<ApiResponse<never>>(
       {
         success: false,
         error: 'Erro interno do servidor',
       },
       { status: 500 }
-    )
+    );
   }
 }

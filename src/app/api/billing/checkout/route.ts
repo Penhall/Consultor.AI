@@ -15,10 +15,10 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Não autenticado' },
         { status: 401 }
@@ -44,13 +44,7 @@ export async function POST(request: NextRequest) {
     const successUrl = `${origin}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${origin}/checkout?status=cancel`;
 
-    const result = await createCheckout(
-      session.user.id,
-      session.user.email!,
-      planId,
-      successUrl,
-      cancelUrl
-    );
+    const result = await createCheckout(user.id, user.email!, planId, successUrl, cancelUrl);
 
     if (!result.success) {
       return NextResponse.json<ApiResponse<never>>(

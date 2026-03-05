@@ -11,6 +11,7 @@
 /playwright-report
 /.nyc_output
 *.lcov
+/playwright/.auth/
 
 # Next.js
 /.next/

@@ -29,10 +29,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Nao autenticado' },
         { status: 401 }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data: consultant } = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     const consultantId = (consultant as { id: string } | null)?.id;

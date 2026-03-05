@@ -3,20 +3,25 @@
  * Creates a singleton instance for client-side usage
  */
 
-import { createBrowserClient } from '@supabase/ssr'
-import type { Database } from '@/types/database'
+import { createBrowserClient } from '@supabase/ssr';
+import type { Database } from '@/types/database';
 
-let client: ReturnType<typeof createBrowserClient<Database>> | null = null
+let client: ReturnType<typeof createBrowserClient<Database>> | null = null;
 
 export function createClient() {
   if (client) {
-    return client
+    return client;
   }
 
   client = createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookieOptions: {
+        name: 'sb-consultorai-auth-token',
+      },
+    }
+  );
 
-  return client
+  return client;
 }

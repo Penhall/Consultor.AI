@@ -14,17 +14,17 @@ export async function GET() {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Não autenticado' },
         { status: 401 }
       );
     }
 
-    const result = await getCreditBalance(session.user.id);
+    const result = await getCreditBalance(user.id);
 
     if (!result.success) {
       return NextResponse.json<ApiResponse<never>>(

@@ -4,16 +4,16 @@
  * POST /api/conversations/start - Start a new conversation flow
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { startConversation } from '@/lib/flow-engine'
-import type { ApiResponse } from '@/types/api'
-import { z } from 'zod'
+import { type NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { startConversation } from '@/lib/flow-engine';
+import type { ApiResponse } from '@/types/api';
+import { z } from 'zod';
 
 const startConversationSchema = z.object({
   leadId: z.string().uuid('Invalid lead ID'),
   flowId: z.string().uuid('Invalid flow ID'),
-})
+});
 
 /**
  * POST /api/conversations/start
@@ -23,27 +23,27 @@ const startConversationSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Get authenticated user
-    const supabase = await createClient()
+    const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         {
           success: false,
           error: 'Não autenticado',
         },
         { status: 401 }
-      )
+      );
     }
 
     // Get consultant profile
     const consultantResult = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
-      .single()
+      .eq('user_id', user.id)
+      .single();
 
     if (consultantResult.error || !consultantResult.data) {
       return NextResponse.json<ApiResponse<never>>(
@@ -52,16 +52,16 @@ export async function POST(request: NextRequest) {
           error: 'Perfil de consultor não encontrado',
         },
         { status: 404 }
-      )
+      );
     }
 
-    const consultant = (consultantResult as any).data
+    const consultant = (consultantResult as any).data;
 
     // Parse request body
-    const body = await request.json()
+    const body = await request.json();
 
     // Validate input
-    const validation = startConversationSchema.safeParse(body)
+    const validation = startConversationSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json<ApiResponse<never>>(
         {
@@ -70,17 +70,17 @@ export async function POST(request: NextRequest) {
           details: validation.error.errors,
         },
         { status: 400 }
-      )
+      );
     }
 
-    const { leadId, flowId } = validation.data
+    const { leadId, flowId } = validation.data;
 
     // Verify lead ownership
     const { data: lead, error: leadError } = await (supabase as any)
       .from('leads')
       .select('id, consultant_id')
       .eq('id', leadId)
-      .single()
+      .single();
 
     if (leadError || !lead) {
       return NextResponse.json<ApiResponse<never>>(
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
           error: 'Lead não encontrado',
         },
         { status: 404 }
-      )
+      );
     }
 
     if (lead.consultant_id !== consultant.id) {
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
           error: 'Acesso negado',
         },
         { status: 403 }
-      )
+      );
     }
 
     // Verify flow ownership
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       .from('flows')
       .select('id, consultant_id')
       .eq('id', flowId)
-      .single()
+      .single();
 
     if (flowError || !flow) {
       return NextResponse.json<ApiResponse<never>>(
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
           error: 'Fluxo não encontrado',
         },
         { status: 404 }
-      )
+      );
     }
 
     // Flows can be owned by consultant or be public (consultant_id = null)
@@ -127,11 +127,11 @@ export async function POST(request: NextRequest) {
           error: 'Acesso negado ao fluxo',
         },
         { status: 403 }
-      )
+      );
     }
 
     // Start conversation
-    const result = await startConversation(leadId, flowId)
+    const result = await startConversation(leadId, flowId);
 
     if (!result.success) {
       return NextResponse.json<ApiResponse<never>>(
@@ -140,19 +140,17 @@ export async function POST(request: NextRequest) {
           error: result.error,
         },
         { status: 500 }
-      )
+      );
     }
 
     // Save initial bot message if it's a message type
     if (result.data.firstStep.success && result.data.firstStep.type === 'message') {
-      await (supabase as any)
-        .from('messages')
-        .insert({
-          conversation_id: result.data.conversationId,
-          direction: 'outbound',
-          content: result.data.firstStep.message,
-          status: 'sent',
-        })
+      await (supabase as any).from('messages').insert({
+        conversation_id: result.data.conversationId,
+        direction: 'outbound',
+        content: result.data.firstStep.message,
+        status: 'sent',
+      });
     }
 
     return NextResponse.json<ApiResponse<typeof result.data>>(
@@ -161,15 +159,15 @@ export async function POST(request: NextRequest) {
         data: result.data,
       },
       { status: 201 }
-    )
+    );
   } catch (error) {
-    console.error('Error in POST /api/conversations/start:', error)
+    console.error('Error in POST /api/conversations/start:', error);
     return NextResponse.json<ApiResponse<never>>(
       {
         success: false,
         error: 'Erro interno do servidor',
       },
       { status: 500 }
-    )
+    );
   }
 }

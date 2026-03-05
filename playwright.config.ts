@@ -15,8 +15,9 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
 
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Limit workers to avoid overwhelming Docker Supabase.
+   * CI: 1 worker (sequential). Local: 3 workers max. */
+  workers: process.env.CI ? 1 : 3,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
@@ -42,18 +43,27 @@ export default defineConfig({
     /* Maximum time each action such as `click()` can take */
     actionTimeout: 10000,
 
-    /* Maximum navigation time */
-    navigationTimeout: 30000,
+    /* Maximum navigation time.
+     * 60s handles slow Docker/WSL2 middleware responses to Supabase.
+     * Default 30s is too tight when Kong/PostgREST are warming up. */
+    navigationTimeout: 60000,
   },
 
   /* Configure projects for major browsers */
   projects: [
+    /* Auth setup — runs once before the browser projects */
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+    },
+
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 },
       },
+      dependencies: ['setup'],
     },
 
     {
@@ -62,6 +72,7 @@ export default defineConfig({
         ...devices['Desktop Firefox'],
         viewport: { width: 1280, height: 720 },
       },
+      dependencies: ['setup'],
     },
 
     {
@@ -70,16 +81,20 @@ export default defineConfig({
         ...devices['Desktop Safari'],
         viewport: { width: 1280, height: 720 },
       },
+      dependencies: ['setup'],
     },
 
     /* Test against mobile viewports. */
     {
       name: 'Mobile Chrome',
       use: { ...devices['Pixel 5'] },
+      dependencies: ['setup'],
     },
+
     {
       name: 'Mobile Safari',
       use: { ...devices['iPhone 12'] },
+      dependencies: ['setup'],
     },
 
     /* Test against branded browsers. */
@@ -97,17 +112,18 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    // Reuse if: running locally (no CI) OR a custom base URL is set (Docker stack)
+    reuseExistingServer: !process.env.CI || !!process.env.PLAYWRIGHT_BASE_URL,
     timeout: 120000,
     stdout: 'ignore',
     stderr: 'pipe',
   },
 
   /* Global timeout for each test */
-  timeout: 60000,
+  timeout: 90000,
 
   /* Expected conditions timeout */
   expect: {
-    timeout: 10000,
+    timeout: 15000,
   },
 });

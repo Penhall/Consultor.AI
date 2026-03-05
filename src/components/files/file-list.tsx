@@ -28,7 +28,7 @@ export function FileList() {
 
   const handleDownload = async (fileId: string, fileName: string) => {
     try {
-      const response = await fetch(`/api/files/${fileId}`);
+      const response = await fetch(`/api/files/${fileId}`, { credentials: 'include' });
       const data = await response.json();
 
       if (data.success && data.data.downloadUrl) {

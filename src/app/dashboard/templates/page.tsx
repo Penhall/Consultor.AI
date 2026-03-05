@@ -106,9 +106,9 @@ export default function TemplatesPage() {
     setError(null);
     try {
       const res = await fetch('/api/templates', {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(form),
       });
 
@@ -132,9 +132,9 @@ export default function TemplatesPage() {
     setError(null);
     try {
       const res = await fetch(`/api/templates/${id}`, {
+        credentials: 'include',
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(form),
       });
 
@@ -157,8 +157,8 @@ export default function TemplatesPage() {
     setError(null);
     try {
       const res = await fetch(`/api/templates/${id}`, {
-        method: 'DELETE',
         credentials: 'include',
+        method: 'DELETE',
       });
 
       if (!res.ok) throw new Error('Falha ao excluir template');

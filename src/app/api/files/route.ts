@@ -18,10 +18,10 @@ export async function GET() {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Não autenticado' },
         { status: 401 }
@@ -31,7 +31,7 @@ export async function GET() {
     const { data: rawData } = await supabase
       .from('consultants')
       .select()
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
     const consultant = rawData as Consultant | null;
 
@@ -61,10 +61,10 @@ export async function POST(request: Request) {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Não autenticado' },
         { status: 401 }
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     const { data: rawData } = await supabase
       .from('consultants')
       .select()
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
     const consultant = rawData as Consultant | null;
 

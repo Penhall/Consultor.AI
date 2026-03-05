@@ -14,10 +14,10 @@ export async function GET(request: Request) {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: 'Não autenticado' },
         { status: 401 }
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || '';
     const returnUrl = `${origin}/dashboard`;
 
-    const result = await getPortalUrl(session.user.id, returnUrl);
+    const result = await getPortalUrl(user.id, returnUrl);
 
     if (!result.success) {
       return NextResponse.json<ApiResponse<never>>(

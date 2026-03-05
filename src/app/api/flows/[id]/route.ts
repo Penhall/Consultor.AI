@@ -28,10 +28,10 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     // Get authenticated user
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         {
           success: false,
@@ -58,7 +58,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     const { data: consultant, error: consultantError } = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     const consultantId = consultant ? (consultant as { id: string }).id : null;
@@ -104,10 +104,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     // Get authenticated user
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         {
           success: false,
@@ -121,7 +121,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { data: consultantData, error: consultantError } = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (consultantError || !consultantData) {
@@ -207,10 +207,10 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     // Get authenticated user
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json<ApiResponse<never>>(
         {
           success: false,
@@ -224,7 +224,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const { data: deleteConsultant, error: deleteConsultantError } = await supabase
       .from('consultants')
       .select('id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (deleteConsultantError || !deleteConsultant) {
