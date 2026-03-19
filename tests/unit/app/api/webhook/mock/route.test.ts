@@ -188,7 +188,8 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation(() => {
+    // eslint-disable-next-line prefer-arrow-callback
+    MockFlowEngine.mockImplementation(function () {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -294,7 +295,8 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation(() => {
+    // eslint-disable-next-line prefer-arrow-callback
+    MockFlowEngine.mockImplementation(function () {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -390,7 +392,8 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation(() => {
+    // eslint-disable-next-line prefer-arrow-callback
+    MockFlowEngine.mockImplementation(function () {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -516,7 +519,8 @@ describe('POST /api/webhook/mock', () => {
         ],
       }),
     };
-    MockFlowEngine.mockImplementation(() => {
+    // eslint-disable-next-line prefer-arrow-callback
+    MockFlowEngine.mockImplementation(function () {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -608,7 +612,8 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation(() => {
+    // eslint-disable-next-line prefer-arrow-callback
+    MockFlowEngine.mockImplementation(function () {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -771,7 +776,8 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation(() => {
+    // eslint-disable-next-line prefer-arrow-callback
+    MockFlowEngine.mockImplementation(function () {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
