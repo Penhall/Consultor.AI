@@ -61,8 +61,8 @@ src/
 └── app/
     ├── layout.tsx            — lê cookie → data-skin no <html>
     └── dashboard/
-        └── settings/
-            └── page.tsx      — seção "Aparência" com 4 cards visuais
+        └── perfil/
+            └── page.tsx      — adicionar seção "Aparência" (já existe, não criar novo arquivo)
 ```
 
 ---
@@ -225,7 +225,7 @@ src/
 
 ### Settings Page — Cards visuais
 
-- Grid 2x2 de cards clicáveis em `/dashboard/settings`
+- Grid 2x2 de cards clicáveis adicionados à **página existente** `/dashboard/perfil`
 - Cada card contém: mini-preview SVG + nome + descrição + badge "Ativo"
 - Mini-preview: SVG estático 120x80px com as cores representativas da skin
 
@@ -284,6 +284,13 @@ CHECK (theme IN ('corporate', 'noturno', 'moderno', 'classico'));
 async function setSkin(id: SkinId) {
   // 1. Aplicação imediata (visual)
   document.documentElement.setAttribute('data-skin', id);
+  // Skin noturno também ativa a classe .dark para compatibilidade com
+  // qualquer dark: variant remanescente durante a transição do refactor
+  if (id === 'noturno') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
 
   // 2. Cache local (anti-flash próxima visita via JS)
   localStorage.setItem('consultor-ai-skin', id);
@@ -294,6 +301,7 @@ async function setSkin(id: SkinId) {
   // 4. Banco de dados (sync entre dispositivos)
   await fetch('/api/consultants/me', {
     method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ theme: id }),
   });
 }
@@ -303,24 +311,37 @@ async function setSkin(id: SkinId) {
 // app/layout.tsx (Server Component)
 import { cookies } from 'next/headers';
 
+const VALID_SKINS = ['corporate', 'noturno', 'moderno', 'classico'] as const;
+
 export default async function RootLayout({ children }) {
-  const skin = cookies().get('skin')?.value ?? 'corporate';
+  const cookieVal = cookies().get('skin')?.value;
+  // Sanitize: rejeita valores inválidos/tampered antes de injetar no HTML
+  const skin = VALID_SKINS.includes(cookieVal as any) ? cookieVal : 'corporate';
   return (
-    <html lang="pt-BR" data-skin={skin}>
+    <html lang="pt-BR" data-skin={skin} className={skin === 'noturno' ? 'dark' : ''}>
       ...
     </html>
   );
 }
 ```
 
+### Notas de persistência
+
+- **`:root` mantido**: O bloco `:root` existente no `globals.css` é preservado como fallback no-JS. O seletor `[data-skin]` tem especificidade maior e sempre vence quando presente.
+- **`.dark` deprecado progressivamente**: A classe `.dark` continua funcionando durante o período de refatoração. Após todos os `dark:` variants serem migrados para CSS variables, `.dark` pode ser removido. `setSkin('noturno')` adiciona `.dark` automaticamente para evitar regressões.
+- **`VALID_SKINS` no layout**: O array `VALID_SKINS` em `layout.tsx` deve ser importado de `src/lib/skin/types.ts` (não duplicado) para manter fonte única da verdade — atenção à boundary Server Component.
+- **Flash cross-device (limitação conhecida)**: Na primeira visita em um novo dispositivo, o cookie ainda não existe. O layout renderiza `corporate` por padrão. Após hidratação, o `SkinContext` lê o banco e corrige — causando um flash único. Isso é aceito como comportamento previsto; uma solução completa (SSR com leitura do DB no layout) está fora do escopo.
+
 ---
 
 ## Testes
 
-- Unit: `SkinContext` — setSkin aplica atributo, salva localStorage, chama API
-- Unit: `SkinSwitcher` — renderiza 4 opções, destaca ativa, chama setSkin ao clicar
-- Integration: `PATCH /api/consultants/me` aceita campo `theme` válido, rejeita valor inválido
-- E2E: Trocar skin → recarregar → skin persiste (sem flash)
+- Unit: `SkinContext` — `setSkin` aplica `data-skin`, gerencia classe `.dark`, salva localStorage, chama API
+- Unit: `SkinContext` — inicialização lê localStorage como fallback
+- Unit: `SkinSwitcher` — renderiza 4 opções, destaca ativa com check mark, chama `setSkin` ao clicar
+- Integration: `PATCH /api/consultants/me` (novo endpoint) — aceita `theme` válido, rejeita valor fora do enum, requer autenticação
+- Integration: `layout.tsx` — cookie com valor válido renderiza `data-skin` correto; cookie com valor inválido/tampered renderiza `corporate`
+- E2E: Trocar skin → recarregar → skin persiste (sem flash no mesmo dispositivo)
 
 ---
 
@@ -331,19 +352,21 @@ export default async function RootLayout({ children }) {
 - Skin preview em tempo real no Settings antes de aplicar
 - Animações de transição entre skins (fade/morph)
 - Exportar/importar skins customizadas
+- SSR com leitura do DB no layout (cross-device first-visit sem flash)
 
 ---
 
 ## Resumo de Entregas
 
-| #   | Entrega                                             | Tipo       |
-| --- | --------------------------------------------------- | ---------- |
-| 1   | `globals.css` atualizado com 4 blocos `[data-skin]` | CSS        |
-| 2   | `src/lib/skin/` — types, skins, context             | TypeScript |
-| 3   | `skin-switcher.tsx` no header                       | Componente |
-| 4   | Seção "Aparência" em `/dashboard/settings`          | Página     |
-| 5   | `layout.tsx` com leitura de cookie SSR              | Next.js    |
-| 6   | Migration SQL `theme` em `consultants`              | Database   |
-| 7   | PATCH endpoint atualizado com campo `theme`         | API        |
-| 8   | Refatoração de ~15 componentes                      | Refactor   |
-| 9   | Testes unitários e E2E                              | Tests      |
+| #   | Entrega                                                             | Tipo       |
+| --- | ------------------------------------------------------------------- | ---------- |
+| 1   | `globals.css` — 4 blocos `[data-skin]`, `:root` preservado          | CSS        |
+| 2   | `src/lib/skin/` — types, skins, context                             | TypeScript |
+| 3   | `skin-switcher.tsx` no header                                       | Componente |
+| 4   | Seção "Aparência" adicionada à página existente `/dashboard/perfil` | Página     |
+| 5   | `layout.tsx` com leitura + sanitização de cookie SSR                | Next.js    |
+| 6   | Migration SQL `theme` em `consultants`                              | Database   |
+| 7   | **Novo endpoint** `PATCH /api/consultants/me` (criar do zero)       | API        |
+| 8   | Atualizar `src/types/database.ts` com campo `theme`                 | TypeScript |
+| 9   | Refatoração de ~15 componentes (todos os `dark:` variants)          | Refactor   |
+| 10  | Testes unitários, integração e E2E                                  | Tests      |
