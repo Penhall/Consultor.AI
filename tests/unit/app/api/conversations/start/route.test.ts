@@ -32,7 +32,7 @@ describe('POST /api/conversations/start', () => {
     // Setup default Supabase mock
     mockSupabase = {
       auth: {
-        getSession: vi.fn(),
+        getUser: vi.fn(),
       },
       from: vi.fn(),
     };
@@ -42,8 +42,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve iniciar conversa com dados válidos', async () => {
     // Arrange: User authenticated
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -126,8 +126,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve aceitar fluxo público (consultant_id null)', async () => {
     // Arrange: User authenticated
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -203,8 +203,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve salvar mensagem inicial se firstStep for do tipo message', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -284,8 +284,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve retornar 401 se não autenticado', async () => {
     // Arrange: No session
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: null },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
       error: null,
     });
 
@@ -308,8 +308,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve retornar 404 se consultant não encontrado', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -343,8 +343,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve retornar 400 se leadId inválido', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -379,8 +379,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve retornar 404 se lead não encontrado', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -431,8 +431,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve retornar 403 se lead não pertence ao consultant', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -486,8 +486,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve retornar 404 se fluxo não encontrado', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -550,8 +550,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve retornar 403 se fluxo privado não pertence ao consultant', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -617,8 +617,8 @@ describe('POST /api/conversations/start', () => {
 
   it('deve retornar 500 se flow engine falhar', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -686,7 +686,7 @@ describe('POST /api/conversations/start', () => {
 
   it('deve retornar 500 se ocorrer erro inesperado', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockRejectedValue(new Error('Database connection lost'));
+    mockSupabase.auth.getUser.mockRejectedValue(new Error('Database connection lost'));
 
     // Act
     const request = new NextRequest('http://localhost:3000/api/conversations/start', {

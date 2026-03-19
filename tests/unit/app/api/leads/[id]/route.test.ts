@@ -27,7 +27,7 @@ describe('GET /api/leads/[id]', () => {
 
     mockSupabase = {
       auth: {
-        getSession: vi.fn(),
+        getUser: vi.fn(),
       },
     };
 
@@ -36,8 +36,8 @@ describe('GET /api/leads/[id]', () => {
 
   it('deve retornar lead específico', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -60,8 +60,8 @@ describe('GET /api/leads/[id]', () => {
 
   it('deve retornar 401 se não autenticado', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: null },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
       error: null,
     });
 
@@ -78,8 +78,8 @@ describe('GET /api/leads/[id]', () => {
 
   it('deve retornar 404 se lead não encontrado', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -101,8 +101,8 @@ describe('GET /api/leads/[id]', () => {
 
   it('deve retornar 500 em caso de erro interno', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -130,7 +130,7 @@ describe('PATCH /api/leads/[id]', () => {
 
     mockSupabase = {
       auth: {
-        getSession: vi.fn(),
+        getUser: vi.fn(),
       },
     };
 
@@ -139,8 +139,8 @@ describe('PATCH /api/leads/[id]', () => {
 
   it('deve atualizar lead com dados válidos', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -175,8 +175,8 @@ describe('PATCH /api/leads/[id]', () => {
 
   it('deve atualizar apenas campos fornecidos', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -202,8 +202,8 @@ describe('PATCH /api/leads/[id]', () => {
 
   it('deve retornar 400 se dados inválidos', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -223,8 +223,8 @@ describe('PATCH /api/leads/[id]', () => {
 
   it('deve retornar 401 se não autenticado', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: null },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
       error: null,
     });
 
@@ -244,8 +244,8 @@ describe('PATCH /api/leads/[id]', () => {
 
   it('deve retornar 404 se lead não encontrado', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -277,7 +277,7 @@ describe('DELETE /api/leads/[id]', () => {
 
     mockSupabase = {
       auth: {
-        getSession: vi.fn(),
+        getUser: vi.fn(),
       },
     };
 
@@ -286,8 +286,8 @@ describe('DELETE /api/leads/[id]', () => {
 
   it('deve deletar lead com sucesso', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 
@@ -312,8 +312,8 @@ describe('DELETE /api/leads/[id]', () => {
 
   it('deve retornar 401 se não autenticado', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: null },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
       error: null,
     });
 
@@ -332,8 +332,8 @@ describe('DELETE /api/leads/[id]', () => {
 
   it('deve retornar 500 se falhar ao deletar', async () => {
     // Arrange
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'test-user-id' } } },
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
       error: null,
     });
 

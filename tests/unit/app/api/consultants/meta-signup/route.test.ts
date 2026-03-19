@@ -44,7 +44,7 @@ describe('POST /api/consultants/meta-signup', () => {
     mockFrom = vi.fn(() => ({ select: mockSelect }));
 
     mockAuth = {
-      getSession: vi.fn(),
+      getUser: vi.fn(),
     };
 
     mockSupabase = {
@@ -95,7 +95,7 @@ describe('POST /api/consultants/meta-signup', () => {
 
   describe('Authentication & Authorization', () => {
     it('deve retornar 401 se não autenticado', async () => {
-      mockAuth.getSession.mockResolvedValue({ data: { session: null } });
+      mockAuth.getUser.mockResolvedValue({ data: { user: null } });
 
       const request = new NextRequest('http://localhost:3000/api/consultants/meta-signup', {
         method: 'POST',
@@ -113,8 +113,8 @@ describe('POST /api/consultants/meta-signup', () => {
     });
 
     it('deve retornar 404 se consultor não encontrado', async () => {
-      mockAuth.getSession.mockResolvedValue({
-        data: { session: { user: { id: mockConsultant.user_id } } },
+      mockAuth.getUser.mockResolvedValue({
+        data: { user: { id: mockConsultant.user_id } },
       });
       mockSingle.mockResolvedValue({ data: null, error: { message: 'Not found' } });
 
@@ -134,8 +134,8 @@ describe('POST /api/consultants/meta-signup', () => {
     });
 
     it('deve retornar 404 se consultor pertence a outro usuário', async () => {
-      mockAuth.getSession.mockResolvedValue({
-        data: { session: { user: { id: mockConsultant.user_id } } },
+      mockAuth.getUser.mockResolvedValue({
+        data: { user: { id: mockConsultant.user_id } },
       });
 
       // Mock the query to check for consultant with this ID AND the current user's ID
@@ -160,8 +160,8 @@ describe('POST /api/consultants/meta-signup', () => {
 
   describe('Meta OAuth Flow', () => {
     beforeEach(() => {
-      mockAuth.getSession.mockResolvedValue({
-        data: { session: { user: { id: mockConsultant.user_id } } },
+      mockAuth.getUser.mockResolvedValue({
+        data: { user: { id: mockConsultant.user_id } },
       });
       mockSingle.mockResolvedValue({ data: mockConsultant, error: null });
     });
@@ -444,8 +444,8 @@ describe('POST /api/consultants/meta-signup', () => {
 
   describe('Edge Cases', () => {
     beforeEach(() => {
-      mockAuth.getSession.mockResolvedValue({
-        data: { session: { user: { id: mockConsultant.user_id } } },
+      mockAuth.getUser.mockResolvedValue({
+        data: { user: { id: mockConsultant.user_id } },
       });
       mockSingle.mockResolvedValue({ data: mockConsultant, error: null });
     });
