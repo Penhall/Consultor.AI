@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { cookies } from 'next/headers';
 import './globals.css';
 import { Providers } from '@/components/providers';
+import { isValidSkinId } from '@/lib/skin/types';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -34,21 +36,28 @@ export const metadata: Metadata = {
     title: 'Consultor.AI',
     description: 'Assistente de vendas por WhatsApp com IA',
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const rawSkin = cookieStore.get('skin')?.value;
+  // Sanitizar: rejeitar valores inválidos/tampered antes de injetar no HTML
+  const skin = isValidSkinId(rawSkin) ? rawSkin : 'corporate';
+
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html
+      lang="pt-BR"
+      data-skin={skin}
+      className={skin === 'noturno' ? 'dark' : ''}
+      suppressHydrationWarning
+    >
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers initialSkin={skin}>{children}</Providers>
       </body>
     </html>
   );
