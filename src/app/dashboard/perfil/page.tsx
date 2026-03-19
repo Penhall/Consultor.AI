@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { useSkin } from '@/lib/skin/skin-context';
 
 export default function PerfilPage() {
   const { consultant, isLoading } = useAuth();
+  const { skinId, setSkin, skins } = useSkin();
 
   const planLabel: Record<string, string> = {
     freemium: 'Freemium',
@@ -159,6 +161,42 @@ export default function PerfilPage() {
             <li>Histórico de faturas</li>
             <li>Gerenciar métodos de pagamento</li>
           </ul>
+        </div>
+
+        {/* Aparência */}
+        <div className="rounded-lg border border-border bg-card p-6 shadow">
+          <h2 className="mb-4 text-xl font-semibold text-foreground">Aparência</h2>
+          <p className="mb-4 text-sm text-muted-foreground">Escolha o tema visual da interface</p>
+          <div className="grid grid-cols-2 gap-3">
+            {skins.map(skin => (
+              <button
+                key={skin.id}
+                onClick={() => setSkin(skin.id)}
+                className={`relative flex flex-col items-start gap-2 rounded-lg border-2 p-4 text-left transition-colors hover:bg-muted ${
+                  skinId === skin.id ? 'border-primary bg-primary/5' : 'border-border'
+                }`}
+              >
+                {/* Mini preview */}
+                <div
+                  className="h-10 w-full rounded"
+                  style={{
+                    backgroundColor: skin.previewBg,
+                    border: `3px solid ${skin.previewPrimary}`,
+                  }}
+                />
+                <div className="flex items-center gap-2">
+                  <span>{skin.icon}</span>
+                  <span className="text-sm font-medium text-foreground">{skin.name}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">{skin.description}</p>
+                {skinId === skin.id && (
+                  <span className="absolute right-2 top-2 rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
+                    Ativo
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
