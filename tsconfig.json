@@ -2,11 +2,7 @@
   "compilerOptions": {
     /* Language and Environment */
     "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     /* Modules */
     "module": "ESNext",
@@ -16,12 +12,8 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@tests/*": [
-        "./tests/*"
-      ]
+      "@/*": ["./src/*"],
+      "@tests/*": ["./tests/*"]
     },
     /* JavaScript Support */
     "allowJs": true,
@@ -77,6 +69,9 @@
     "build",
     "coverage",
     "playwright-report",
-    "test-results"
+    "test-results",
+    "diagnostics",
+    "scripts",
+    "tests/unit/seed-diagnostic.test.ts"
   ]
 }

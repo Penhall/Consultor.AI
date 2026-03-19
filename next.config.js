@@ -16,18 +16,16 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
 
-  // ESLint strict mode
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-
   // Image optimization
   images: {
-    domains: [
-      // Add allowed image domains here
-      'localhost',
-      // Supabase storage
-      process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('https://', '') || '',
+    remotePatterns: [
+      ...(process.env.NEXT_PUBLIC_SUPABASE_URL
+        ? [{ protocol: 'https', hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname }]
+        : [{ protocol: 'https', hostname: '*.supabase.co' }]),
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
   },
@@ -105,8 +103,8 @@ const nextConfig = {
   // Performance optimizations
   compress: true,
 
-  // Output
-  output: 'standalone',
+  // Output: standalone for Docker/self-hosted; Vercel handles its own output
+  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
 
   // Power by header
   poweredByHeader: false,

@@ -9,7 +9,7 @@ const getSupabaseUrl = () => process.env.SUPABASE_URL || process.env.NEXT_PUBLIC
 // uses kong:8000 but the browser uses 127.0.0.1:54321).
 const COOKIE_NAME = 'sb-consultorai-auth-token';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   let response = NextResponse.next({ request });

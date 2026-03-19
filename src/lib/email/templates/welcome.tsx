@@ -4,8 +4,6 @@
  * Sent to new users after registration.
  */
 
-import * as React from 'react';
-
 interface WelcomeEmailProps {
   name: string;
 }

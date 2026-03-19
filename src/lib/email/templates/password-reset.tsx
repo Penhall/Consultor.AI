@@ -4,8 +4,6 @@
  * Sent when user requests a password reset.
  */
 
-import * as React from 'react';
-
 interface PasswordResetEmailProps {
   resetUrl: string;
 }

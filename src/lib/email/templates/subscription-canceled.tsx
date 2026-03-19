@@ -4,8 +4,6 @@
  * Sent when a user's subscription is canceled. Includes retention message.
  */
 
-import * as React from 'react';
-
 interface SubscriptionCanceledEmailProps {
   name: string;
 }
