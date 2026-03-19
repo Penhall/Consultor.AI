@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @layer base {
+  /* Fallback no-JS: mantido para garantir que a página renderize sem JS */
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -26,6 +27,103 @@
     --radius: 0.5rem;
   }
 
+  /* 1. Corporate — profissional, B2B, azul-marinho */
+  [data-skin='corporate'] {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  /* 2. Noturno — elegante, escuro, violeta */
+  [data-skin='noturno'] {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --card: 224 71% 7%;
+    --card-foreground: 213 31% 91%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 263 70% 65%;
+    --primary-foreground: 224 71% 4%;
+    --secondary: 223 47% 11%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 216 34% 17%;
+    --accent-foreground: 213 31% 91%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+    --ring: 263 70% 65%;
+    --radius: 0.5rem;
+  }
+
+  /* 3. Moderno — startup, teal, cantos arredondados */
+  [data-skin='moderno'] {
+    --background: 0 0% 98%;
+    --foreground: 240 10% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
+    --primary: 172 66% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 172 30% 94%;
+    --secondary-foreground: 172 66% 25%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 172 40% 90%;
+    --accent-foreground: 172 66% 25%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 172 66% 36%;
+    --radius: 0.75rem;
+  }
+
+  /* 4. Clássico — enterprise, roxo, creme */
+  [data-skin='classico'] {
+    --background: 40 20% 97%;
+    --foreground: 270 30% 10%;
+    --card: 40 15% 99%;
+    --card-foreground: 270 30% 10%;
+    --popover: 40 15% 99%;
+    --popover-foreground: 270 30% 10%;
+    --primary: 270 60% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 270 20% 94%;
+    --secondary-foreground: 270 60% 30%;
+    --muted: 30 10% 93%;
+    --muted-foreground: 270 15% 45%;
+    --accent: 270 30% 90%;
+    --accent-foreground: 270 60% 30%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 270 20% 85%;
+    --input: 270 20% 85%;
+    --ring: 270 60% 38%;
+    --radius: 0.375rem;
+  }
+
+  /* .dark mantido temporariamente para compatibilidade durante a refatoração */
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
