@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { UserMenu } from '@/components/auth/UserMenu';
+import { SkinSwitcher } from '@/components/ui/skin-switcher';
 
 export const metadata: Metadata = {
   title: 'Dashboard - Consultor.AI',
@@ -147,7 +148,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Link>
         </nav>
 
-        {/* User Menu */}
+        {/* Skin Switcher + User Menu */}
+        <div className="flex items-center justify-between border-t border-border px-4 py-2">
+          <span className="text-xs text-muted-foreground">Aparência</span>
+          <SkinSwitcher />
+        </div>
         <UserMenu />
       </aside>
 
