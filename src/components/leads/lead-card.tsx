@@ -39,13 +39,13 @@ export function LeadCard({ lead, onClick, isSelected }: LeadCardProps) {
           {(lead.status ?? 'novo').replace('_', ' ')}
         </Badge>
       </CardHeader>
-      <CardContent className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+      <CardContent className="space-y-2 text-sm text-foreground">
         <div className="flex justify-between">
-          <span className="text-gray-500">Score</span>
+          <span className="text-muted-foreground">Score</span>
           <span className="font-semibold">{lead.score ?? '—'}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-500">Última atualização</span>
+          <span className="text-muted-foreground">Última atualização</span>
           <span>
             {lead.updated_at ? new Date(lead.updated_at).toLocaleDateString('pt-BR') : '—'}
           </span>

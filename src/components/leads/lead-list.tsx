@@ -58,7 +58,7 @@ export function LeadList({ leads, onSelect, selectedId }: LeadListProps) {
               className={`rounded-full border px-3 py-1 text-sm ${
                 status === option.value
                   ? 'border-blue-600 bg-blue-600 text-white'
-                  : 'border-gray-200 bg-white text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200'
+                  : 'border-border bg-card text-foreground'
               }`}
             >
               {option.label}
@@ -79,7 +79,7 @@ export function LeadList({ leads, onSelect, selectedId }: LeadListProps) {
       </div>
 
       {filtered.length === 0 && (
-        <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
+        <div className="flex items-center gap-3 text-muted-foreground">
           <Badge>Sem resultados</Badge>
           <span>Nenhum lead encontrado com os filtros atuais.</span>
         </div>
