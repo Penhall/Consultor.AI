@@ -42,15 +42,12 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-8 w-64 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="h-8 w-64 animate-pulse rounded bg-muted" />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {[1, 2, 3].map(i => (
-            <div
-              key={i}
-              className="rounded-lg border bg-white p-6 dark:border-gray-700 dark:bg-gray-800"
-            >
-              <div className="mb-4 h-4 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-              <div className="h-8 w-16 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+            <div key={i} className="rounded-lg border border-border bg-card p-6">
+              <div className="mb-4 h-4 w-24 animate-pulse rounded bg-muted" />
+              <div className="h-8 w-16 animate-pulse rounded bg-muted" />
             </div>
           ))}
         </div>
@@ -65,18 +62,16 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Welcome Header */}
       <div>
-        <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-          Bem-vindo, {displayName}! 👋
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">Aqui está um resumo da sua atividade</p>
+        <h1 className="mb-2 text-3xl font-bold text-foreground">Bem-vindo, {displayName}! 👋</h1>
+        <p className="text-muted-foreground">Aqui está um resumo da sua atividade</p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* Total Leads */}
-        <div className="rounded-lg border bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-lg border border-border bg-card p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Total de Leads</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">Total de Leads</h3>
             <svg
               className="h-5 w-5 text-blue-500"
               fill="none"
@@ -92,13 +87,11 @@ export default function DashboardPage() {
             </svg>
           </div>
           {statsLoading ? (
-            <div className="h-8 w-16 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-8 w-16 animate-pulse rounded bg-muted" />
           ) : (
             <>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {stats?.total ?? 0}
-              </p>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-3xl font-bold text-foreground">{stats?.total ?? 0}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
                 {stats?.total ? `${stats.thisMonth} este mês` : 'Nenhum lead cadastrado ainda'}
               </p>
             </>
@@ -106,11 +99,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Active Conversations */}
-        <div className="rounded-lg border bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-lg border border-border bg-card p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Em Contato / Qualificados
-            </h3>
+            <h3 className="text-sm font-medium text-muted-foreground">Em Contato / Qualificados</h3>
             <svg
               className="h-5 w-5 text-green-500"
               fill="none"
@@ -126,13 +117,11 @@ export default function DashboardPage() {
             </svg>
           </div>
           {statsLoading ? (
-            <div className="h-8 w-16 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-8 w-16 animate-pulse rounded bg-muted" />
           ) : (
             <>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {activeConversations}
-              </p>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-3xl font-bold text-foreground">{activeConversations}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
                 {activeConversations ? 'leads em andamento' : 'Nenhum lead em andamento'}
               </p>
             </>
@@ -140,9 +129,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Monthly Limit */}
-        <div className="rounded-lg border bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-lg border border-border bg-card p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Limite Mensal</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">Limite Mensal</h3>
             <svg
               className="h-5 w-5 text-purple-500"
               fill="none"
@@ -158,15 +147,13 @@ export default function DashboardPage() {
             </svg>
           </div>
           {statsLoading ? (
-            <div className="h-8 w-20 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-8 w-20 animate-pulse rounded bg-muted" />
           ) : (
             <>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              <p className="text-3xl font-bold text-foreground">
                 {stats?.thisMonth ?? 0} / {monthlyLimit}
               </p>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                Leads processados este mês
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">Leads processados este mês</p>
             </>
           )}
         </div>
@@ -175,9 +162,7 @@ export default function DashboardPage() {
       {/* Getting Started Section — only shown when no leads exist */}
       {!statsLoading && (stats?.total ?? 0) === 0 && (
         <div className="rounded-lg border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 dark:border-blue-800 dark:from-blue-900/20 dark:to-blue-800/20">
-          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            🚀 Primeiros Passos
-          </h2>
+          <h2 className="mb-4 text-xl font-bold text-foreground">🚀 Primeiros Passos</h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 flex-shrink-0">
@@ -186,10 +171,8 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Configure seu perfil
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-foreground">Configure seu perfil</p>
+                <p className="text-sm text-muted-foreground">
                   Complete suas informações e conecte seu WhatsApp Business
                 </p>
               </div>
@@ -202,10 +185,8 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Crie seu primeiro fluxo
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-foreground">Crie seu primeiro fluxo</p>
+                <p className="text-sm text-muted-foreground">
                   Personalize as conversas automatizadas para seu negócio
                 </p>
               </div>
@@ -218,10 +199,8 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Comece a receber leads
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-foreground">Comece a receber leads</p>
+                <p className="text-sm text-muted-foreground">
                   Compartilhe seu link do WhatsApp e deixe a IA trabalhar
                 </p>
               </div>
@@ -232,10 +211,8 @@ export default function DashboardPage() {
 
       {/* Quick stats breakdown — shown when there are leads */}
       {!statsLoading && (stats?.total ?? 0) > 0 && stats?.byStatus && (
-        <div className="rounded-lg border bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-            Distribuição por Status
-          </h2>
+        <div className="rounded-lg border border-border bg-card p-6">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">Distribuição por Status</h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {[
               {
