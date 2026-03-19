@@ -188,7 +188,7 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation((this: any) => {
+    MockFlowEngine.mockImplementation(() => {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -294,7 +294,7 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation((this: any) => {
+    MockFlowEngine.mockImplementation(() => {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -390,7 +390,7 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation((this: any) => {
+    MockFlowEngine.mockImplementation(() => {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -516,7 +516,7 @@ describe('POST /api/webhook/mock', () => {
         ],
       }),
     };
-    MockFlowEngine.mockImplementation((this: any) => {
+    MockFlowEngine.mockImplementation(() => {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -608,7 +608,7 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation((this: any) => {
+    MockFlowEngine.mockImplementation(() => {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
@@ -771,7 +771,7 @@ describe('POST /api/webhook/mock', () => {
         choices: [],
       }),
     };
-    MockFlowEngine.mockImplementation((this: any) => {
+    MockFlowEngine.mockImplementation(() => {
       return mockFlowEngine;
     });
     mockGetOrCreateLead.mockResolvedValue({
