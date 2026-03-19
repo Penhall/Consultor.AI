@@ -152,6 +152,7 @@ export type Database = {
           subscription_plan: string | null;
           subscription_status: string | null;
           subscription_tier: string | null;
+          theme: string;
           updated_at: string | null;
           user_id: string | null;
           vertical: Database['public']['Enums']['vertical_type'] | null;
@@ -182,6 +183,7 @@ export type Database = {
           subscription_plan?: string | null;
           subscription_status?: string | null;
           subscription_tier?: string | null;
+          theme?: string | null;
           updated_at?: string | null;
           user_id?: string | null;
           vertical?: Database['public']['Enums']['vertical_type'] | null;
@@ -212,6 +214,7 @@ export type Database = {
           subscription_plan?: string | null;
           subscription_status?: string | null;
           subscription_tier?: string | null;
+          theme?: string | null;
           updated_at?: string | null;
           user_id?: string | null;
           vertical?: Database['public']['Enums']['vertical_type'] | null;
