@@ -2,15 +2,5 @@
   "buildCommand": "npm run build",
   "installCommand": "npm ci",
   "framework": "nextjs",
-  "regions": ["gru1"],
-  "crons": [
-    {
-      "path": "/api/cron/daily-stats",
-      "schedule": "0 1 * * *"
-    },
-    {
-      "path": "/api/cron/reset-credits",
-      "schedule": "0 0 1 * *"
-    }
-  ]
+  "regions": ["gru1"]
 }

@@ -1,6 +1,6 @@
 # Guia de Deploy no Vercel
 
-**Versão:** 1.0 | **Atualizado:** 2026-03-24
+**Versão:** 1.1 | **Atualizado:** 2026-03-24
 
 Guia passo a passo para fazer o deploy do Consultor.AI no Vercel com autenticação, dashboard, leads e IA funcionando.
 
@@ -29,12 +29,13 @@ npx supabase link --project-ref qzljsendvthfetrntwab
 
 # Aplicar todas as migrations
 npx supabase db push
-
-# (Opcional) Aplicar seed dos flows de conversa
-npx supabase db seed
 ```
 
+> **Importante:** Não execute `supabase db seed` em produção — o seed contém dados de desenvolvimento que poluiriam o banco cloud.
+
 Após executar, verifique no Supabase Dashboard → Table Editor que as tabelas foram criadas (`consultants`, `leads`, `conversations`, etc.).
+
+> **Nota sobre pg_cron:** Os jobs de cron (reset mensal de créditos, cálculo diário de stats) requerem a extensão `pg_cron`, disponível apenas no **plano pago** do Supabase. No free tier, as funções pg_cron serão ignoradas silenciosamente — as funcionalidades principais continuam funcionando.
 
 ---
 
@@ -46,11 +47,11 @@ Execute localmente para gerar valores seguros:
 # ENCRYPTION_KEY (para tokens criptografados)
 openssl rand -base64 32
 
-# NEXTAUTH_SECRET (para sessões)
+# Outro segredo geral de sessão
 openssl rand -base64 32
 ```
 
-Guarde os valores gerados — você vai precisar no próximo passo.
+Guarde os dois valores gerados — você vai precisar no próximo passo.
 
 ---
 
@@ -76,29 +77,30 @@ Na tela de configuração do projeto, adicione as seguintes variáveis:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase Dashboard → Settings → API → anon/public key      |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Supabase Dashboard → Settings → API → service_role key     |
 | `GOOGLE_AI_API_KEY`             | [Google AI Studio](https://aistudio.google.com/app/apikey) |
-| `ENCRYPTION_KEY`                | Valor gerado no Passo 2                                    |
-| `NEXTAUTH_SECRET`               | Valor gerado no Passo 2                                    |
+| `ENCRYPTION_KEY`                | 1º valor gerado no Passo 2                                 |
 
 > `NEXT_PUBLIC_APP_URL` será adicionada após o 1º deploy (ver Passo 6).
 
 ### Para Stripe (billing)
 
-| Variável                             | Onde pegar                               |
-| ------------------------------------ | ---------------------------------------- |
-| `STRIPE_SECRET_KEY`                  | Stripe Dashboard → Developers → API keys |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard → Developers → API keys |
-| `STRIPE_PRO_PRICE_ID`                | Stripe Dashboard → Products              |
-| `STRIPE_AGENCIA_PRICE_ID`            | Stripe Dashboard → Products              |
+| Variável                             | Onde pegar                                       |
+| ------------------------------------ | ------------------------------------------------ |
+| `STRIPE_SECRET_KEY`                  | Stripe Dashboard → Developers → API keys         |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard → Developers → API keys         |
+| `STRIPE_PRO_PRICE_ID`                | Stripe Dashboard → Products                      |
+| `STRIPE_AGENCIA_PRICE_ID`            | Stripe Dashboard → Products                      |
+| `STRIPE_CREDITS50_PRICE_ID`          | Stripe Dashboard → Products (pacote de créditos) |
 
 > `STRIPE_WEBHOOK_SECRET` será adicionada após o 1º deploy (ver Passo 7).
 
 ### Opcionais
 
-| Variável                 | Efeito sem ela                        |
-| ------------------------ | ------------------------------------- |
-| `RESEND_API_KEY`         | Emails aparecem só no log do servidor |
-| `NEXT_PUBLIC_SENTRY_DSN` | Sem rastreamento de erros             |
-| `ADMIN_EMAILS`           | Nenhum usuário admin                  |
+| Variável                 | Efeito sem ela                                   |
+| ------------------------ | ------------------------------------------------ |
+| `RESEND_API_KEY`         | Emails aparecem só no log do servidor            |
+| `EMAIL_FROM`             | Usa `noreply@consultor.ai` como remetente padrão |
+| `NEXT_PUBLIC_SENTRY_DSN` | Sem rastreamento de erros                        |
+| `ADMIN_EMAILS`           | Nenhum usuário admin                             |
 
 ---
 
@@ -168,6 +170,14 @@ O cookie `sb-consultorai-auth-token` pode estar em conflito. Limpe os cookies do
 
 **Emails não chegam:**
 Normal sem `RESEND_API_KEY` — os emails aparecem nos Function Logs do Vercel.
+
+**Stats e reset de créditos não acontecem:**
+pg_cron requer plano pago do Supabase. No free tier, execute manualmente via SQL Editor:
+
+```sql
+SELECT calculate_daily_stats();
+SELECT reset_monthly_credits();
+```
 
 ---
 
