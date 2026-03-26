@@ -62,7 +62,7 @@
     "local:dev": "npm run local:start && npm run dev",
     "local:full": "npm run docker:full:up",
     "local:full:stop": "npm run docker:full:down",
-    "prepare": "husky install"
+    "prepare": "node -e \"if (!process.env.CI) require('child_process').execSync('husky install', {stdio: 'inherit'})\""
   },
   "dependencies": {
     "@google/generative-ai": "^0.2.1",
