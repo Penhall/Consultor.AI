@@ -33,7 +33,7 @@ CREATE TYPE crm_sync_status AS ENUM (
 -- Stores CRM connection settings for each consultant
 -- =====================================================
 CREATE TABLE crm_integrations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Ownership
     consultant_id UUID NOT NULL REFERENCES consultants(id) ON DELETE CASCADE,
@@ -106,7 +106,7 @@ CREATE TRIGGER update_crm_integrations_updated_at BEFORE UPDATE ON crm_integrati
 -- Stores sync operation history for debugging and analytics
 -- =====================================================
 CREATE TABLE crm_sync_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Relationships
     integration_id UUID NOT NULL REFERENCES crm_integrations(id) ON DELETE CASCADE,
@@ -153,7 +153,7 @@ CREATE INDEX idx_crm_sync_logs_integration_status ON crm_sync_logs(integration_i
 -- Default field mappings for each CRM provider
 -- =====================================================
 CREATE TABLE crm_field_mappings_defaults (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Provider
     provider crm_provider NOT NULL,

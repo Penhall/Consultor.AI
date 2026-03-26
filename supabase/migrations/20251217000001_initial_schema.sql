@@ -18,7 +18,7 @@ CREATE TYPE vertical_type AS ENUM ('saude', 'imoveis');
 -- Sales professionals using the platform
 -- =====================================================
 CREATE TABLE consultants (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Authentication (linked to Supabase Auth)
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -68,7 +68,7 @@ CREATE INDEX idx_consultants_subscription ON consultants(subscription_tier, subs
 -- Potential customers
 -- =====================================================
 CREATE TABLE leads (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Ownership
     consultant_id UUID NOT NULL REFERENCES consultants(id) ON DELETE CASCADE,
@@ -114,7 +114,7 @@ CREATE INDEX idx_leads_score ON leads(score DESC) WHERE score IS NOT NULL;
 -- Conversation flow definitions (JSON-based)
 -- =====================================================
 CREATE TABLE flows (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Ownership
     consultant_id UUID REFERENCES consultants(id) ON DELETE CASCADE,
@@ -156,7 +156,7 @@ CREATE INDEX idx_flows_active ON flows(is_active) WHERE is_active = true;
 -- Active conversation sessions
 -- =====================================================
 CREATE TABLE conversations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Relationships
     lead_id UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
@@ -193,7 +193,7 @@ CREATE INDEX idx_conversations_active ON conversations(status, updated_at) WHERE
 -- Individual messages in conversations
 -- =====================================================
 CREATE TABLE messages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Relationships
     conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
@@ -240,7 +240,7 @@ CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
 -- AI generation logs for analytics
 -- =====================================================
 CREATE TABLE ai_responses (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Relationships
     conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
@@ -282,7 +282,7 @@ CREATE INDEX idx_ai_responses_created_at ON ai_responses(created_at DESC);
 -- Webhook audit trail (LGPD compliance)
 -- =====================================================
 CREATE TABLE webhook_events (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Event Details
     event_type TEXT NOT NULL,
@@ -315,7 +315,7 @@ CREATE INDEX idx_webhook_events_created_at ON webhook_events(created_at DESC);
 -- LGPD compliance audit trail
 -- =====================================================
 CREATE TABLE audit_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Actor
     user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,

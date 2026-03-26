@@ -4,7 +4,7 @@
 
 -- Create whatsapp_integrations table
 CREATE TABLE IF NOT EXISTS whatsapp_integrations (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   consultant_id UUID NOT NULL REFERENCES consultants(id) ON DELETE CASCADE,
 
   -- Provider type (Meta, Weni, 360dialog, Twilio)

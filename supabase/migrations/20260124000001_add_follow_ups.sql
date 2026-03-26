@@ -11,7 +11,7 @@ CREATE TYPE follow_up_status AS ENUM ('pending', 'sent', 'completed', 'cancelled
 -- Scheduled and manual follow-ups for leads
 -- =====================================================
 CREATE TABLE follow_ups (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Relationships
     lead_id UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
